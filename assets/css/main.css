@@ -1,0 +1,80 @@
+/* ===== Glassmorphic Scrollbars ===== */
+/* Palette variables (tweak to your Tailwind theme) */
+:root{
+  --sb-track: rgba(255,255,255,.06);          /* translucent track */
+  --sb-track-border: rgba(255,255,255,.15);
+  --sb-thumb: linear-gradient(180deg,
+                #8db2caAA 0%,
+                #392651AA 55%,
+                #9c3c1bAA 100%);              /* brand → plum → rust */
+  --sb-thumb-hover: linear-gradient(180deg,
+                #8db2caCC 0%,
+                #392651CC 55%,
+                #9c3c1bCC 100%);
+  --sb-thumb-active: linear-gradient(180deg,
+                #1b6594DD 0%,
+                #392651DD 60%,
+                #9c3c1bDD 100%);
+}
+
+/* Firefox */
+*{
+  scrollbar-width: thin;                      /* auto | thin | none */
+  scrollbar-color: rgba(255,255,255,.35) var(--sb-track);
+}
+
+/* WebKit (Chromium, Safari, Edge) */
+::-webkit-scrollbar{
+  width: 12px;                                /* vertical */
+  height: 12px;                               /* horizontal */
+}
+
+::-webkit-scrollbar-track{
+  background: var(--sb-track);
+  border: 1px solid var(--sb-track-border);
+  border-radius: 9999px;
+  /* subtle glass depth */
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.08),
+    inset 0 -1px 0 rgba(0,0,0,.15);
+  /* optional (experimental support) */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* thumb = frosted pill with gradient + inner ring */
+::-webkit-scrollbar-thumb{
+  background: var(--sb-thumb);
+  border-radius: 9999px;
+  border: 3px solid transparent;              /* creates padding ring */
+  background-clip: padding-box;               /* keep gradient crisp */
+  box-shadow:
+    0 4px 14px rgba(0,0,0,.25),
+    inset 0 0 0 1px rgba(255,255,255,.18);
+}
+
+::-webkit-scrollbar-thumb:hover{
+  background: var(--sb-thumb-hover);
+  box-shadow:
+    0 6px 18px rgba(0,0,0,.3),
+    inset 0 0 0 1px rgba(255,255,255,.22);
+}
+
+::-webkit-scrollbar-thumb:active{
+  background: var(--sb-thumb-active);
+  box-shadow:
+    0 4px 14px rgba(0,0,0,.35),
+    inset 0 0 0 1px rgba(255,255,255,.28);
+}
+
+::-webkit-scrollbar-corner{
+  background: transparent;
+}
+
+/* ===== Compact variant for tight panels (optional) ===== */
+.glass-scroll-thin::-webkit-scrollbar{ width: 8px; height: 8px; }
+.glass-scroll-thin *{ scrollbar-width: thin; }
+
+/* ===== Hide scrollbar but keep scroll (optional) ===== */
+.glass-scroll-hidden{ scrollbar-width: none; }
+.glass-scroll-hidden::-webkit-scrollbar{ display: none; }

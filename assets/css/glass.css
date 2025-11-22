@@ -1,0 +1,58 @@
+/* ===== Glassmorphic Cards ===== */
+.glass-card {
+  border-radius: 20px;
+  background: rgba(255,255,255,0.08);               /* frosted panel */
+  border: 1px solid rgba(255,255,255,0.15);         /* soft edge */
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.25),
+    inset 0 1px 0 rgba(255,255,255,0.15);
+}
+
+/* hover micro-interaction (optional) */
+.glass-hover {
+  transition: transform .25s ease, box-shadow .25s ease, background .25s ease;
+}
+.glass-hover:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 16px 40px rgba(0,0,0,0.35),
+    inset 0 1px 0 rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.10);
+}
+
+/* subtle gradient ring (optional, for hero cards) */
+.glass-ring {
+  position: relative;
+  isolation: isolate;
+}
+.glass-ring::before {
+  content: "";
+  position: absolute; inset: -1px; border-radius: 22px; z-index: -1;
+  background: conic-gradient(
+    from 140deg,
+    #8db2ca66, #39265166, #9c3c1b66, #8db2ca66
+  );
+  filter: blur(8px);
+  opacity: .6;
+  pointer-events: none;
+}
+
+/* compact scroll areas inside cards */
+.glass-scroll {
+  scrollbar-width: thin;
+}
+.glass-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+.glass-scroll::-webkit-scrollbar-track {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 9999px;
+  backdrop-filter: blur(8px);
+}
+.glass-scroll::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  background: linear-gradient(180deg,#8db2caAA,#392651AA,#9c3c1bAA);
+}
