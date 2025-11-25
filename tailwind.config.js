@@ -6,8 +6,18 @@ export default {
         './app/layouts/**/*.vue',
         './app/pages/**/*.vue',
         './app/composables/**/*.{js,ts}',
+        './app/stores/**/*.{js,ts}',
         './app/app.vue',
     ],
+
+    // 👇 IMPORTANT: keep dynamic bg/text/border colors from being purged
+    safelist: [
+        {
+            pattern:
+                /(bg|text|border)-(brand|plum|clay|rust|neutral)-(50|100|200|300|400|500|600|700|800|900)/,
+        },
+    ],
+
     theme: {
         extend: {
             colors: {

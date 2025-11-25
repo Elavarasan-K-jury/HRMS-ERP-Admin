@@ -1,13 +1,14 @@
 <template>
-    <div
-        class="relative bg-[conic-gradient(at_50%_50%,theme(colors.brand.500),theme(colors.plum.500),theme(colors.rust.500),theme(colors.brand.500))] min-h-screen overflow-hidden">
+    <!-- Main background controlled by themeStore.bgColor -->
+    <div class="relative min-h-screen overflow-hidden" :style="{ backgroundColor: themeStore.bgColor }">
+
         <div v-if="!preloader" class="pointer-events-none absolute bottom-2 right-2 z-[100]">
             <a href="https://www.jurysoft.com" target="_blank" rel="noopener noreferrer" class="pointer-events-auto group inline-flex items-center gap-1.5 rounded-full
-           bg-black/50 backdrop-blur-md ring-1 ring-white/25
-           px-3 py-1.5 text-[11px] leading-none font-medium text-white/90
-           shadow-lg shadow-black/30 transition
-           hover:bg-black/60 hover:text-white
-           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+               bg-black/50 backdrop-blur-md ring-1 ring-white/25
+               px-3 py-1.5 text-[11px] leading-none font-medium text-white/90
+               shadow-lg shadow-black/30 transition
+               hover:bg-black/60 hover:text-white
+               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
                 aria-label="Powered by Jurysoft (opens in a new tab)">
                 <span aria-hidden="true">✨</span>
                 <span class="hidden sm:inline opacity-80">Powered by</span>
@@ -20,6 +21,9 @@
         <!-- Sidebar -->
         <UiSidebar v-if="!preloader" :menu-items="menu" :title="title" />
 
+        <!-- 🎨 Color Picker Sidebar -->
+        <UiColorSidebar />
+
         <!-- Main wrapper (shifts right when sidebar expands) -->
         <div v-if="!preloader" :class="sidebar ? 'ml-[250px]' : 'ml-[85px]'" class="transition-all duration-300">
             <UiHeader :breadcrumbs="breadcrumbs" @toggleSidebar="toggleSidebar" />
@@ -27,12 +31,12 @@
                 <slot />
             </main>
         </div>
+
         <div v-if="preloader" class="w-full h-screen backdrop-blur-xl bg-white/10 flex items-center justify-center">
             <UiLoader />
         </div>
-    </div>
 
-    <!-- Preloader -->
+    </div>
 </template>
 
 <script setup>
@@ -45,6 +49,7 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 const authStore = useAuthStore()
 const themeStore = useThemeStore()
+
 const title = 'JURY-HRMS'
 const sidebar = computed(() => themeStore.sidebar)
 const preloader = computed(() => themeStore.preloader)
@@ -54,12 +59,8 @@ const toggleSidebar = () => themeStore.toggleSidebar()
 function findBreadcrumb(menuGroups, path, parents = []) {
     for (const group of menuGroups) {
         for (const item of group.items) {
-            // Found exact match
-            if (item.path === path) {
-                return [...parents, group.group, item.label]
-            }
+            if (item.path === path) return [...parents, group.group, item.label]
 
-            // If has nested children, search deeper
             if (item.children) {
                 const found = findBreadcrumb(
                     [{ group: item.label, items: item.children }],
@@ -81,13 +82,12 @@ const breadcrumbs = computed(() => {
 
 onMounted(async () => {
     try {
-        // Try to verify token and load user silently
         await authStore.loadLocalData()
+        themeStore.loadColor()
     } catch (err) {
         console.error('[Layout] loadLocalData failed:', err)
         await authStore.logout('/login')
     } finally {
-        // Always stop preloader after a short delay
         setTimeout(() => {
             themeStore.preloader = false
         }, 1000)

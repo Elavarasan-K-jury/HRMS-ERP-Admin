@@ -35,7 +35,7 @@
 
 <script setup>
 import { computed } from 'vue';
-import { useThemeStore } from '../../../stores/theme.store';
+import { useThemeStore } from '../stores/theme.store';
 
 definePageMeta({
     layout: 'auth',

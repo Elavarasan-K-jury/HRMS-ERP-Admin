@@ -110,7 +110,7 @@ function childX(index) {
 
 function viewProfile() {
     router.push({
-        path: `/panel/super-admin/organization/${props.node.organization_id}/employee/list`,
+        path: `/organization/${props.node.organization_id}/employee/list`,
         query: {
             employee_id: props.node.id,
             preview: true

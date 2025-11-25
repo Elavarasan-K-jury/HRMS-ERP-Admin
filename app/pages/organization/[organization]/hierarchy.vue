@@ -102,12 +102,12 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
 
-import { useAuthStore } from '../../../../../stores/auth.store'
-import { useDepartmentStore } from '../../../../../stores/department.store'
-import { useHierarchyStore } from '../../../../../stores/hierarchy.store'
+import { useAuthStore } from '../../../stores/auth.store'
+import { useDepartmentStore } from '../../../stores/department.store'
+import { useHierarchyStore } from '../../../stores/hierarchy.store'
 
-import HierarchyHorizontal from '../../../../../components/hierarchy/HierarchyHorizontal.vue'
-import OrganizationTree from '../../../../../components/hierarchy/OrganizationTree.vue'
+import HierarchyHorizontal from '../../../components/hierarchy/HierarchyHorizontal.vue'
+import OrganizationTree from '../../../components/hierarchy/OrganizationTree.vue'
 
 definePageMeta({
     layout: 'organization',

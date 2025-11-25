@@ -38,14 +38,14 @@
 </template>
 
 <script setup>
-import { useEmpCategoryStore } from '../../../../../../stores/empCategory.store';
-import { useEmployeesStore } from '../../../../../../stores/employee.store';
-import { useDesignationStore } from '../../../../../../stores/designation.store';
-import { useDepartmentStore } from '../../../../../../stores/department.store';
-import { useAuthStore } from '../../../../../../stores/auth.store';
-import DataTable from '../../../../../../components/employee/dataTable.vue';
-import DetailedView from '../../../../../../components/employee/detailedView.vue';
-import EmployeeForm from '../../../../../../components/employee/form.vue';
+import { useEmpCategoryStore } from '../../../../stores/empCategory.store';
+import { useEmployeesStore } from '../../../../stores/employee.store';
+import { useDesignationStore } from '../../../../stores/designation.store';
+import { useDepartmentStore } from '../../../../stores/department.store';
+import { useAuthStore } from '../../../../stores/auth.store';
+import DataTable from '../../../../components/employee/dataTable.vue';
+import DetailedView from '../../../../components/employee/detailedView.vue';
+import EmployeeForm from '../../../../components/employee/form.vue';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router'
 definePageMeta({

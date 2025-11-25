@@ -149,8 +149,8 @@
                             <!-- Actions -->
                             <td class="td align-top text-center">
                                 <div class="inline-flex flex-col items-center gap-1.5">
-                                    <NuxtLink class="btn-icon" title="View"
-                                        :to="`/panel/super-admin/organization/${org.id}/dashboard`" :target="`_blank`">
+                                    <NuxtLink class="btn-icon" title="View" :to="`/organization/${org.id}/dashboard`"
+                                        :target="`_blank`">
                                         <Icon name="lucide:eye" class="w-4 h-4" />
                                     </NuxtLink>
                                     <button class="btn-icon" title="Edit" @click="$emit('edit', org)">

@@ -3,16 +3,16 @@
         <div
             class="rounded-lg p-5 bg-white/10 border h-16 border-white/15 backdrop-blur-xl shadow-lg flex items-center justify-between">
             <h2 class="text-lg font-semibold uppercase text-white/90">{{ total }}
-                Asset Model<span>(s)</span></h2>
+                Asset Category<span>(s)</span></h2>
             <div class="flex items-center gap-2">
                 <UiSearch :color="search ? '#4aff7a' : '#fff'" v-model="search" :suggestions="results"
                     :loading="loading" @search="fetchResults" @select="goTo" />
-                <UiButton @click="openAddModal" color="#4aff7a" text="Add Asset Model" prepend-icon="ion:add-circle" />
-                <UiButton @click="fetchAssetsCategories" color="#fff" text="Reload" prepend-icon="ion:refresh" />
+                <UiButton @click="openAddModal" color="#4aff7a" text="Add Asset Category"
+                    prepend-icon="ion:add-circle" />
+                <UiButton @click="fetchAssetCategories" color="#fff" text="Reload" prepend-icon="ion:refresh" />
             </div>
         </div>
-        <pre>{{ assetModels }}</pre>
-        <DataTable :items="assetModels" :loading="loading" :total="total" :page="page" :total-pages="totalPages"
+        <DataTable :items="assetCategories" :loading="loading" :total="total" :page="page" :total-pages="totalPages"
             @refresh="fetchDepartments" @view="view" @edit="editEmpCategory" @delete="deleteEmpCategory" />
     </div>
     <UiSidebarModal width="600px" v-model="addUpdateModal" :title="formTitle">
@@ -36,17 +36,17 @@
 </template>
 <script setup>
 import { onMounted, computed, ref } from 'vue';
-import { useAssetsModelStore } from '../../../../../../stores/assetModel.store';
-import { useAuthStore } from '../../../../../../stores/auth.store';
-import DataTable from '../../../../../../components/asset/categoryList.vue';
-import CategoryForm from '../../../../../../components/asset/categoryForm.vue';
+import { useAssetsCategoryStore } from '../../../../stores/assetsCategory.store';
+import { useAuthStore } from '../../../../stores/auth.store';
+import DataTable from '../../../../components/asset/categoryList.vue';
+import CategoryForm from '../../../../components/asset/categoryForm.vue';
 import { storeToRefs } from 'pinia';
 definePageMeta({
     layout: 'organization',
 });
 
 
-const assetModelStore = useAssetsModelStore()
+const assetCategoryStore = useAssetsCategoryStore()
 const authStore = useAuthStore()
 
 const {
@@ -61,13 +61,13 @@ const {
     description,
     is_active,
     assetCategoryId
-} = storeToRefs(assetModelStore)
+} = storeToRefs(assetCategoryStore)
 const addUpdateModal = ref(false)
 const formTitle = ref(null)
 const deleteModal = ref(false)
 const deleteData = ref(null)
-const assetModels = computed(() => assetModelStore.models)
-const total = computed(() => assetModelStore.total)
+const assetCategories = computed(() => assetCategoryStore.categories)
+const total = computed(() => assetCategoryStore.total)
 
 const openAddModal = () => {
     addUpdateModal.value = true
@@ -80,8 +80,8 @@ const closeAddUpdateModal = () => {
 }
 
 const saveOnboarding = async () => {
-    await assetModelStore.saveAssetsCategory()
-    await fetchAssetsCategories()
+    await assetCategoryStore.saveAssetsCategory()
+    await fetchAssetCategories()
     closeAddUpdateModal()
 }
 
@@ -102,8 +102,8 @@ const deleteEmpCategory = (data) => {
 }
 
 const confirmDelete = async () => {
-    await assetModelStore.deleteAssetsCategory()
-    await fetchAssetsCategories()
+    await assetCategoryStore.deleteAssetsCategory()
+    await fetchAssetCategories()
     assetCategoryId.value = null
     deleteData.value = null
     deleteModal.value = false
@@ -120,16 +120,16 @@ watch(search, () => {
     clearTimeout(timer.value)
     timer.value = setTimeout(() => {
         page.value = 1
-        fetchAssetsCategories()
+        fetchAssetCategories()
     }, 300)
 })
 
-const fetchAssetsCategories = async () => {
-    await assetModelStore.fetchAssetsCategories()
+const fetchAssetCategories = async () => {
+    await assetCategoryStore.fetchAssetsCategories()
 };
 
 onMounted(async () => {
     organization_id.value = authStore.organization
-    await fetchAssetsCategories()
+    await fetchAssetCategories()
 });
 </script>

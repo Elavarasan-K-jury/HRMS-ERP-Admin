@@ -4,7 +4,7 @@ import { useThemeStore } from './theme.store'
 
 export const useAuthStore = defineStore('Auth', {
     state: () => ({
-        username: 'debanjan.d@jurysoft.com',
+        username: 'admin@jurysoft.com',
         otp: '123456',
         purpose: 'login',
         otpSent: false,
@@ -114,7 +114,7 @@ export const useAuthStore = defineStore('Auth', {
                     await this.setToken(data.access_token, data.refresh_token)
 
                     const redirectCookie = useCookie('REDIRECT_PATH', { maxAge: 60 * 5 })
-                    const redirectTo = redirectCookie.value || '/panel/super-admin/dashboard'
+                    const redirectTo = redirectCookie.value || '/'
                     redirectCookie.value = null
 
                     await this.getUserDetails()
@@ -156,23 +156,23 @@ export const useAuthStore = defineStore('Auth', {
                 if (data?.success) {
                     this.admin = data.user
                     this.isLoggedIn = true
-                    // console.log('Redirecting to /panel/super-admin/dashboard');
+                    // console.log('Redirecting to //dashboard');
                     // const redirectCookie = useCookie('REDIRECT_PATH', { maxAge: 60 * 5 })
-                    // const redirectTo = redirectCookie.value || '/panel/super-admin/dashboard'
+                    // const redirectTo = redirectCookie.value || '//dashboard'
                     // await navigateTo(redirectTo, { replace: true })
                 } else {
                     toast.error({ title: 'Error!', message: data.message, timeout: 1500 })
                     this.clearToken()
-                    if (process.client && window.location.pathname !== '/login') {
-                        await navigateTo('/login', { replace: true })
+                    if (process.client && window.location.pathname !== '/auth') {
+                        await navigateTo('/auth', { replace: true })
                     }
                 }
             } catch (err) {
                 console.error('[Auth] Token verification failed:', err)
                 toast.error({ title: 'Error!', message: err.message, timeout: 1500 })
                 this.clearToken()
-                if (process.client && window.location.pathname !== '/login') {
-                    await navigateTo('/login', { replace: true })
+                if (process.client && window.location.pathname !== '/auth') {
+                    await navigateTo('/auth', { replace: true })
                 }
             } finally {
                 this.loading = false
@@ -180,7 +180,7 @@ export const useAuthStore = defineStore('Auth', {
         },
 
         /* ---------------------- LOGOUT ---------------------- */
-        async logout(redirectTo = '/login') {
+        async logout(redirectTo = '/auth') {
             this.clearToken()
             const toast = useToast()
             const redirectCookie = useCookie('REDIRECT_PATH', { maxAge: 60 * 5 })

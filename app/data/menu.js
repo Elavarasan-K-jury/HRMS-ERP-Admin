@@ -3,16 +3,16 @@ export const organization_menu = (org_id) => {
         {
             group: 'Core HR',
             items: [
-                { label: 'Dashboard', path: `/panel/super-admin/organization/${org_id}/dashboard`, icon: 'ion:pie-chart' },
+                { label: 'Dashboard', path: `/organization/${org_id}/dashboard`, icon: 'ion:pie-chart' },
                 {
                     label: 'Organization',
                     path: '/organization',
                     icon: 'ion:business',
                     children: [
                         // { label: 'List', path: '/organization/list', icon: 'ion:list-outline' },
-                        { label: 'Departments', path: `/panel/super-admin/organization/${org_id}/departments`, icon: 'lucide:git-fork' },
-                        { label: 'Designations', path: `/panel/super-admin/organization/${org_id}/designations`, icon: 'ion:briefcase-outline' },
-                        { label: 'Hierarchy', path: `/panel/super-admin/organization/${org_id}/hierarchy`, icon: 'ion:people-outline' },
+                        { label: 'Departments', path: `/organization/${org_id}/departments`, icon: 'lucide:git-fork' },
+                        { label: 'Designations', path: `/organization/${org_id}/designations`, icon: 'ion:briefcase-outline' },
+                        { label: 'Hierarchy', path: `/organization/${org_id}/hierarchy`, icon: 'ion:people-outline' },
                     ],
                 },
                 {
@@ -20,14 +20,14 @@ export const organization_menu = (org_id) => {
                     path: '/employee',
                     icon: 'ion:people',
                     children: [
-                        { label: 'Employees', path: `/panel/super-admin/organization/${org_id}/employee/list`, icon: 'ion:person-outline' },
-                        { label: 'Employee Categories', path: `/panel/super-admin/organization/${org_id}/employee/categories`, icon: 'ion:albums-outline' },
-                        { label: 'Onboarding', path: `/panel/super-admin/organization/${org_id}/employee/onboarding`, icon: 'ion:person-add-outline' },
-                        { label: 'Permissions', path: `/panel/super-admin/organization/${org_id}/employee/permissions`, icon: 'heroicons:lock-closed' },
+                        { label: 'Employees', path: `/organization/${org_id}/employee/list`, icon: 'ion:person-outline' },
+                        { label: 'Employee Categories', path: `/organization/${org_id}/employee/categories`, icon: 'ion:albums-outline' },
+                        { label: 'Onboarding', path: `/organization/${org_id}/employee/onboarding`, icon: 'ion:person-add-outline' },
+                        { label: 'Permissions', path: `/organization/${org_id}/employee/permissions`, icon: 'heroicons:lock-closed' },
                     ],
                 },
-                { label: 'Attendance', path: `/panel/super-admin/organization/${org_id}/attendance`, icon: 'ion:clock' },
-                { label: 'Leave', path: `/panel/super-admin/organization/${org_id}/leave`, icon: 'ion:calendar' },
+                { label: 'Attendance', path: `/organization/${org_id}/attendance`, icon: 'ion:clock' },
+                { label: 'Leave', path: `/organization/${org_id}/leave`, icon: 'ion:calendar' },
             ],
         },
 
@@ -84,10 +84,10 @@ export const organization_menu = (org_id) => {
                     path: '/assets',
                     icon: 'ion:laptop-outline',
                     children: [
-                        { label: 'Asset Categories', path: `/panel/super-admin/organization/${org_id}/assets/categories`, icon: 'heroicons:squares-plus' },
-                        { label: 'Asset Models', path: `/panel/super-admin/organization/${org_id}/assets/models`, icon: 'heroicons:rectangle-group' },
-                        { label: 'Assets', path: `/panel/super-admin/organization/${org_id}/assets`, icon: 'ion:desktop-outline' },
-                        { label: 'Asset Requests', path: `/panel/super-admin/organization/${org_id}/assets/requests`, icon: 'ion:document-text-outline' },
+                        { label: 'Asset Categories', path: `/organization/${org_id}/assets/categories`, icon: 'heroicons:squares-plus' },
+                        { label: 'Asset Models', path: `/organization/${org_id}/assets/models`, icon: 'heroicons:rectangle-group' },
+                        { label: 'Assets', path: `/organization/${org_id}/assets`, icon: 'ion:desktop-outline' },
+                        { label: 'Asset Requests', path: `/organization/${org_id}/assets/requests`, icon: 'ion:document-text-outline' },
                     ],
                 },
                 { label: 'Employee Self-Service', path: '/ess', icon: 'ion:person-circle' },
@@ -137,24 +137,23 @@ export const organization_menu = (org_id) => {
     ]
 }
 
-
 export const menu = [
     {
         group: 'Analytics',
         items: [
-            { label: 'Dashboard', path: '/panel/super-admin/dashboard', icon: 'ion:pie-chart' },
+            { label: 'Dashboard', path: '/', icon: 'ion:pie-chart' },
         ]
     }, {
         group: 'Tenants',
         items: [
             {
                 label: 'Organization',
-                path: '/panel/super-admin/organization/list',
+                path: '/organization/list',
                 icon: 'ion:business',
             },
             {
                 label: 'Plans',
-                path: '/panel/super-admin/Plans',
+                path: '/Plans',
                 icon: 'heroicons:receipt-percent',
             },
         ],
@@ -165,10 +164,10 @@ export const menu = [
         items: [
             {
                 label: 'Invoices',
-                path: '/panel/super-admin/invoices',
+                path: '/invoices',
                 icon: 'ion:document-text',
             },
-            { label: 'Payments', path: '/panel/super-admin/payments', icon: 'ion:cash' },
+            { label: 'Payments', path: '/payments', icon: 'ion:cash' },
         ],
     },
 
@@ -177,7 +176,7 @@ export const menu = [
         items: [
             {
                 label: 'Discounts',
-                path: '/panel/super-admin/discounts',
+                path: '/discounts',
                 icon: 'heroicons:percent-badge',
             },
         ],
@@ -186,9 +185,9 @@ export const menu = [
     {
         group: 'Reports & Analytics',
         items: [
-            { label: 'Traffic Reports', path: '/panel/super-admin/reports/traffic', icon: 'heroicons:chart-pie' },
-            { label: 'Payment Reports', path: '/panel/super-admin/reports/payments', icon: 'heroicons:currency-dollar' },
-            { label: 'Usage Reports', path: '/panel/super-admin/reports/usage', icon: 'heroicons:chart-bar' },
+            { label: 'Traffic Reports', path: '/reports/traffic', icon: 'heroicons:chart-pie' },
+            { label: 'Payment Reports', path: '/reports/payments', icon: 'heroicons:currency-dollar' },
+            { label: 'Usage Reports', path: '/reports/usage', icon: 'heroicons:chart-bar' },
         ],
     },
 
@@ -197,11 +196,11 @@ export const menu = [
         items: [
             {
                 label: 'Modules',
-                path: '/panel/super-admin/modules',
+                path: '/modules',
                 icon: 'ion:document-text',
             },
-            { label: 'General Settings', path: '/panel/super-admin/settings/general', icon: 'ion:options-outline' },
-            { label: 'Notifications', path: '/panel/super-admin/settings/notifications', icon: 'ion:notifications-outline' },
+            { label: 'General Settings', path: '/settings/general', icon: 'ion:options-outline' },
+            { label: 'Notifications', path: '/settings/notifications', icon: 'ion:notifications-outline' },
 
         ],
     },

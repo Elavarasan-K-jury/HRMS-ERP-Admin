@@ -198,9 +198,9 @@
 
 <script setup>
 import { onMounted, ref, watch, computed } from 'vue'
-import { industries } from '../../../../constants/industries'
-import { countries } from '../../../../constants/countries'
-import { useOrganizationStore } from '../../../../stores/organization.store'
+import { industries } from '../../constants/industries'
+import { countries } from '../../constants/countries'
+import { useOrganizationStore } from '../../stores/organization.store'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 
