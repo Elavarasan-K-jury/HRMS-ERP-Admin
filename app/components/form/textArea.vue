@@ -1,6 +1,6 @@
 <template>
     <div class="relative select-none" :class="fullWidth ? 'w-full' : widthClass">
-        <div class="rounded-2xl overflow-hidden border shadow-[0_8px_30px_rgba(0,0,0,.25)] transition-all duration-200"
+        <div class="rounded-lg overflow-hidden border shadow-[0_8px_30px_rgba(0,0,0,.25)] transition-all duration-200"
             :class="roundedClass" :style="editorWrapperStyle">
             <!-- Quill mounts its toolbar automatically here -->
             <div ref="editorRef" class="quill-editor"></div>
@@ -101,7 +101,7 @@ watch(
 
 /* Placeholder */
 .quill-editor :deep(.ql-editor.ql-blank::before) {
-    color: rgba(255, 255, 255, 0.45) !important;
+    color: transparent !important;
 }
 
 /* Default toolbar background but themed */

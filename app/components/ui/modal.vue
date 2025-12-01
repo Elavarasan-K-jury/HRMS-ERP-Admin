@@ -1,7 +1,6 @@
 <template>
     <transition name="fade-scale">
-        <div v-if="modelValue"
-            class="fixed inset-0 z-[120] flex items-center justify-center bg-white/10 backdrop-blur-md"
+        <div v-if="modelValue" class="fixed inset-0 z-[120] flex items-center justify-center backdrop-blur-md"
             @click.self="close">
             <div class="relative w-full rounded-2xl border border-white/15
                bg-white/10 backdrop-blur-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.6)]

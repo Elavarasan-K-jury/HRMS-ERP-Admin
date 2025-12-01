@@ -18,13 +18,13 @@
                 <div class="col-span-12 lg:col-span-5">
                     <ChartsPlatformTopOrgs class="h-full w-full" />
                 </div>
+                <div class="col-span-12">
+                    <ChartsPlatformSubscriptionRisk class="h-full w-full" />
+                </div>
             </div>
         </div>
         <div class="col-span-12 xl:col-span-4">
             <ChartsPlatformServiceHealth class="h-full w-full" />
-        </div>
-        <div class="col-span-12">
-            <ChartsPlatformSubscriptionRisk class="h-full w-full" />
         </div>
     </div>
 

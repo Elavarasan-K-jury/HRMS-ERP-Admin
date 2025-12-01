@@ -24,9 +24,9 @@ export const useAuthStore = defineStore('Auth', {
         async setToken(token, refreshToken) {
             this.accessToken = token
             this.refreshToken = refreshToken
-            const c = useCookie('ACCESS_KEY', { maxAge: 60 * 60 * 24 * 7 })
+            const c = useCookie('ADMIN_ACCESS_KEY', { maxAge: 60 * 60 * 24 * 7 })
             c.value = token || null
-            const r = useCookie('REFRESH_KEY', { maxAge: 60 * 60 * 24 * 7 })
+            const r = useCookie('ADMIN_REFRESH_KEY', { maxAge: 60 * 60 * 24 * 7 })
             r.value = refreshToken || null
         },
 
@@ -39,9 +39,9 @@ export const useAuthStore = defineStore('Auth', {
             this.otpSent = false
 
             if (!process.client) return
-            const c = useCookie('ACCESS_KEY', { maxAge: 60 * 60 * 24 * 7 })
+            const c = useCookie('ADMIN_ACCESS_KEY', { maxAge: 60 * 60 * 24 * 7 })
             c.value = null
-            const r = useCookie('REFRESH_KEY', { maxAge: 60 * 60 * 24 * 7 })
+            const r = useCookie('ADMIN_REFRESH_KEY', { maxAge: 60 * 60 * 24 * 7 })
             r.value = null
         },
 
@@ -49,8 +49,8 @@ export const useAuthStore = defineStore('Auth', {
         async loadLocalData() {
             if (!process.client) return
 
-            this.accessToken = useCookie('ACCESS_KEY', { maxAge: 60 * 60 * 24 * 7 }).value
-            this.refreshToken = useCookie('REFRESH_KEY', { maxAge: 60 * 60 * 24 * 7 }).value
+            this.accessToken = useCookie('ADMIN_ACCESS_KEY', { maxAge: 60 * 60 * 24 * 7 }).value
+            this.refreshToken = useCookie('ADMIN_REFRESH_KEY', { maxAge: 60 * 60 * 24 * 7 }).value
 
             if (this.accessToken) {
                 await this.getUserDetails()

@@ -8,7 +8,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     // ✅ Define public pages
     const publicPaths = ['/login', '/forgot-password']
     const redirectCookie = useCookie('REDIRECT_PATH', { maxAge: 60 * 5 })
-    const accessTokenCookie = useCookie('ACCESS_KEY', { maxAge: 60 * 60 * 24 * 7 })
+    const accessTokenCookie = useCookie('ADMIN_ACCESS_KEY', { maxAge: 60 * 60 * 24 * 7 })
 
     const hasToken = !!accessTokenCookie.value
     const isPublic = publicPaths.includes(to.path)

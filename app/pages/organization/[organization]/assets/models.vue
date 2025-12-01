@@ -1,135 +1,184 @@
 <template>
     <div class="p-2 h-[calc(100vh-4rem)] overflow-y-scroll flex flex-col gap-2">
+
+        <!-- HEADER -->
         <div
             class="rounded-lg p-5 bg-white/10 border h-16 border-white/15 backdrop-blur-xl shadow-lg flex items-center justify-between">
-            <h2 class="text-lg font-semibold uppercase text-white/90">{{ total }}
-                Asset Model<span>(s)</span></h2>
+
+            <h2 class="text-lg font-semibold uppercase text-white/90">
+                {{ total }} Asset Model<span>(s)</span>
+            </h2>
+
             <div class="flex items-center gap-2">
                 <UiSearch :color="search ? '#4aff7a' : '#fff'" v-model="search" :suggestions="results"
-                    :loading="loading" @search="fetchResults" @select="goTo" />
+                    :loading="loading" />
+
                 <UiButton @click="openAddModal" color="#4aff7a" text="Add Asset Model" prepend-icon="ion:add-circle" />
-                <UiButton @click="fetchAssetsCategories" color="#fff" text="Reload" prepend-icon="ion:refresh" />
+
+                <UiButton @click="fetchModels" color="#fff" text="Reload" prepend-icon="ion:refresh" />
             </div>
         </div>
-        <pre>{{ assetModels }}</pre>
+
+        <!-- TABLE -->
         <DataTable :items="assetModels" :loading="loading" :total="total" :page="page" :total-pages="totalPages"
-            @refresh="fetchDepartments" @view="view" @edit="editEmpCategory" @delete="deleteEmpCategory" />
+            @view="viewModel" @edit="editModel" @delete="deleteModel" @prev="prevPage" @next="nextPage" />
+
     </div>
+
+    <!-- ADD/EDIT MODEL -->
     <UiSidebarModal width="600px" v-model="addUpdateModal" :title="formTitle">
-        <CategoryForm />
+        <AssetModelForm />
+
         <template #footer>
-            <UiButton :disabled="loading" @click="closeAddUpdateModal" color="#fff" text="Cancel"
-                prepend-icon="ion:close-circle" />
-            <UiButton :disabled="loading" @click="saveOnboarding" color="#4aff7a"
-                :text="!loading ? 'Save Asset Category' : 'Saving please wait...'" prepend-icon="ion:save-outline" />
+            <UiButton @click="close" color="#fff" text="Cancel" prepend-icon="ion:close-circle" />
+            <UiButton :disabled="loading" @click="save" color="#4aff7a"
+                :text="loading ? 'Saving, please wait...' : 'Save Asset Model'" prepend-icon="ion:save-outline" />
         </template>
     </UiSidebarModal>
+
+    <!-- DELETE MODAL -->
     <UiModal v-model="deleteModal" title="Are you sure?" size="sm">
         <template #default>
-            <span>Are you sure you want to delete {{ deleteData.name }}?</span>
+            <span>Are you sure you want to delete <b>{{ deleteData?.model_name }}</b>?</span>
         </template>
+
         <template #footer>
-            <UiButton @click="cancelDelete" color="#fff" text="Cancel" prepend-icon="ion:close-circle" />
-            <UiButton @click="confirmDelete" color="#750d0d" text="Delete Asset Category" prepend-icon="ion:trash" />
+            <UiButton @click="cancelDelete" color="#fff" text="Cancel" />
+            <UiButton @click="confirmDelete" color="#750d0d" text="Delete Model" prepend-icon="ion:trash" />
         </template>
     </UiModal>
+
+    <!-- VIEW DETAILS -->
+    <UiSidebarModal width="600px" v-model="viewModal" :title="'Asset Model Details'">
+        <AssetModelView :model="selectedModel" />
+    </UiSidebarModal>
+
 </template>
+
 <script setup>
-import { onMounted, computed, ref } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
+import { storeToRefs } from 'pinia';
 import { useAssetsModelStore } from '../../../../stores/assetModel.store';
 import { useAuthStore } from '../../../../stores/auth.store';
-import DataTable from '../../../../components/asset/categoryList.vue';
-import CategoryForm from '../../../../components/asset/categoryForm.vue';
-import { storeToRefs } from 'pinia';
-definePageMeta({
-    layout: 'organization',
-});
 
+import DataTable from '../../../../components/asset/AssetModelsTable.vue';
+import AssetModelForm from '../../../../components/asset/AssetModelForm.vue';
+import AssetModelView from '../../../../components/asset/AssetModelView.vue';
 
-const assetModelStore = useAssetsModelStore()
-const authStore = useAuthStore()
+definePageMeta({ layout: 'organization' });
+
+/* STORES */
+const store = useAssetsModelStore();
+const auth = useAuthStore();
 
 const {
-    organization_id,
     loading,
     page,
     limit,
     totalPages,
     search,
-    name,
-    code,
-    description,
-    is_active,
-    assetCategoryId
-} = storeToRefs(assetModelStore)
-const addUpdateModal = ref(false)
-const formTitle = ref(null)
-const deleteModal = ref(false)
-const deleteData = ref(null)
-const assetModels = computed(() => assetModelStore.models)
-const total = computed(() => assetModelStore.total)
+    assetModelId
+} = storeToRefs(store);
 
+const assetModels = computed(() => store.models);
+const total = computed(() => store.total);
+
+/* MODALS */
+const addUpdateModal = ref(false);
+const deleteModal = ref(false);
+const viewModal = ref(false);
+
+/* SELECTED ITEMS */
+const selectedModel = ref(null);
+const deleteData = ref(null);
+
+/* TITLE */
+const formTitle = ref("Add Asset Model");
+
+/* OPEN MODAL */
 const openAddModal = () => {
-    addUpdateModal.value = true
-    formTitle.value = 'Add New Asset Category'
-}
-
-const closeAddUpdateModal = () => {
-    formTitle.value = null
-    addUpdateModal.value = false
-}
-
-const saveOnboarding = async () => {
-    await assetModelStore.saveAssetsCategory()
-    await fetchAssetsCategories()
-    closeAddUpdateModal()
-}
-
-const editEmpCategory = (data) => {
-    assetCategoryId.value = data.id
-    name.value = data.name
-    code.value = data.code
-    description.value = data.description
-    is_active.value = data.is_active
-    formTitle.value = 'Edit Asset Category'
-    addUpdateModal.value = true
-}
-
-const deleteEmpCategory = (data) => {
-    assetCategoryId.value = data.id
-    deleteData.value = data
-    deleteModal.value = true
-}
-
-const confirmDelete = async () => {
-    await assetModelStore.deleteAssetsCategory()
-    await fetchAssetsCategories()
-    assetCategoryId.value = null
-    deleteData.value = null
-    deleteModal.value = false
-}
-
-const cancelDelete = () => {
-    assetCategoryId.value = null
-    deleteData.value = null
-    deleteModal.value = false
-}
-
-const timer = ref(null)
-watch(search, () => {
-    clearTimeout(timer.value)
-    timer.value = setTimeout(() => {
-        page.value = 1
-        fetchAssetsCategories()
-    }, 300)
-})
-
-const fetchAssetsCategories = async () => {
-    await assetModelStore.fetchAssetsCategories()
+    formTitle.value = "Add Asset Model";
+    store.resetForm();
+    addUpdateModal.value = true;
 };
 
+/* CLOSE MODAL */
+const close = () => {
+    store.resetForm();
+    addUpdateModal.value = false;
+};
+
+/* SAVE */
+const save = async () => {
+    await store.saveAssetModel();
+    await fetchModels();
+    close();
+};
+
+/* VIEW DETAILS */
+const viewModel = (row) => {
+    selectedModel.value = row;
+    viewModal.value = true;
+};
+
+/* EDIT MODEL */
+const editModel = (row) => {
+    formTitle.value = "Edit Asset Model";
+    assetModelId.value = row.id;
+
+    store.category_id = store.category_list.find(c => c.value === row.category_id);
+    store.brand = row.brand;
+    store.model_name = row.model_name;
+    store.code = row.code;
+    store.description = row.description;
+    store.specs = row.specs;
+    store.is_active = row.is_active;
+
+    addUpdateModal.value = true;
+};
+
+/* DELETE */
+const deleteModel = (row) => {
+    deleteData.value = row;
+    assetModelId.value = row.id;
+    deleteModal.value = true;
+};
+
+const confirmDelete = async () => {
+    await store.deleteAssetModel();
+    await fetchModels();
+    deleteModal.value = false;
+};
+
+const cancelDelete = () => {
+    deleteModal.value = false;
+};
+
+/* PAGINATION */
+const prevPage = () => {
+    if (page.value > 1) page.value--;
+    fetchModels();
+};
+const nextPage = () => {
+    if (page.value < totalPages.value) page.value++;
+    fetchModels();
+};
+
+/* SEARCH */
+watch(search, () => {
+    page.value = 1;
+    fetchModels();
+});
+
+/* LOAD MODELS */
+const fetchModels = async () => {
+    await store.fetchAssetModels();
+};
+
+/* ON MOUNT */
 onMounted(async () => {
-    organization_id.value = authStore.organization
-    await fetchAssetsCategories()
+    store.organization_id = auth.organization;
+    await store.fetchAllCategories();
+    await fetchModels();
 });
 </script>

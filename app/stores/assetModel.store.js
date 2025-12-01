@@ -1,10 +1,9 @@
-// app/stores/head.store.js
+// app/stores/assetModel.store.js
 import { defineStore } from 'pinia'
 
 export const useAssetsModelStore = defineStore('AssetsModel', {
     state: () => ({
         total: 0,
-        model_list: [],
         models: [],
         page: 1,
         limit: 10,
@@ -14,21 +13,33 @@ export const useAssetsModelStore = defineStore('AssetsModel', {
         sortOrder: 'desc',
         loading: false,
         error: null,
+
+        // Form fields
         organization_id: null,
-        assetCategoryId: null,
-        name: null,
-        brandName: null,
+        assetModelId: null,
+        category_id: null,
+        brand: null,
+        model_name: null,
         code: null,
         description: null,
-        is_active: true,
         specs: null,
+        is_active: true,
+
+        // Dropdown lists
+        category_list: []
     }),
+
     actions: {
-        async fetchAssetsCategories() {
+        /* ----------------------------------------------------
+         * FETCH MODELS (LIST)
+        ---------------------------------------------------- */
+        async fetchAssetModels() {
             const { $api } = useNuxtApp()
             const toast = useToast()
+
             try {
                 this.loading = true
+
                 const res = await $api.get('/asset-models', {
                     params: {
                         organization_id: this.organization_id,
@@ -39,28 +50,34 @@ export const useAssetsModelStore = defineStore('AssetsModel', {
                         sort_order: this.sortOrder
                     },
                 })
+
                 if (res.data.success) {
                     this.models = res.data.models
                     this.total = res.data.total
                     this.totalPages = res.data.total_pages
                 }
             } catch (err) {
-                console.error('[AssetsCategory] Fetch categories error:', err)
+                console.error('[AssetsModel] Fetch models error:', err)
                 toast.error({ title: 'Error!', message: err.message, timeout: 1500 })
             } finally {
                 this.loading = false
             }
         },
-        async fetchAllAssetsCategories() {
+
+        /* ----------------------------------------------------
+         * LOAD CATEGORY DROPDOWN
+        ---------------------------------------------------- */
+        async fetchAllCategories() {
             const { $api } = useNuxtApp()
             const toast = useToast()
+
             try {
-                this.loading = true
                 const res = await $api.get('/asset-categories', {
                     params: {
                         organization_id: this.organization_id,
                     },
                 })
+
                 if (res.data.success) {
                     this.category_list = res.data.categories.map(e => ({
                         value: e.id,
@@ -68,93 +85,111 @@ export const useAssetsModelStore = defineStore('AssetsModel', {
                     }))
                 }
             } catch (err) {
-                console.error('[AssetsCategory] Fetch categories error:', err)
+                console.error('[AssetsModel] Fetch categories error:', err)
                 toast.error({ title: 'Error!', message: err.message, timeout: 1500 })
-            } finally {
-                this.loading = false
             }
         },
-        async deleteAssetsCategory() {
+
+        /* ----------------------------------------------------
+         * DELETE MODEL
+        ---------------------------------------------------- */
+        async deleteAssetModel() {
             const toast = useToast()
+
             try {
                 const { $api } = useNuxtApp()
-                const { data } = await $api.delete(`/asset-categories/${this.assetCategoryId}`)
+                const { data } = await $api.delete(`/asset-models/${this.assetModelId}`)
+
                 if (data.success) {
                     toast.success({
                         title: 'Success!',
                         message: data.message,
                         timeout: 1500
                     })
-                    this.fetchAssetsCategories()
+                    this.fetchAssetModels()
                 }
             } catch (err) {
-                console.error('[AssetsCategory] Delete category error:', err)
+                console.error('[AssetsModel] Delete model error:', err)
                 toast.error({ title: 'Error!', message: err.message, timeout: 1500 })
             } finally {
-                this.assetCategoryId = null
+                this.assetModelId = null
             }
         },
-        async saveAssetsCategory() {
+
+        /* ----------------------------------------------------
+         * CREATE / UPDATE ASSET MODEL
+        ---------------------------------------------------- */
+        async saveAssetModel() {
             const toast = useToast()
+
+            const payload = {
+                organization_id: this.organization_id,
+                category_id: this.category_id.value,
+                brand: this.brand,
+                model_name: this.model_name,
+                code: this.code,
+                description: this.description,
+                specs: this.specs,
+                is_active: this.is_active
+            }
+
             try {
                 const { $api } = useNuxtApp()
-                if (this.assetCategoryId) {
-                    const { data } = await $api.put(`/asset-categories/${this.assetCategoryId}`, {
-                        name: this.name,
-                        code: this.code,
-                        description: this.description,
-                        is_active: this.is_active,
-                        organization_id: this.organization_id
-                    }
-                    )
+
+                if (this.assetModelId) {
+                    // UPDATE
+                    const { data } = await $api.put(`/asset-models/${this.assetModelId}`, payload)
+
                     if (data.success) {
                         toast.success({
                             title: 'Success!',
                             message: data.message,
                             timeout: 1500
                         })
-                        this.fetchAssetsCategories()
+                        this.fetchAssetModels()
                     } else {
-                        toast.error({
-                            title: 'Error!',
-                            message: data.message,
-                            timeout: 1500
-                        })
+                        toast.error({ title: 'Error!', message: data.message, timeout: 1500 })
                     }
                 } else {
-                    const { data } = await $api.post('/asset-categories', {
-                        name: this.name,
-                        code: this.code,
-                        description: this.description,
-                        is_active: this.is_active,
-                        organization_id: this.organization_id
-                    }
-                    )
+                    // CREATE
+                    const { data } = await $api.post('/asset-models', payload)
+
                     if (data.success) {
                         toast.success({
                             title: 'Success!',
                             message: data.message,
                             timeout: 1500
                         })
-                        this.fetchAssetsCategories()
+                        this.fetchAssetModels()
                     } else {
-                        toast.error({
-                            title: 'Error!',
-                            message: data.message,
-                            timeout: 1500
-                        })
+                        toast.error({ title: 'Error!', message: data.message, timeout: 1500 })
                     }
                 }
             } catch (err) {
-                console.error('[AssetCategory] Save category error:', err)
+                console.error('[AssetsModel] Save model error:', err)
                 toast.error({ title: 'Error!', message: err.message, timeout: 1500 })
             } finally {
-                this.name = null
-                this.code = null
-                this.description = null
-                this.is_active = true
-                this.assetCategoryId = null
+                this.resetForm()
             }
+        },
+
+        /* ----------------------------------------------------
+         * RESET FORM
+        ---------------------------------------------------- */
+        resetForm() {
+            this.assetModelId = null
+            this.category_id = null
+            this.brand = null
+            this.model_name = null
+            this.code = null
+            this.description = null
+            this.specs = JSON.stringify([
+                {
+                    key: '',
+                    value: ''
+                }
+            ])
+            this.is_active = true
         }
     }
 })

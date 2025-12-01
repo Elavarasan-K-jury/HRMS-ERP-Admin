@@ -13,6 +13,7 @@ export const organization_menu = (org_id) => {
                         { label: 'Departments', path: `/organization/${org_id}/departments`, icon: 'lucide:git-fork' },
                         { label: 'Designations', path: `/organization/${org_id}/designations`, icon: 'ion:briefcase-outline' },
                         { label: 'Hierarchy', path: `/organization/${org_id}/hierarchy`, icon: 'ion:people-outline' },
+                        { label: 'Holidays', path: `/organization/${org_id}/holiday`, icon: 'ion:calendar-number-outline' },
                     ],
                 },
                 {
@@ -26,7 +27,16 @@ export const organization_menu = (org_id) => {
                         { label: 'Permissions', path: `/organization/${org_id}/employee/permissions`, icon: 'heroicons:lock-closed' },
                     ],
                 },
-                { label: 'Attendance', path: `/organization/${org_id}/attendance`, icon: 'ion:clock' },
+                {
+                    label: 'Attendance',
+                    path: `/organization/${org_id}/attendance`,
+                    icon: 'ion:clock',
+                    children: [
+                        { label: 'Attendance', path: `/organization/${org_id}/attendance`, icon: 'ion:clock' },
+                        { label: 'Attendance Policy', path: `/organization/${org_id}/attendance/policy`, icon: 'ion:document-text-outline' },
+                        { label: 'Attendance Report', path: `/organization/${org_id}/attendance/report`, icon: 'ion:document-text-outline' },
+                    ]
+                },
                 { label: 'Leave', path: `/organization/${org_id}/leave`, icon: 'ion:calendar' },
             ],
         },
