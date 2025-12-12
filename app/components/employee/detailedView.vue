@@ -223,7 +223,11 @@
         </template>
 
         <template #footer>
-            <div class="footer">
+            <div class="footer flex gap-2">
+                <NuxtLink v-if="employee" target="_blank"
+                    :to="getUserProfileUrl(employee.id, employee.organization_id)">
+                    <UiButton text="Open Profile" color="#fff" />
+                </NuxtLink>
                 <UiButton text="Close" color="#4aff7a" @click="close" />
             </div>
         </template>
@@ -318,6 +322,8 @@ function formatGender(g) {
     if (up === 'OTHER') return 'Other'
     return g
 }
+
+const getUserProfileUrl = (employeeId, orgId) => `/organization/${orgId}/employee/${employeeId}/home`
 
 onMounted(async () => {
     loading.value = true

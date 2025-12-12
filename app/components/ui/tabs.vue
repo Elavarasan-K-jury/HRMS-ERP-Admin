@@ -5,7 +5,7 @@
             <button v-for="(tab, index) in tabs" :key="index" :disabled="tab.disabled" :style="getTabStyle(index)"
                 class="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-semibold rounded-lg
                        transition-all duration-300 select-none whitespace-nowrap
-                       active:scale-[.98]
+                       active:scale-[.98] capitalize
                        disabled:opacity-50 disabled:cursor-not-allowed" :class="getTabClasses(index)"
                 @click="selectTab(index)">
                 <Icon v-if="tab.icon" :name="tab.icon" class="text-lg" />

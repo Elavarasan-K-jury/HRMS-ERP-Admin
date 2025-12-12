@@ -194,4 +194,17 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     opacity: 1;
     filter: invert(1) brightness(2);
 }
+
+
+/* Hide arrows in number input (Chrome, Safari, Edge) */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Hide arrows in Firefox */
+input[type="number"] {
+    -moz-appearance: textfield;
+}
 </style>

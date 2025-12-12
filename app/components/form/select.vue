@@ -3,7 +3,8 @@
         <!-- Field -->
         <div ref="fieldRef"
             class="group flex items-center gap-2 rounded-2xl border shadow-[0_8px_30px_rgba(0,0,0,.25)] transition-all duration-200 focus-within:shadow-[0_12px_34px_rgba(0,0,0,.32)]"
-            :class="[roundedClass, sizeClass]" :style="fieldStyle" @click="toggle">
+            :class="[roundedClass, sizeClass, { 'opacity-60 pointer-events-none': disabled }]" :style="fieldStyle"
+            @click="handleFieldClick">
             <!-- Prepend icon / slot -->
             <slot name="prepend">
                 <Icon v-if="prependIcon" :name="prependIcon" class="opacity-90" />
@@ -15,7 +16,7 @@
                     <span v-for="(val, i) in innerValue" :key="i"
                         class="px-2 py-0.5 bg-white/10 rounded-lg text-xs flex items-center gap-1">
                         {{ labelOf(val) }}
-                        <button type="button" class="text-white/70 hover:text-white" @click.stop="remove(val)">
+                        <button type="button" class="text-white/70 hover:text-white" @click.stop="handleRemove(val)">
                             <Icon name="lucide:x" class="w-3 h-3" />
                         </button>
                     </span>
@@ -32,7 +33,7 @@
 
             <!-- Clear / caret -->
             <button v-if="clearable && hasValue"
-                class="flex items-center rounded-lg hover:bg-white/10 transition-colors" @click.stop="clear">
+                class="flex items-center rounded-lg hover:bg-white/10 transition-colors" @click.stop="handleClear">
                 <Icon name="ion:close-outline" class="text-lg" />
             </button>
             <Icon v-else :name="open ? 'lucide:chevron-up' : 'lucide:chevron-down'"
@@ -58,7 +59,7 @@
                                     : isSelected(opt)
                                         ? 'bg-white/10 cursor-pointer'
                                         : 'hover:bg-white/5 cursor-pointer',
-                            ]" @click="!isOptionDisabled(opt) && choose(opt)">
+                            ]" @click="handleChoose(opt)">
                             <Icon v-if="opt.icon" :name="opt.icon" class="opacity-90 w-4 h-4 flex-shrink-0 mt-0.5" />
                             <span class="text-sm flex-1 leading-snug text-white option-label">
                                 {{ labelOf(opt) }}
@@ -96,7 +97,8 @@ const props = defineProps({
     rounded: { type: String, default: '2xl' },
     fullWidth: { type: Boolean, default: true },
     width: { type: String, default: '320px' },
-    hideSelected: { type: Boolean, default: false }, // NEW: Hide already selected options
+    hideSelected: { type: Boolean, default: false },
+    disabled: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['update:modelValue', 'select', 'clear'])
@@ -180,37 +182,49 @@ const portalMenuStyle = computed(() => ({
 
 /* Logic - ENHANCED */
 const isOptionDisabled = (opt) => {
-    // Check if option has disabled property set to true
     if (opt && typeof opt === 'object' && opt.disabled === true) {
         return true
     }
-
-    // Check if option has selected property set to true
     if (opt && typeof opt === 'object' && opt.selected === true) {
         return true
     }
-
-    // If hideSelected is enabled and option is already selected, treat as disabled
     if (props.hideSelected && isSelected(opt)) {
         return true
     }
-
     return false
 }
 
 const filteredOptions = computed(() => {
     const q = query.value.toLowerCase()
     let opts = q ? props.options.filter((o) => labelOf(o).toLowerCase().includes(q)) : props.options
-
-    // If hideSelected is true, filter out already selected options
     if (props.hideSelected) {
         opts = opts.filter(opt => !isSelected(opt))
     }
-
     return opts
 })
 
 const hasValue = computed(() => (props.multiple ? innerValue.value.length > 0 : !!innerValue.value))
+
+/* Event handlers with disabled check */
+function handleFieldClick() {
+    if (props.disabled) return
+    toggle()
+}
+
+function handleClear(e) {
+    if (props.disabled) return
+    clear()
+}
+
+function handleRemove(opt) {
+    if (props.disabled) return
+    remove(opt)
+}
+
+function handleChoose(opt) {
+    if (props.disabled || isOptionDisabled(opt)) return
+    choose(opt)
+}
 
 async function toggle() {
     if (open.value) {
@@ -244,9 +258,6 @@ function clear() {
 }
 
 function choose(opt) {
-    // Don't allow selection if disabled
-    if (isOptionDisabled(opt)) return
-
     if (props.multiple) {
         const exists = innerValue.value.some((v) => valueOf(v) === valueOf(opt))
         innerValue.value = exists

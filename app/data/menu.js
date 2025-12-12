@@ -1,3 +1,59 @@
+export const employee_menu = (org_id, employee_id) => {
+    return [
+        {
+            group: 'Home',
+            items: [
+                { label: 'Home', path: `/organization/${org_id}/employee/${employee_id}/home`, icon: 'ion:home-outline' },
+                { label: 'Holidays', path: `/organization/${org_id}/employee/${employee_id}/holidays`, icon: 'ion:calendar-outline' },
+            ]
+        },
+
+        {
+            group: 'Self',
+            items: [
+                { label: 'Attendance', path: `/organization/${org_id}/employee/${employee_id}/attendance`, icon: 'ion:clock' },
+                { label: 'Leaves', path: `/organization/${org_id}/employee/${employee_id}/leaves`, icon: 'ion:calendar-outline' },
+                { label: 'Performance', path: `/organization/${org_id}/employee/${employee_id}/performance`, icon: 'ion:bar-chart-outline' },
+            ],
+        },
+
+        {
+            group: 'Inbox',
+            items: [
+                { label: 'Mails', path: `/organization/${org_id}/employee/${employee_id}/mails`, icon: 'ion:mail-outline' },
+                { label: 'Notifications', path: `/organization/${org_id}/employee/${employee_id}/notifications`, icon: 'ion:notifications-outline' },
+                { label: 'Chat', path: '/chat', icon: 'ion:chatbubbles-outline' },
+                { label: 'Channels', path: '/channels', icon: 'ion:chatbubbles-outline' },
+                { label: 'Events', path: '/events', icon: 'ion:calendar-outline' },
+            ],
+        },
+
+        {
+            group: 'Finalnce',
+            items: [
+                { label: 'Salary', path: `/organization/${org_id}/employee/${employee_id}/finance/salary`, icon: 'ion:cash-outline' },
+                { label: 'Payslips', path: '/payslips', icon: 'ion:document-text-outline' },
+                { label: 'Income Tax', path: '/income-tax', icon: 'heroicons:percent-badge' },
+                { label: 'Forms', path: '/forms', icon: 'heroicons:document-text' },
+            ],
+        },
+
+        {
+            group: 'Team',
+            items: [
+                { label: 'My Team', path: '/team', icon: 'ion:people-outline' },
+                { label: 'Hierarchy', path: '/hierarchy', icon: 'ion:people-outline' },
+            ],
+        },
+
+        {
+            group: 'Settings',
+            items: [
+                { label: 'Profile', path: '/profile', icon: 'heroicons:user' },
+            ],
+        },
+    ]
+}
 export const organization_menu = (org_id) => {
     return [
         {
@@ -49,7 +105,8 @@ export const organization_menu = (org_id) => {
                     path: '/payroll',
                     icon: 'ion:wallet',
                     children: [
-                        { label: 'Salary Structure', path: '/payroll/structure', icon: 'ion:document-outline' },
+                        { label: 'Salary Components', path: `/organization/${org_id}/payroll/components`, icon: 'ion:git-branch' },
+                        { label: 'Salary Template', path: `/organization/${org_id}/payroll/templates`, icon: 'heroicons:document-currency-rupee' },
                         { label: 'Payslips', path: '/payroll/payslips', icon: 'ion:receipt-outline' },
                         { label: 'Bonuses', path: '/payroll/bonuses', icon: 'ion:gift-outline' },
                     ],

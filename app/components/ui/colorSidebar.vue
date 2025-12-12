@@ -26,7 +26,7 @@
 
         <!-- Trigger Button -->
         <button @click="toggle" :class="[
-            'absolute top-1/2 -translate-y-1/2 h-16 flex items-center justify-center',
+            'absolute bottom-1 h-16 flex items-center justify-center',
             'bg-black/40 hover:bg-black/60 transition backdrop-blur rounded-r-xl',
             'w-10 pointer-events-auto',
             open ? 'translate-x-[229px]' : 'translate-x-0'

@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { useAuthStore } from './auth.store.js'
 
 export const useDepartmentStore = defineStore('department', {
     state: () => ({
@@ -48,9 +49,10 @@ export const useDepartmentStore = defineStore('department', {
             const toast = useToast()
             try {
                 const { $api } = useNuxtApp()
+                const auth = useAuthStore()
                 const { data } = await $api.get(`/departments/all`, {
                     params: {
-                        organization_id: this.organization_id,
+                        organization_id: this.organization_id ? this.organization_id : auth.organization,
                     },
                 })
 

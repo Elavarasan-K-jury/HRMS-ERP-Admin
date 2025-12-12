@@ -14,7 +14,7 @@
         </div>
         <OrganizationDataTable :items="organizations" :loading="loading" :total="organizationStore.meta.total"
             :page="organizationStore.meta.page" :total-pages="organizationStore.meta.totalPages" @refresh="refresh"
-            @next="next" @prev="prev" @view="view" @edit="edit" @delete="del" />
+            @next="next" @prev="prev" @edit="edit" @delete="del" />
     </div>
     <UiSidebarModal v-model="open" title="Add New Organization">
         <template #default>

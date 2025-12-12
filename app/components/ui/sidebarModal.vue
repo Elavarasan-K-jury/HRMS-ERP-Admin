@@ -3,7 +3,7 @@
         <div v-if="modelValue" class="fixed inset-0 z-[100] flex justify-end backdrop-blur-lg" @click.self="close">
             <aside class="relative h-full flex flex-col text-white border-l border-white/20
           bg-white/10 backdrop-blur-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.6)]
-          transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]" :style="{ width: width }">
+          transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]" :style="sidebarStyle">
                 <!-- Header -->
                 <header class="flex items-center justify-between px-5 py-4 border-b border-white/20
             bg-white/10 backdrop-blur-lg">
@@ -11,13 +11,22 @@
                         <slot name="title">{{ title }}</slot>
                     </h2>
 
-                    <button v-if="showClose" @click="close" class="text-white/60 hover:text-white transition-colors">
-                        <Icon name="lucide:x" class="w-5 h-5" />
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <!-- Fullscreen Toggle Button -->
+                        <button @click="toggleFullscreen" class="text-white/60 hover:text-white transition-colors"
+                            :title="isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'">
+                            <Icon :name="isFullscreen ? 'lucide:minimize-2' : 'lucide:maximize-2'" class="w-5 h-5" />
+                        </button>
+
+                        <button v-if="showClose" @click="close"
+                            class="text-white/60 hover:text-white transition-colors">
+                            <Icon name="lucide:x" class="w-5 h-5" />
+                        </button>
+                    </div>
                 </header>
 
                 <!-- Content -->
-                <div class="flex-1 overflow-y-auto px-5 py-4 glass-scroll">
+                <div class="flex-1 overflow-y-auto p-2 glass-scroll">
                     <slot>
                         <p class="text-white/60 text-sm">
                             Add your form or content here.
@@ -45,6 +54,8 @@
 </template>
 
 <script setup>
+import { ref, computed } from 'vue'
+
 const props = defineProps({
     modelValue: { type: Boolean, required: true },
     title: { type: String, default: 'Add New Item' },
@@ -57,12 +68,28 @@ const props = defineProps({
 
     /** Show or hide footer */
     showFooter: { type: Boolean, default: true },
+
+    /** Start in fullscreen mode */
+    fullscreen: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['update:modelValue', 'close'])
+
+const isFullscreen = ref(props.fullscreen)
+
+const sidebarStyle = computed(() => ({
+    width: isFullscreen.value ? '100vw' : props.width
+}))
+
 const close = () => {
     emit('update:modelValue', false)
     emit('close')
+    // Reset fullscreen state when closing
+    isFullscreen.value = props.fullscreen
+}
+
+const toggleFullscreen = () => {
+    isFullscreen.value = !isFullscreen.value
 };
 </script>
 
