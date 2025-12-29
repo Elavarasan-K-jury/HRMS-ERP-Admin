@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev --host 0.0.0.0",
+    "dev": "PORT=3030 HOST=0.0.0.0 nuxt dev",
     "generate": "nuxt generate",
-    "preview": "nuxt preview --host 0.0.0.0",
+    "preview": "PORT=3030 HOST=0.0.0.0 nuxt preview",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
@@ -28,5 +28,10 @@
     "vue": "^3.5.22",
     "vue-router": "^4.6.3",
     "vue3-apexcharts": "^1.10.0"
+  },
+  "devDependencies": {
+    "@iconify-json/heroicons-outline": "^1.2.1",
+    "@iconify-json/heroicons-solid": "^1.2.1",
+    "@iconify-json/lucide": "^1.2.62"
   }
 }

@@ -1,4 +1,8 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { fileURLToPath } from 'node:url'
+import { dirname, resolve } from 'node:path'
+const __dirname = dirname(fileURLToPath(import.meta.url))
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
@@ -16,8 +20,9 @@ export default defineNuxtConfig({
   devServer: {
     port: 3030
   },
-  server: {
-    port: 3030
+  icon: {
+    mode: 'css', // or 'svg' if you want inline
+    autoInstall: true
   },
   serverDir: 'server',
   runtimeConfig: {
