@@ -88,9 +88,9 @@
                         <!-- Actions -->
                         <td class="td text-right">
                             <div class="inline-flex flex-col items-center gap-1.5">
-                                <button class="btn-icon" title="View" @click="$emit('view', item)">
+                                <!-- <button class="btn-icon" title="View" @click="$emit('view', item)">
                                     <Icon name="lucide:eye" class="w-4 h-4" />
-                                </button>
+                                </button> -->
                                 <button class="btn-icon" title="Edit" @click="$emit('edit', item)">
                                     <Icon name="lucide:pencil" class="w-4 h-4" />
                                 </button>

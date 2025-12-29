@@ -1,21 +1,60 @@
 <template>
     <div class="p-2 h-[calc(100vh-4rem)] overflow-y-scroll flex flex-col gap-2">
-        <div
-            class="rounded-lg p-5 bg-white/10 border h-16 border-white/15 backdrop-blur-xl shadow-lg flex items-center justify-between">
-            <h2 class="text-lg font-semibold uppercase text-white/90">{{ total }}
-                Salary Component<span>(s)</span></h2>
-            <div class="flex items-center gap-2">
-                <UiSearch :color="search ? '#4aff7a' : '#fff'" v-model="search" :suggestions="results"
-                    :loading="loading" @search="fetchResults" @select="goTo" />
-                <UiButton @click="openAddModal" color="#4aff7a" text="Add Salary Component"
-                    prepend-icon="ion:add-circle" />
-                <UiButton @click="fetchComponents" color="#fff" text="Reload" prepend-icon="ion:refresh" />
+        <template v-if="financeEnabled">
+            <div
+                class="rounded-lg p-5 bg-white/10 border h-16 border-white/15 backdrop-blur-xl shadow-lg flex items-center justify-between">
+                <h2 class="text-lg font-semibold uppercase text-white/90">{{ total }}
+                    Salary Component<span>(s)</span></h2>
+                <div class="flex items-center gap-2">
+                    <UiSearch :color="search ? '#4aff7a' : '#fff'" v-model="search" :suggestions="results"
+                        :loading="loading" @search="fetchResults" @select="goTo" />
+                    <UiButton @click="openAddModal" color="#4aff7a" text="Add Salary Component"
+                        prepend-icon="ion:add-circle" />
+                    <UiButton @click="fetchComponents" color="#fff" text="Reload" prepend-icon="ion:refresh" />
+                </div>
+            </div>
+            <UiTabs v-model="activeTab" :tabs="tabs" color="#fff" :blur="16" />
+            <SalaryComponentTable :items="components" :loading="loading" :total="total" :page="page"
+                :total-pages="totalPages" @view="viewDetails" @edit="editComponent" @delete="deleteComponent"
+                @prev="page-- && fetchComponents()" @next="page++ && fetchComponents()" />
+        </template>
+        <div v-else
+            class="rounded-lg p-5 bg-white/10 border h-full border-white/15 backdrop-blur-xl shadow-lg flex items-center justify-center">
+            <div class="max-w-lg w-full p-8 text-center">
+                <!-- Icon / Illustration -->
+                <div class="w-20 h-20 mx-auto mb-4 rounded-full
+                 bg-gradient-to-br from-amber-400 to-orange-500
+                 flex items-center justify-center text-4xl">
+                    <Icon name="heroicons:currency-rupee" class="text-[50px]" />
+                </div>
+
+                <!-- Title -->
+                <h2 class="text-2xl font-semibold text-white mb-2">
+                    Finance Module Not Enabled
+                </h2>
+
+                <!-- Description -->
+                <p class="text-white/70 text-sm mb-6">
+                    To manage payroll, salaries, invoices and financial reports,
+                    you need to set up the finance module for your organization.
+                </p>
+
+                <!-- CTA -->
+                <NuxtLink :to="`/organization/${authStore.organization}/payroll/settings`" class="px-6 py-3 rounded-lg
+                 bg-gradient-to-r from-indigo-500 to-purple-600
+                 text-white font-medium shadow-lg
+                 hover:scale-[1.02] active:scale-[0.98]
+                 transition-all">
+                    Setup Finance
+                </NuxtLink>
+
+                <!-- Secondary Hint -->
+                <p class="text-xs text-white/50 mt-4">
+                    Only administrators can configure finance settings
+                </p>
             </div>
         </div>
-        <UiTabs v-model="activeTab" :tabs="tabs" color="#fff" :blur="16" />
-        <SalaryComponentTable :items="components" :loading="loading" :total="total" :page="page"
-            :total-pages="totalPages" @view="viewDetails" @edit="editComponent" @delete="deleteComponent"
-            @prev="page-- && fetchComponents()" @next="page++ && fetchComponents()" />
+
     </div>
     <UiSidebarModal v-model="addUpdateModal" @close="closeAddUpdateModal"
         :title="componentId ? 'Update Salary Component' : 'Create Salary Component'">
@@ -36,7 +75,7 @@
         </template>
         <template #footer>
             <UiButton @click="cancelDelete" color="#fff" text="Cancel" prepend-icon="ion:close-circle" />
-            <UiButton @click="confirmDelete" color="#750d0d" text="Delete Department" prepend-icon="ion:trash" />
+            <UiButton @click="confirmDelete" color="#750d0d" text="Delete Component" prepend-icon="ion:trash" />
         </template>
     </UiModal>
 </template>
@@ -47,9 +86,13 @@ import { computed, ref, watch } from 'vue';
 import SalaryComponentForm from '../../../../components/component-definition/form.vue'
 import SalaryComponentTable from '../../../../components/component-definition/dataTable.vue'
 import { useComponentDefinitionStore } from '../../../../stores/componentDefinition.store';
+import { useFinanceStore } from '../../../../stores/finance.store';
 import { storeToRefs } from 'pinia';
+import { useAuthStore } from '../../../../stores/auth.store';
 
+const authStore = useAuthStore()
 const componentDefinitionStore = useComponentDefinitionStore()
+const financeStore = useFinanceStore()
 definePageMeta({
     layout: 'organization',
 });
@@ -67,12 +110,21 @@ const {
     activeTab
 } = storeToRefs(componentDefinitionStore)
 
+const financeEnabled = computed(() => financeStore.isFinanceEnabled())
 const deleteData = ref(null)
 const deleteModal = ref(false)
 
 const tabs = computed(() => componentDefinitionStore.tabs)
 
 const deleteComponent = (component) => {
+    if (!component.isDeletable) {
+        const toast = useToast()
+        return toast.error({
+            title: 'Error!',
+            message: "Default component can't be deleted",
+            timeout: 1500
+        })
+    }
     componentId.value = component.id
     deleteData.value = component
     deleteModal.value = true
@@ -138,6 +190,9 @@ const fetchComponents = async () => {
 }
 
 onMounted(async () => {
-    await fetchComponents()
+    await financeStore.checkFinanceEnabled()
+    if (financeEnabled.value) {
+        await fetchComponents()
+    }
 });
 </script>

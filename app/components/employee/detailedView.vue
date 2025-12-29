@@ -1,244 +1,257 @@
 <template>
-    <UiSidebarModal v-model="open" @close="close" :title="`Employee: ${employee?.full_name || '—'}`" size="xl">
-        <template #default>
-            <div v-if="employee && !loading" class="cv-auto text-white/90">
-                <!-- 🌟 Profile Header -->
-                <section class="blk">
-                    <div class="profile-card">
-                        <div class="avatar">
-                            <span>{{ initials }}</span>
-                        </div>
+    <div>
+        <UiSidebarModal v-model="open" @close="close" :title="`Employee: ${employee?.full_name || '—'}`" size="xl">
+            <template #default>
+                <div v-if="employee && !loading" class="cv-auto text-white/90">
+                    <!-- 🌟 Profile Header -->
+                    <section class="blk">
+                        <div class="profile-card">
+                            <div class="avatar">
+                                <span>{{ initials }}</span>
+                            </div>
 
-                        <div class="profile-main">
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <h2 class="profile-name">
-                                    {{ employee.full_name || '—' }}
-                                </h2>
-                                <span v-if="employee.employee_code" class="chip chip-soft">
-                                    <Icon name="lucide:badge-check" class="chip-ic" />
-                                    {{ employee.employee_code }}
+                            <div class="profile-main">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <h2 class="profile-name">
+                                        {{ employee.full_name || '—' }}
+                                    </h2>
+                                    <span v-if="employee.employee_code" class="chip chip-soft">
+                                        <Icon name="lucide:badge-check" class="chip-ic" />
+                                        {{ employee.employee_code }}
+                                    </span>
+                                </div>
+
+                                <div class="profile-meta">
+                                    <div class="meta-item">
+                                        <Icon name="lucide:briefcase" class="meta-ic" />
+                                        <span>{{ employee.designation?.name || '—' }}</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <Icon name="lucide:building-2" class="meta-ic" />
+                                        <span>{{ employee.organization?.name || '—' }}</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <Icon name="lucide:layers" class="meta-ic" />
+                                        <span>{{ employee.category?.name || '—' }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="profile-contact">
+                                    <div class="meta-item">
+                                        <Icon name="lucide:mail" class="meta-ic" />
+                                        <span>{{ employee.email || '—' }}</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <Icon name="lucide:phone" class="meta-ic" />
+                                        <span>{{ employee.phone || '—' }}</span>
+                                    </div>
+                                    <div v-if="employee.alt_phone" class="meta-item">
+                                        <Icon name="lucide:phone-call" class="meta-ic" />
+                                        <span>{{ employee.alt_phone }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 📂 Employment Info -->
+                    <section class="blk">
+                        <h2 class="hdr">
+                            <Icon name="lucide:id-card" class="ic" /> Employment Details
+                        </h2>
+                        <div class="grid2">
+                            <div>
+                                <span class="label">Employee Code</span>
+                                {{ employee.employee_code || '—' }}
+                            </div>
+                            <div>
+                                <span class="label">Organization</span>
+                                {{ employee.organization?.name || '—' }}
+                            </div>
+                            <div>
+                                <span class="label">Category</span>
+                                {{ employee.category?.name || '—' }}
+                            </div>
+                            <div>
+                                <span class="label">Designation</span>
+                                {{ employee.designation?.name || '—' }}
+                            </div>
+                            <div>
+                                <span class="label">Department</span>
+                                {{ employee.department?.name || employee.department_id || '—' }}
+                            </div>
+                            <div>
+                                <span class="label">Employment Type</span>
+                                <span>
+                                    <template v-if="employee.category?.is_permanent">Permanent</template>
+                                    <template v-else>—</template>
                                 </span>
                             </div>
-
-                            <div class="profile-meta">
-                                <div class="meta-item">
-                                    <Icon name="lucide:briefcase" class="meta-ic" />
-                                    <span>{{ employee.designation?.name || '—' }}</span>
-                                </div>
-                                <div class="meta-item">
-                                    <Icon name="lucide:building-2" class="meta-ic" />
-                                    <span>{{ employee.organization?.name || '—' }}</span>
-                                </div>
-                                <div class="meta-item">
-                                    <Icon name="lucide:layers" class="meta-ic" />
-                                    <span>{{ employee.category?.name || '—' }}</span>
-                                </div>
+                            <div>
+                                <span class="label">Benefits Applicable</span>
+                                {{ bool(employee.category?.benefits_applicable) }}
                             </div>
-
-                            <div class="profile-contact">
-                                <div class="meta-item">
-                                    <Icon name="lucide:mail" class="meta-ic" />
-                                    <span>{{ employee.email || '—' }}</span>
-                                </div>
-                                <div class="meta-item">
-                                    <Icon name="lucide:phone" class="meta-ic" />
-                                    <span>{{ employee.phone || '—' }}</span>
-                                </div>
-                                <div v-if="employee.alt_phone" class="meta-item">
-                                    <Icon name="lucide:phone-call" class="meta-ic" />
-                                    <span>{{ employee.alt_phone }}</span>
-                                </div>
+                            <div>
+                                <span class="label">Training Required</span>
+                                {{ bool(employee.category?.training_required) }}
                             </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- 📂 Employment Info -->
-                <section class="blk">
-                    <h2 class="hdr">
-                        <Icon name="lucide:id-card" class="ic" /> Employment Details
-                    </h2>
-                    <div class="grid2">
-                        <div>
-                            <span class="label">Employee Code</span>
-                            {{ employee.employee_code || '—' }}
-                        </div>
-                        <div>
-                            <span class="label">Organization</span>
-                            {{ employee.organization?.name || '—' }}
-                        </div>
-                        <div>
-                            <span class="label">Category</span>
-                            {{ employee.category?.name || '—' }}
-                        </div>
-                        <div>
-                            <span class="label">Designation</span>
-                            {{ employee.designation?.name || '—' }}
-                        </div>
-                        <div>
-                            <span class="label">Department</span>
-                            {{ employee.department?.name || employee.department_id || '—' }}
-                        </div>
-                        <div>
-                            <span class="label">Employment Type</span>
-                            <span>
-                                <template v-if="employee.category?.is_permanent">Permanent</template>
+                            <div>
+                                <span class="label">Probation</span>
+                                <template v-if="employee.category?.probation_required">
+                                    {{ employee.category.probation_months || 0 }} month(s)
+                                </template>
                                 <template v-else>—</template>
-                            </span>
+                            </div>
+                            <div>
+                                <span class="label">Notice Period</span>
+                                <template v-if="employee.category?.notice_required">
+                                    {{ employee.category.notice_months || 0 }} month(s)
+                                </template>
+                                <template v-else>—</template>
+                            </div>
+                            <div class="col2">
+                                <span class="label">Category Description</span>
+                                {{ employee.category?.description || '—' }}
+                            </div>
                         </div>
-                        <div>
-                            <span class="label">Benefits Applicable</span>
-                            {{ bool(employee.category?.benefits_applicable) }}
-                        </div>
-                        <div>
-                            <span class="label">Training Required</span>
-                            {{ bool(employee.category?.training_required) }}
-                        </div>
-                        <div>
-                            <span class="label">Probation</span>
-                            <template v-if="employee.category?.probation_required">
-                                {{ employee.category.probation_months || 0 }} month(s)
-                            </template>
-                            <template v-else>—</template>
-                        </div>
-                        <div>
-                            <span class="label">Notice Period</span>
-                            <template v-if="employee.category?.notice_required">
-                                {{ employee.category.notice_months || 0 }} month(s)
-                            </template>
-                            <template v-else>—</template>
-                        </div>
-                        <div class="col2">
-                            <span class="label">Category Description</span>
-                            {{ employee.category?.description || '—' }}
-                        </div>
-                    </div>
-                </section>
+                    </section>
 
-                <!-- 🧍 Personal Info -->
-                <section class="blk">
-                    <h2 class="hdr">
-                        <Icon name="lucide:user-round" class="ic" /> Personal Info
-                    </h2>
-                    <div class="grid2">
-                        <div>
-                            <span class="label">Full Name</span>
-                            {{ employee.full_name || '—' }}
+                    <!-- 🧍 Personal Info -->
+                    <section class="blk">
+                        <h2 class="hdr">
+                            <Icon name="lucide:user-round" class="ic" /> Personal Info
+                        </h2>
+                        <div class="grid2">
+                            <div>
+                                <span class="label">Full Name</span>
+                                {{ employee.full_name || '—' }}
+                            </div>
+                            <div>
+                                <span class="label">Gender</span>
+                                <span class="chip chip-soft">
+                                    <Icon name="lucide:user" class="chip-ic" />
+                                    {{ formatGender(employee.gender) }}
+                                </span>
+                            </div>
+                            <div>
+                                <span class="label">Date of Birth</span>
+                                {{ employee.date_of_birth || '—' }}
+                            </div>
+                            <div>
+                                <span class="label">Primary Phone</span>
+                                {{ employee.phone || '—' }}
+                            </div>
+                            <div>
+                                <span class="label">Alternate Phone</span>
+                                {{ employee.alt_phone || '—' }}
+                            </div>
+                            <div class="col2">
+                                <span class="label">Email</span>
+                                {{ employee.email || '—' }}
+                            </div>
                         </div>
-                        <div>
-                            <span class="label">Gender</span>
-                            <span class="chip chip-soft">
-                                <Icon name="lucide:user" class="chip-ic" />
-                                {{ formatGender(employee.gender) }}
-                            </span>
-                        </div>
-                        <div>
-                            <span class="label">Date of Birth</span>
-                            {{ employee.date_of_birth || '—' }}
-                        </div>
-                        <div>
-                            <span class="label">Primary Phone</span>
-                            {{ employee.phone || '—' }}
-                        </div>
-                        <div>
-                            <span class="label">Alternate Phone</span>
-                            {{ employee.alt_phone || '—' }}
-                        </div>
-                        <div class="col2">
-                            <span class="label">Email</span>
-                            {{ employee.email || '—' }}
-                        </div>
-                    </div>
-                </section>
+                    </section>
 
-                <!-- 🏢 Organization -->
-                <section class="blk">
-                    <h2 class="hdr">
-                        <Icon name="lucide:building-2" class="ic" /> Organization
-                    </h2>
-                    <div class="grid2">
-                        <div>
-                            <span class="label">Name</span>
-                            {{ employee.organization?.name || '—' }}
+                    <!-- 🏢 Organization -->
+                    <section class="blk">
+                        <h2 class="hdr">
+                            <Icon name="lucide:building-2" class="ic" /> Organization
+                        </h2>
+                        <div class="grid2">
+                            <div>
+                                <span class="label">Name</span>
+                                {{ employee.organization?.name || '—' }}
+                            </div>
+                            <div>
+                                <span class="label">Email</span>
+                                {{ employee.organization?.email || '—' }}
+                            </div>
+                            <div>
+                                <span class="label">Industry</span>
+                                {{ employee.organization?.industry || '—' }}
+                            </div>
+                            <div>
+                                <span class="label">Size</span>
+                                <template v-if="employee.organization?.size">
+                                    {{ employee.organization.size }} Employees
+                                </template>
+                                <template v-else>—</template>
+                            </div>
+                            <div class="col2">
+                                <span class="label">Domain</span>
+                                <a v-if="employee.organization?.domain" :href="employee.organization.domain"
+                                    target="_blank" rel="noopener" class="lnk">
+                                    {{ employee.organization.domain }}
+                                </a>
+                                <span v-else>—</span>
+                            </div>
+                            <div>
+                                <span class="label">Contact Person</span>
+                                {{ employee.organization?.contact_person_name || '—' }}
+                            </div>
+                            <div>
+                                <span class="label">Phone</span>
+                                {{ employee.organization?.contact_person_number || '—' }}
+                            </div>
+                            <div class="col2">
+                                <span class="label">Address</span>
+                                {{ formatAddress(employee.organization?.address) }}
+                            </div>
                         </div>
-                        <div>
-                            <span class="label">Email</span>
-                            {{ employee.organization?.email || '—' }}
-                        </div>
-                        <div>
-                            <span class="label">Industry</span>
-                            {{ employee.organization?.industry || '—' }}
-                        </div>
-                        <div>
-                            <span class="label">Size</span>
-                            <template v-if="employee.organization?.size">
-                                {{ employee.organization.size }} Employees
-                            </template>
-                            <template v-else>—</template>
-                        </div>
-                        <div class="col2">
-                            <span class="label">Domain</span>
-                            <a v-if="employee.organization?.domain" :href="employee.organization.domain" target="_blank"
-                                rel="noopener" class="lnk">
-                                {{ employee.organization.domain }}
-                            </a>
-                            <span v-else>—</span>
-                        </div>
-                        <div>
-                            <span class="label">Contact Person</span>
-                            {{ employee.organization?.contact_person_name || '—' }}
-                        </div>
-                        <div>
-                            <span class="label">Phone</span>
-                            {{ employee.organization?.contact_person_number || '—' }}
-                        </div>
-                        <div class="col2">
-                            <span class="label">Address</span>
-                            {{ formatAddress(employee.organization?.address) }}
-                        </div>
-                    </div>
-                </section>
+                    </section>
 
-                <!-- 🕒 Timestamps -->
-                <section class="blk">
-                    <h2 class="hdr">
-                        <Icon name="lucide:calendar-clock" class="ic" /> Timestamps
-                    </h2>
-                    <div class="grid2">
-                        <div>
-                            <span class="label">Created</span>
-                            {{ formatDate(employee.created_at) }}
+                    <!-- 🕒 Timestamps -->
+                    <section class="blk">
+                        <h2 class="hdr">
+                            <Icon name="lucide:calendar-clock" class="ic" /> Timestamps
+                        </h2>
+                        <div class="grid2">
+                            <div>
+                                <span class="label">Created</span>
+                                {{ formatDate(employee.created_at) }}
+                            </div>
+                            <div>
+                                <span class="label">Updated</span>
+                                {{ formatDate(employee.updated_at) }}
+                            </div>
                         </div>
-                        <div>
-                            <span class="label">Updated</span>
-                            {{ formatDate(employee.updated_at) }}
-                        </div>
-                    </div>
-                </section>
-            </div>
+                    </section>
+                </div>
 
-            <div v-else class="center">
-                <Icon name="lucide:loader-2" class="spin ic mr-2" /> Loading employee details...
-            </div>
-        </template>
+                <div v-else class="center">
+                    <Icon name="lucide:loader-2" class="spin ic mr-2" /> Loading employee details...
+                </div>
+            </template>
 
-        <template #footer>
-            <div class="footer flex gap-2">
-                <NuxtLink v-if="employee" target="_blank"
-                    :to="getUserProfileUrl(employee.id, employee.organization_id)">
-                    <UiButton text="Open Profile" color="#fff" />
-                </NuxtLink>
-                <UiButton text="Close" color="#4aff7a" @click="close" />
-            </div>
-        </template>
-    </UiSidebarModal>
+            <template #footer>
+                <div class="footer flex gap-2">
+                    <UiButton @click="openReportView(employee.id)" text="Report" color="#fff" />
+                    <NuxtLink v-if="employee" target="_blank"
+                        :to="getUserProfileUrl(employee.id, employee.organization_id)">
+                        <UiButton text="Open Profile" color="#fff" />
+                    </NuxtLink>
+                    <UiButton text="Close" color="#4aff7a" @click="close" />
+                </div>
+            </template>
+        </UiSidebarModal>
+        <UiSidebarModal :showFooter="false" v-model="openReport" @close="closeReportView"
+            :title="`Report: ${employee?.full_name || '—'}`" width="900px">
+            <template #default>
+                <div v-if="loadingReport" class="w-full h-full flex items-center justify-center">
+                    <UiLoader />
+                </div>
+                <div v-else v-html="report.html" />
+            </template>
+        </UiSidebarModal>
+    </div>
 </template>
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useEmployeesStore } from '../../stores/employee.store'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 const router = useRouter()
+const route = useRoute()
 const employeesStore = useEmployeesStore()
 const loading = ref(false)
 const employee = ref(null)
@@ -254,11 +267,27 @@ const open = computed({
     set: (v) => emit('update:modelValue', v),
 })
 
+const openReport = computed(() => route.query.report || false)
+const report = computed(() => employeesStore.employeeReport)
+const loadingReport = ref(true)
+
+const openReportView = (empid) => {
+    router.push({ query: { employee_id: empid, preview: true, report: true } })
+}
+
 const close = () => {
     emit('update:modelValue', false)
     router.push({ query: {} })
 }
+const closeReportView = () => {
+    const { report, ...rest } = router.currentRoute.value.query
 
+    router.push({
+        query: {
+            ...rest
+        }
+    })
+}
 const initials = computed(() => {
     const e = employee.value
     if (!e) return '—'
@@ -328,6 +357,13 @@ const getUserProfileUrl = (employeeId, orgId) => `/organization/${orgId}/employe
 onMounted(async () => {
     loading.value = true
     const data = await employeesStore.fetchEmployee(props.id)
+    if (openReport.value) {
+        loadingReport.value = true
+        await employeesStore.fetchEmployeeReport(props.id)
+        setTimeout(() => {
+            loadingReport.value = false
+        }, 1000);
+    }
     employee.value = data.employee
     loading.value = false
 });

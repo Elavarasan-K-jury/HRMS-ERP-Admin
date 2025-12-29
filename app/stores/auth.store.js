@@ -16,7 +16,8 @@ export const useAuthStore = defineStore('Auth', {
         isLoggedIn: false,
         loading: false,
 
-        organization: null
+        organization: null,
+        employee: null
     }),
 
     actions: {
@@ -88,7 +89,7 @@ export const useAuthStore = defineStore('Auth', {
                 return data
             } catch (err) {
                 console.error('[Auth] Login error:', err)
-                toast.error({ title: 'Error!', message: err.message, timeout: 1500 })
+                toast.error({ title: 'Error!', message: err?.response?.data?.error?.split(':')?.[1] || err.message, timeout: 1500 })
                 return { success: false, message: 'Login request failed' }
             } finally {
                 this.loading = false

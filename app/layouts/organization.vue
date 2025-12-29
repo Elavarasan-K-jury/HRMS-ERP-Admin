@@ -43,11 +43,13 @@
 import { organization_menu } from '../data/menu'
 import { useThemeStore } from '../stores/theme.store'
 import { useAuthStore } from '../stores/auth.store'
+import { useFinanceStore } from '../stores/finance.store'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const authStore = useAuthStore()
+const financeStore = useFinanceStore()
 const themeStore = useThemeStore()
 
 const menu = ref([])
@@ -93,6 +95,7 @@ onMounted(async () => {
         if (route.params.organization) {
             authStore.organization = route.params.organization
             menu.value = organization_menu(route.params.organization)
+            await financeStore.checkFinanceEnabled()
         }
 
         themeStore.loadColor() // load HEX color on mount

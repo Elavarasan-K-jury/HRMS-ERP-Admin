@@ -1,10 +1,12 @@
 // app/stores/assetModel.store.js
 import { defineStore } from 'pinia'
+import { useAuthStore } from './auth.store'
 
 export const useAssetsModelStore = defineStore('AssetsModel', {
     state: () => ({
         total: 0,
         models: [],
+        models_select: [],
         page: 1,
         limit: 10,
         totalPages: 0,
@@ -33,16 +35,45 @@ export const useAssetsModelStore = defineStore('AssetsModel', {
         /* ----------------------------------------------------
          * FETCH MODELS (LIST)
         ---------------------------------------------------- */
-        async fetchAssetModels() {
+        async fetchAllAssetModels() {
             const { $api } = useNuxtApp()
             const toast = useToast()
+            const auth = useAuthStore()
 
             try {
                 this.loading = true
 
                 const res = await $api.get('/asset-models', {
                     params: {
-                        organization_id: this.organization_id,
+                        organization_id: auth.organization,
+                    },
+                })
+
+                if (res.data.success) {
+                    this.models_select = res.data.models.map(e => ({
+                        value: e.id,
+                        label: `${e.model_name} (${e.brand})`
+                    }))
+                }
+            } catch (err) {
+                console.error('[AssetsModel] Fetch models error:', err)
+                toast.error({ title: 'Error!', message: err.message, timeout: 1500 })
+            } finally {
+                this.loading = false
+            }
+        },
+
+        async fetchAssetModels() {
+            const { $api } = useNuxtApp()
+            const toast = useToast()
+            const auth = useAuthStore()
+
+            try {
+                this.loading = true
+
+                const res = await $api.get('/asset-models', {
+                    params: {
+                        organization_id: auth.organization,
                         page: Number(this.page),
                         limit: Number(this.limit),
                         search: this.search,
@@ -70,11 +101,12 @@ export const useAssetsModelStore = defineStore('AssetsModel', {
         async fetchAllCategories() {
             const { $api } = useNuxtApp()
             const toast = useToast()
+            const auth = useAuthStore()
 
             try {
                 const res = await $api.get('/asset-categories', {
                     params: {
-                        organization_id: this.organization_id,
+                        organization_id: auth.organization,
                     },
                 })
 

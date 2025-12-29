@@ -34,10 +34,29 @@ export const useEmployeesStore = defineStore('employee', {
                 employees_list: []
             }
         ],
-        employee_id: null
+        employee_id: null,
+        employeeReport: null,
     }),
     actions: {
-        async fetchAllEmployees(department_id, ret = false) {
+        async fetchEmployeeReport(employee_id) {
+            this.loading = true
+            const { $api } = useNuxtApp()
+
+            try {
+
+                const { data } = await $api.get(`/reports/employee/${employee_id}`)
+                console.log('employee.store.js @ Line 18:', data);
+                this.employeeReport = data
+            } catch (err) {
+                console.error('❌ Failed to fetch employee report:', err)
+                this.error = err
+            } finally {
+                setTimeout(() => {
+                    this.loading = false
+                }, 1000);
+            }
+        },
+        async fetchAllEmployees(department_id = null, ret = false) {
             this.loading = true
             const { $api } = useNuxtApp()
             const organization_id = this.organization_id

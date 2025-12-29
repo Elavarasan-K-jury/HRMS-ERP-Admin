@@ -1,7 +1,7 @@
 <template>
     <div class="relative select-none" :class="fullWidth ? 'w-full' : widthClass">
         <div class="rounded-lg overflow-hidden border shadow-[0_8px_30px_rgba(0,0,0,.25)] transition-all duration-200"
-            :class="roundedClass" :style="editorWrapperStyle">
+            :class="[roundedClass, { 'opacity-60 pointer-events-none': disabled }]" :style="editorWrapperStyle">
             <!-- Quill mounts its toolbar automatically here -->
             <div ref="editorRef" class="quill-editor"></div>
         </div>
@@ -24,6 +24,8 @@ const props = defineProps({
     rounded: { type: String, default: "lg" },
     fullWidth: { type: Boolean, default: false },
     width: { type: String, default: "100%" },
+
+    disabled: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(["update:modelValue"]);

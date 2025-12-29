@@ -86,7 +86,6 @@
                                 <div class="col-span-12 mt-2">
                                     <h3 class="text-white/90 font-semibold">Structure Details</h3>
                                     <div class="grid grid-cols-12 gap-2">
-                                        <PanelRow label="Structure ID" :value="item.structure.id" />
                                         <PanelRow label="Gross Annual"
                                             :value="formatCurrency(item.structure.grossAnnual)" />
                                         <PanelRow label="Status" :value="item.structure.status" />

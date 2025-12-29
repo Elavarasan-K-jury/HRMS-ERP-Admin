@@ -14,8 +14,7 @@
             </div>
         </div>
         <DataTable :items="employees" :loading="loading" :total="total" :page="page" :total-pages="totalPages"
-            @refresh="fetchDepartments" @salary="openSalaryPreview" @view="view" @edit="editEmployee"
-            @delete="deleteEmployee" />
+            @refresh="fetchDepartments" @view="view" @edit="editEmployee" @delete="deleteEmployee" />
     </div>
     <UiSidebarModal width="980px" v-model="addUpdateModal" :title="formTitle">
         <EmployeeForm />
@@ -80,10 +79,6 @@ const formTitle = ref(null)
 
 const view = (emp) => {
     router.push({ query: { employee_id: emp.id, preview: true } })
-}
-
-const openSalaryPreview = (data) => {
-    router.push(`/organization/${data.organization_id}/employee/${data.id}/finance/salary`)
 }
 
 const {

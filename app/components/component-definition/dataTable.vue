@@ -71,8 +71,12 @@
                         class="border-b border-white/5 hover:bg-white/5 transition-colors">
 
                         <!-- Name + Description hint -->
-                        <td class="td align-top font-semibold text-white">
-                            {{ `${item.name} ${item.key ? `( ${item.key} )` : ''}` || '—' }}
+                        <td class="td !min-w-[400px] align-top font-semibold text-white">
+                            {{ `${item.name} ${item.key ? `( ${item.key} )` : ''}` || '—' }} <span v-if="item.isDefault"
+                                class="bg-blue-400 text-xs px-5 py-1 ml-3 rounded-full shadow shadow-white/70">{{
+                                    item.isDefault ?
+                                        'Default' : ''
+                                }}</span>
                             <div v-if="item.description" class="text-xs text-white/70 mt-1 line-clamp-2"
                                 v-html="shortDescription(item.description)" />
                         </td>

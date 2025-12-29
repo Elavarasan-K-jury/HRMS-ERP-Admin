@@ -5,7 +5,6 @@ export const useComponentDefinitionStore = defineStore("componentDefinitionStore
     state: () => ({
         loading: false,
         error: null,
-
         // LISTING
         components: [],
         page: 1,
@@ -38,6 +37,8 @@ export const useComponentDefinitionStore = defineStore("componentDefinitionStore
             defaultFormula: "",
             description: "",
 
+            isDefault: false,
+            isDeletable: true,
             isTaxable: true,
             isVariable: false,
             isStatutory: false,
@@ -112,6 +113,8 @@ export const useComponentDefinitionStore = defineStore("componentDefinitionStore
                 defaultFormula: item.defaultFormula,
                 description: item.description,
 
+                isDefault: item.isDefault,
+                isDeletable: item.isDeletable,
                 isTaxable: item.isTaxable,
                 isVariable: item.isVariable,
                 isStatutory: item.isStatutory,
@@ -126,6 +129,42 @@ export const useComponentDefinitionStore = defineStore("componentDefinitionStore
         /* --------------------------------------------------
          * FETCH COMPONENT DEFINITIONS
          * -------------------------------------------------- */
+        async fetchAllComponents() {
+            try {
+                this.loading = true;
+                const authStore = useAuthStore()
+                const { $api } = useNuxtApp()
+                const response = await $api.get("/salary/components", {
+                    params: {
+                        // page: this.page,
+                        // limit: this.limit,
+                        // search: this.search,
+                        // category: this.tabs[this.activeTab].label,
+                        // sort_by: this.sort_by,
+                        // sort_order: this.sort_order,
+                        organization_id: authStore.organization,
+                    },
+                });
+
+                const res = response.data;
+
+                this.components = res.data || [];
+                this.total = res.total;
+                this.totalPages = res.total_pages;
+                this.tabs = this.tabs.map(e => ({
+                    ...e,
+                    badge: res.categories.find(el => el.category_name.toLowerCase() == e.label.toLowerCase())?.components_count
+                }))
+
+            } catch (err) {
+                console.error("Fetch Components Error:", err);
+                this.error = err.message;
+            } finally {
+                setTimeout(() => {
+                    this.loading = false;
+                }, 1000);
+            }
+        },
         async fetchComponents() {
             try {
                 this.loading = true;
@@ -172,7 +211,10 @@ export const useComponentDefinitionStore = defineStore("componentDefinitionStore
                 this.loading = true;
                 const authStore = useAuthStore()
 
-                const payload = {
+                const payload = this.form.isDefault ? {
+                    name: this.form.name,
+                    key: this.form.key
+                } : {
                     ...this.form,
                     type: this.form.type.value,
                     category: this.form.category.value,

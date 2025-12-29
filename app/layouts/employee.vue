@@ -90,6 +90,8 @@ onMounted(async () => {
     try {
         await authStore.loadLocalData()
 
+        console.log('employee.vue @ Line 93:', route.params);
+
         if (route.params.organization && route.params.employee) {
             authStore.organization = route.params.organization
             authStore.employee = route.params.employee

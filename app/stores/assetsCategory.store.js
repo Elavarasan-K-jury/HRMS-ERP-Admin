@@ -59,6 +59,7 @@ export const useAssetsCategoryStore = defineStore('AssetsCategory', {
                         organization_id: this.organization_id,
                     },
                 })
+                console.log('assetsCategory.store.js @ Line 62:', res.data);
                 if (res.data.success) {
                     this.category_list = res.data.categories.map(e => ({
                         value: e.id,

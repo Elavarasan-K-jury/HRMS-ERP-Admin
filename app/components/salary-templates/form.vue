@@ -17,30 +17,19 @@
         </div>
 
         <!-- DEPARTMENTS -->
-        <div class="col-span-12 md:col-span-5 flex flex-col gap-1">
+        <div class="col-span-6 flex flex-col gap-1">
             <label class="text-md text-white/80">Applicable Departments:</label>
             <FormSelect v-model="form.departments" :options="departmentOptions" color="#fff" multiple searchable
                 rounded="lg" />
         </div>
 
         <!-- DESIGNATIONS -->
-        <div class="col-span-12 md:col-span-5 flex flex-col gap-1">
+        <div class="col-span-6 flex flex-col gap-1">
             <label class="text-md text-white/80">Applicable Designations:</label>
             <FormSelect v-model="form.designations" :options="designationOptions" color="#fff" multiple searchable
                 rounded="lg" />
         </div>
 
-        <!-- DEFAULT TOGGLE -->
-        <div class="col-span-6 md:col-span-1 flex flex-col items-start md:items-end justify-between px-3 py-2">
-            <label class="text-white text-sm">Default Template</label>
-            <UiSwitch v-model="form.isDefault" color="#4aff7a" />
-        </div>
-
-        <!-- ACTIVE TOGGLE -->
-        <div class="col-span-6 md:col-span-1 flex flex-col items-start md:items-end justify-between px-3 py-2">
-            <label class="text-white text-sm">Active</label>
-            <UiSwitch v-model="form.isActive" color="#4aff7a" />
-        </div>
 
         <!-- DESCRIPTION -->
         <div class="col-span-12 flex flex-col gap-1">
@@ -48,90 +37,86 @@
             <FormTextArea v-model="form.description" placeholder="Short description about this salary template..." />
         </div>
 
+        <!-- DEFAULT TOGGLE -->
+        <div class="col-span-6 flex flex-col items-start md:items-end justify-between px-3 py-2">
+            <label class="text-white text-sm">Default Template</label>
+            <UiSwitch v-model="form.isDefault" color="#4aff7a" />
+        </div>
+
+        <!-- ACTIVE TOGGLE -->
+        <div class="col-span-6 flex flex-col items-start md:items-end justify-between px-3 py-2">
+            <label class="text-white text-sm">Active</label>
+            <UiSwitch v-model="form.isActive" color="#4aff7a" />
+        </div>
         <!-- ========================================================== -->
         <!-- 🔧 TEMPLATE COMPONENT MAPPER (Responsive Layout) -->
         <!-- ========================================================== -->
 
-        <div class="col-span-12 rounded-lg border border-white/10 bg-white/5 backdrop-blur-xl p-2 mt-4">
+        <!--=<div class="col-span-12 rounded-lg border border-white/10 bg-white/5 backdrop-blur-xl p-2 mt-4">
             <label class="text-lg text-white font-semibold">Template Components</label>
 
-            <!-- RESPONSIVE GRID: 1 column on mobile, 2 on md+ -->
-            <div class="grid gap-2 p-2" style="grid-template-columns: repeat(auto-fit, minmax(320px, 0.25fr));">
-                <!-- Each Component Row -->
+            <div class="grid grid-cols-2 gap-2">
                 <div v-for="(tc, index) in form.components" :key="tc._localId"
-                    class="border border-white/20 p-3 bg-white/10 flex flex-col rounded-lg gap-3">
+                    class="border grid grid-cols-2 border-white/20 p-2 bg-white/10 rounded-lg gap-3">
 
                     <template v-if="!tc.loading">
 
-                        <!-- Component Select -->
-                        <div>
-                            <label class="text-white/70 text-xs">Component</label>
-                            <FormSelect @select="chooseComponent(index)" v-model="tc.componentId"
-                                :options="componentOptions" placeholder="Choose Component" searchable color="#fff"
-                                rounded="lg" size="md" />
+                        <div class="flex flex-col">
+                            <div>
+                                <label class="text-white/70 text-xs">Component</label>
+                                <FormSelect @select="chooseComponent(index)" v-model="tc.componentId"
+                                    :options="componentOptions" placeholder="Choose Component" searchable color="#fff"
+                                    rounded="lg" size="md" />
+                            </div>
+
+                            <div>
+                                <label class="text-white/70 text-xs">Fixed Value</label>
+                                <FormInput v-model="tc.value" placeholder="1000" type="number" size="md" rounded="lg"
+                                    prepend-icon="lucide:calculator" color="#fff" />
+                            </div>
+                            <div>
+                                <label class="text-white/70 text-xs">Order</label>
+                                <FormInput v-model="tc.priority" type="number" size="md" rounded="lg" color="#fff" />
+                            </div>
+
+                            <div class="flex flex-col gap-1">
+                                <label class="text-xs text-white/70">Min Value</label>
+                                <FormInput v-model="tc.minValue" type="number" placeholder="100" color="#fff"
+                                    rounded="lg" />
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="text-xs text-white/70">Max Value</label>
+                                <FormInput v-model="tc.maxValue" type="number" placeholder="1000" color="#fff"
+                                    rounded="lg" />
+                            </div>
+
                         </div>
 
-                        <!-- Formula -->
                         <div>
                             <label class="text-white/70 text-xs">Formula (optional)</label>
                             <FormFormulaBuilder v-model="tc.formula" :components="componentDefinitionList" />
                         </div>
 
-                        <!-- Value -->
-                        <div>
-                            <label class="text-white/70 text-xs">Fixed Value</label>
-                            <FormInput v-model="tc.value" placeholder="1000" type="number" size="md" rounded="lg"
-                                prepend-icon="lucide:calculator" color="#fff" />
-                        </div>
 
-                        <!-- Priority -->
-                        <div>
-                            <label class="text-white/70 text-xs">Order</label>
-                            <FormInput v-model="tc.priority" type="number" size="md" rounded="lg" color="#fff" />
-                        </div>
-
-                        <!-- Condition -->
-                        <div>
-                            <label class="text-white/70 text-xs">Condition (optional)</label>
-                            <FormInput v-model="tc.condition" placeholder="basic > 15000" prepend-icon="lucide:filter"
-                                color="#fff" rounded="lg" />
-                        </div>
-
-                        <!-- Min / Max -->
-                        <div class="flex gap-3">
-                            <div class="flex flex-col gap-1 w-1/2">
-                                <label class="text-xs text-white/70">Min Value</label>
-                                <FormInput v-model="tc.minValue" type="number" placeholder="100" color="#fff"
-                                    rounded="lg" />
-                            </div>
-                            <div class="flex flex-col gap-1 w-1/2">
-                                <label class="text-xs text-white/70">Max Value</label>
-                                <FormInput v-model="tc.maxValue" type="number" placeholder="1000" color="#fff"
-                                    rounded="lg" />
-                            </div>
-                        </div>
-
-                        <!-- Delete -->
-                        <div class="flex justify-end pt-1">
+                        <div class="flex col-span-3 justify-end pt-1">
                             <UiButton size="xs" color="#ff502e" text="Remove Component" prepend-icon="lucide:trash"
                                 @click="removeTemplateComponent(index)" />
                         </div>
 
                     </template>
 
-                    <template v-else>
+<template v-else>
                         <UiLoader />
                     </template>
 
-                </div>
-            </div>
+</div>
+</div>
 
-            <!-- Add Component Button -->
-            <div class="flex justify-end mt-2">
-                <UiButton size="xs" color="#4aff7a" text="Add Component" prepend-icon="ion:add-circle"
-                    @click="addTemplateComponent" />
-            </div>
-        </div>
+<div class="flex justify-end mt-2">
+    <UiButton size="xs" color="#4aff7a" text="Add Component" prepend-icon="ion:add-circle"
+        @click="addTemplateComponent" />
+</div>
+</div> -->
 
     </div>
 </template>

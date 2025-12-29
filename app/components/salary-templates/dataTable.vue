@@ -69,7 +69,7 @@
                             <div class="flex flex-wrap gap-1">
                                 <span v-for="d in item.departments?.slice(0, 3)" :key="d" class="tag">{{ d }}</span>
                                 <span v-if="item.departments?.length > 3" class="tag">+{{ item.departments.length - 3
-                                    }}</span>
+                                }}</span>
                                 <span v-if="!item.departments?.length" class="text-white/50 text-xs">—</span>
                             </div>
                         </td>
@@ -78,9 +78,9 @@
                         <td class="td align-top">
                             <div class="flex flex-wrap gap-1">
                                 <span v-for="des in item.designations?.slice(0, 3)" :key="des" class="tag">{{ des
-                                    }}</span>
+                                }}</span>
                                 <span v-if="item.designations?.length > 3" class="tag">+{{ item.designations.length - 3
-                                    }}</span>
+                                }}</span>
                                 <span v-if="!item.designations?.length" class="text-white/50 text-xs">—</span>
                             </div>
                         </td>
@@ -118,6 +118,9 @@
                             <div class="inline-flex flex-col items-center gap-1.5">
                                 <button class="btn-icon" title="View" @click="$emit('view', item)">
                                     <Icon name="lucide:eye" class="w-4 h-4" />
+                                </button>
+                                <button class="btn-icon" title="Set Up" @click="$emit('update-component', item)">
+                                    <Icon name="lucide:cog" class="w-4 h-4" />
                                 </button>
                                 <button class="btn-icon" title="Edit" @click="$emit('edit', item)">
                                     <Icon name="lucide:pencil" class="w-4 h-4" />
@@ -167,7 +170,7 @@ const props = defineProps({
     totalPages: { type: Number, default: 1 },
 })
 
-defineEmits(["view", "edit", "delete", "prev", "next"])
+defineEmits(["view", "edit", "delete", "prev", "next", "update-component"])
 
 const showPagination = computed(() => props.totalPages > 1)
 

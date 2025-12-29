@@ -14,54 +14,54 @@
 
         <div class="col-span-6 flex flex-col gap-1">
             <label class="text-md text-white/80">Salary Component Type:</label>
-            <FormSelect class="w-full" color="#fff" v-model="form.type" :options="types" searchable size="md"
-                rounded="lg" placeholder="Type" />
+            <FormSelect :disabled="form.isDefault" class="w-full" color="#fff" v-model="form.type" :options="types"
+                searchable size="md" rounded="lg" placeholder="Type" />
         </div>
 
         <div class="col-span-6 flex flex-col gap-1">
             <label class="text-md text-white/80">Salary Component Category:</label>
-            <FormSelect :disabled="!componentId" class="w-full" color="#fff" v-model="form.category"
+            <FormSelect :disabled="form.isDefault || !componentId" class="w-full" color="#fff" v-model="form.category"
                 :options="categories" searchable size="md" rounded="lg" placeholder="Category" />
         </div>
 
         <div class="col-span-12 flex flex-col gap-1">
             <label class="text-md text-white/80">Salary Component Formula:</label>
-            <FormFormulaBuilder v-model="form.defaultFormula" :components="components" />
+            <FormFormulaBuilder :disabled="form.isDefault" v-model="form.defaultFormula" :components="components" />
         </div>
 
         <div class="col-span-12 flex flex-col gap-1">
             <label class="text-md text-white/80">Description:</label>
-            <FormTextArea v-model="form.description" />
+            <FormTextArea :disabled="form.isDefault" v-model="form.description" />
         </div>
         <!-- ACTIVE SWITCH -->
         <div class="col-span-4 w-full items-center justify-between flex flex-row gap-1">
             <label class="text-md text-white/80">Taxable:</label>
-            <UiSwitch v-model="form.isTaxable" color="#4aff7a" />
+            <UiSwitch :disabled="form.isDefault" v-model="form.isTaxable" color="#4aff7a" />
         </div>
         <div class="col-span-4 w-full items-center justify-between flex flex-row gap-1">
             <label class="text-md text-white/80">Is Variable:</label>
-            <UiSwitch v-model="form.isVariable" color="#4aff7a" />
+            <UiSwitch :disabled="form.isDefault" v-model="form.isVariable" color="#4aff7a" />
         </div>
         <div class="col-span-4 w-full items-center justify-between flex flex-row gap-1">
             <label class="text-md text-white/80">Statutory:</label>
-            <UiSwitch v-model="form.isStatutory" color="#4aff7a" />
+            <UiSwitch :disabled="form.isDefault" v-model="form.isStatutory" color="#4aff7a" />
         </div>
         <div class="col-span-4 w-full items-center justify-between flex flex-row gap-1">
             <label class="text-md text-white/80">Include In CTC:</label>
-            <UiSwitch v-model="form.includeInCTC" color="#4aff7a" />
+            <UiSwitch :disabled="form.isDefault" v-model="form.includeInCTC" color="#4aff7a" />
         </div>
         <div class="col-span-4 w-full items-center justify-between flex flex-row gap-1">
             <label class="text-md text-white/80">Include In Gross:</label>
-            <UiSwitch v-model="form.includeInGross" color="#4aff7a" />
+            <UiSwitch :disabled="form.isDefault" v-model="form.includeInGross" color="#4aff7a" />
         </div>
         <div class="col-span-4 w-full items-center justify-between flex flex-row gap-1">
             <label class="text-md text-white/80">Active:</label>
-            <UiSwitch v-model="form.isActive" color="#4aff7a" />
+            <UiSwitch :disabled="form.isDefault" v-model="form.isActive" color="#4aff7a" />
         </div>
 
         <div class="col-span-12 flex flex-col gap-1">
             <label class="text-md text-white/80">Salary Component Order:</label>
-            <FormSelect class="w-full" color="#fff" v-model="form.displayOrder"
+            <FormSelect :disabled="form.isDefault" class="w-full" color="#fff" v-model="form.displayOrder"
                 :options="Array.from({ length: components.length + 10 }, (_, i) => (i + 1).toString())" searchable
                 size="md" rounded="lg" placeholder="Category" />
         </div>

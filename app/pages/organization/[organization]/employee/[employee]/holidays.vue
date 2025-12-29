@@ -5,7 +5,7 @@
             <UiLoader />
         </div>
         <div v-else
-            class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/15 backdrop-blur-xl shadow-lg mx-auto space-y-6">
+            class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/15 backdrop-blur-xl shadow-lg mx-auto space-y-1">
 
             <!-- Header -->
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -46,7 +46,7 @@
             </div>
 
             <!-- Stats -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
                 <div
                     class="card-green bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 border border-emerald-500/20">
                     <p class="label">Holidays</p>

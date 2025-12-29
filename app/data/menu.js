@@ -106,9 +106,10 @@ export const organization_menu = (org_id) => {
                     icon: 'ion:wallet',
                     children: [
                         { label: 'Salary Components', path: `/organization/${org_id}/payroll/components`, icon: 'ion:git-branch' },
-                        { label: 'Salary Template', path: `/organization/${org_id}/payroll/templates`, icon: 'heroicons:document-currency-rupee' },
+                        { label: 'Salary Groups', path: `/organization/${org_id}/payroll/groups`, icon: 'heroicons:document-currency-rupee' },
                         { label: 'Payslips', path: '/payroll/payslips', icon: 'ion:receipt-outline' },
                         { label: 'Bonuses', path: '/payroll/bonuses', icon: 'ion:gift-outline' },
+                        { label: 'Settings', path: `/organization/${org_id}/payroll/settings`, icon: 'ion:cog' },
                     ],
                 },
                 { label: 'Expenses', path: '/expenses', icon: 'ion:cash' },
@@ -180,6 +181,14 @@ export const organization_menu = (org_id) => {
         {
             group: 'System',
             items: [
+                {
+                    label: 'Calculators',
+                    path: '/Calculators',
+                    icon: 'heroicons:calculator',
+                    children: [
+                        { label: 'Salary', path: `/organization/${org_id}/calculators/salary`, icon: 'heroicons:calculator' },
+                    ],
+                },
                 {
                     label: 'Integrations',
                     path: '/integrations',

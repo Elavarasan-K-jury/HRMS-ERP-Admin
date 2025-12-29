@@ -129,9 +129,12 @@
                         <!-- ⚙️ Actions -->
                         <td class="td align-top text-right">
                             <div class="inline-flex items-center gap-1">
-                                <button class="btn-icon" title="salary" @click="$emit('salary', emp)">
-                                    <Icon name="bx:rupee" class="w-4 h-4" />
-                                </button>
+                                <NuxtLink target="_blank"
+                                    :to="`/organization/${emp.organization_id}/employee/${emp.id}/finance/salary`">
+                                    <button class="btn-icon" title="salary">
+                                        <Icon name="bx:rupee" class="w-4 h-4" />
+                                    </button>
+                                </NuxtLink>
                                 <button class="btn-icon" title="View" @click="$emit('view', emp)">
                                     <Icon name="lucide:eye" class="w-4 h-4" />
                                 </button>
@@ -181,7 +184,7 @@ const props = defineProps({
     totalPages: { type: Number, default: 1 },
 })
 
-defineEmits(['view', 'edit', 'delete', 'prev', 'next', 'salary'])
+defineEmits(['view', 'edit', 'delete', 'prev', 'next'])
 const showPagination = computed(() => props.totalPages > 1)
 
 function formatLevel(level) {

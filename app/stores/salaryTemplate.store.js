@@ -61,7 +61,7 @@ export const useSalaryTemplateStore = defineStore("salaryTemplateStore", {
         /* --------------------------------------------------
          * LOAD TEMPLATE INTO FORM (Edit Mode)
          * -------------------------------------------------- */
-        async loadTemplate(template, components = [], availableComponents = []) {
+        async loadTemplate(template) {
             const departmentStore = useDepartmentStore()
             const designationStore = useDesignationStore()
             this.templateId = template.id;
@@ -78,20 +78,6 @@ export const useSalaryTemplateStore = defineStore("salaryTemplateStore", {
                 designations: designations || [],
                 isDefault: template.isDefault,
                 isActive: template.isActive,
-
-                components: components.map(tc => ({
-                    id: tc.id,
-                    componentId: availableComponents.map(e => ({ value: e.id, label: e.name })).find(e => e.value == tc.componentId),
-
-                    formula: tc.formula,
-                    value: tc.value,
-
-                    priority: tc.priority || 0,
-                    minValue: tc.minValue ?? null,
-                    maxValue: tc.maxValue ?? null,
-
-                    condition: tc.condition
-                }))
             };
         },
 
@@ -168,30 +154,15 @@ export const useSalaryTemplateStore = defineStore("salaryTemplateStore", {
         /* --------------------------------------------------
          * FETCH BUILDER DATA (components + existing template)
          * -------------------------------------------------- */
-        async fetchBuilderData(templateId = null, details = false) {
+        async fetchBuilderData(template = null, details = false) {
             try {
                 this.loading = true;
 
-                const auth = useAuthStore();
-                const { $api } = useNuxtApp();
+                this.loadTemplate(
+                    template
+                );
 
-                const resp = await $api.get("/salary/templates/builder", {
-                    params: {
-                        organization_id: auth.organization,
-                        template_id: templateId || ""
-                    }
-                });
-
-                this.builder = resp.data || {};
-
-                // If template exists, auto-load it
-                if (this.builder.template && !details) {
-                    this.loadTemplate(
-                        this.builder.template,
-                        this.builder.template.components || [],
-                        this.builder.availableComponents || []
-                    );
-                }
+                this.builder.template = template
                 if (details) this.viewModal = true
 
             } catch (err) {
@@ -226,16 +197,16 @@ export const useSalaryTemplateStore = defineStore("salaryTemplateStore", {
                     isDefault: this.form.isDefault,
                     isActive: this.form.isActive,
 
-                    components: this.form.components.map(c => ({
-                        id: c.id,
-                        componentId: c.componentId.value,
-                        formula: c.formula || null,
-                        value: c.value || null,
-                        priority: Number(c.priority) || 0,
-                        minValue: c.minValue ? Number(c.minValue) : null,
-                        maxValue: c.maxValue ? Number(c.maxValue) : null,
-                        condition: c.condition || null
-                    }))
+                    // components: this.form.components.map(c => ({
+                    //     id: c.id,
+                    //     componentId: c.componentId.value,
+                    //     formula: c.formula || null,
+                    //     value: c.value || null,
+                    //     priority: Number(c.priority) || 0,
+                    //     minValue: c.minValue ? Number(c.minValue) : null,
+                    //     maxValue: c.maxValue ? Number(c.maxValue) : null,
+                    //     condition: c.condition || null
+                    // }))
                 };
 
                 const resp = await $api.post("/salary/templates", payload);

@@ -1,5 +1,6 @@
 <template>
-    <div class="space-y-2 border border-white/20 p-2 rounded-lg">
+    <div :class="[{ 'opacity-60 pointer-events-none': disabled }]"
+        class="space-y-2 border border-white/20 p-2 rounded-lg">
         <!-- INPUT FIELD -->
         <FormInputArea rows="2" color="#fff" placeholder="e.g. gross * 0.5 or if(basic > 10000, 5000, 2000)"
             v-model="localFormula" @input="emitUpdate" />
@@ -69,6 +70,7 @@ import { ref, watch, computed } from "vue";
 const props = defineProps({
     modelValue: { type: String, default: "" },
     components: { type: Array, default: () => [] },
+    disabled: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(["update:modelValue"]);
