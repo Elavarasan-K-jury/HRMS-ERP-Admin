@@ -16,6 +16,10 @@ export default defineNuxtConfig({
   devServer: {
     port: 3030
   },
+  server: {
+    port: 3030
+  },
+  serverDir: 'server',
   runtimeConfig: {
     // public (available client + server)
     public: {
