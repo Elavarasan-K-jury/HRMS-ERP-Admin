@@ -4,8 +4,8 @@ import { useThemeStore } from './theme.store'
 
 export const useAuthStore = defineStore('Auth', {
     state: () => ({
-        username: 'admin@jurysoft.com',
-        otp: '123456',
+        username: null,
+        otp: null,
         purpose: 'login',
         otpSent: false,
 
