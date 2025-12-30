@@ -5,7 +5,7 @@ import { useThemeStore } from './theme.store'
 export const useAuthStore = defineStore('Auth', {
     state: () => ({
         username: null,
-        otp: null,
+        otp: '',
         purpose: 'login',
         otpSent: false,
 
