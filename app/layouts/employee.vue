@@ -96,6 +96,9 @@ onMounted(async () => {
             authStore.organization = route.params.organization
             authStore.employee = route.params.employee
             menu.value = employee_menu(route.params.organization, route.params.employee)
+            const { $setOrganizationId, $setEmpId } = useNuxtApp()
+            $setOrganizationId(route.params.organization)
+            $setEmpId(route.params.employee)
         }
 
         themeStore.loadColor() // load HEX color on mount

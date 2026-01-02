@@ -96,6 +96,9 @@ onMounted(async () => {
             authStore.organization = route.params.organization
             menu.value = organization_menu(route.params.organization)
             await financeStore.checkFinanceEnabled()
+            const { $setOrganizationId, $setEmpId } = useNuxtApp()
+            $setOrganizationId(route.params.organization)
+            $setEmpId(null)
         }
 
         themeStore.loadColor() // load HEX color on mount

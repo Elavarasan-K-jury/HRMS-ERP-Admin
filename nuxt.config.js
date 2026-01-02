@@ -25,11 +25,35 @@ export default defineNuxtConfig({
     autoInstall: true
   },
   serverDir: 'server',
+
+  nitro: {
+    devErrorHandler: async (error, event) => {
+      const errorMessage = typeof error === 'string'
+        ? error
+        : error?.message || error?.stack || String(error);
+
+      console.error('[Nitro Error]:', errorMessage);
+      return;
+    },
+  },
+
+  // Minimal Vite config
+  vite: {
+    server: {
+      hmr: {
+        protocol: 'ws',
+        host: 'localhost',
+      },
+    },
+  },
+
   runtimeConfig: {
     // public (available client + server)
     public: {
       encSecret: process.env.NUXT_PUBLIC_ENC_SECRET || 'SECRET KEY',
       apiBase: process.env.NUXT_PUBLIC_API_BASE || '/api',
+      apiTrafficBase: process.env.NUXT_PUBLIC_API_TRAFFIC_BASE || '/api',
+      apiUsageUrl: process.env.NUXT_PUBLIC_API_USAGE_BASE || '/api',
     },
   },
 })

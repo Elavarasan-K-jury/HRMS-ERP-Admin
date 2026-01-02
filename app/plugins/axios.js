@@ -5,11 +5,26 @@ export default defineNuxtPlugin(() => {
     const config = useRuntimeConfig()
 
     const api = axios.create({
-        baseURL: config.public.apiBase, // from .env
+        baseURL: config.public.apiBase,
         timeout: 15000,
     })
 
-    // (Optional) central error handling
+    // Set or remove the custom header
+    const setOrganizationId = (id) => {
+        if (id) {
+            api.defaults.headers.common['x-org-id'] = id
+        } else {
+            delete api.defaults.headers.common['x-org-id']
+        }
+    }
+    const setEmpId = (id) => {
+        if (id) {
+            api.defaults.headers.common['x-employee-id'] = id
+        } else {
+            delete api.defaults.headers.common['x-employee-id']
+        }
+    }
+
     api.interceptors.response.use(
         (res) => res,
         (err) => Promise.reject(err)
@@ -17,8 +32,10 @@ export default defineNuxtPlugin(() => {
 
     return {
         provide: {
-            api,       // use as $api
-            axios: api // alias if you prefer $axios naming
+            api,
+            axios: api,
+            setOrganizationId,
+            setEmpId,
         }
     }
 })

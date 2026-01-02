@@ -142,16 +142,16 @@ export const useOrganizationStore = defineStore('organization', {
             const { $api } = useNuxtApp()
 
             // merge provided options with current meta defaults
-            const page = this.meta.page
-            const limit = this.meta.total
+            // const page = this.meta.page
+            // const limit = this.meta.total
             const sortBy = this.meta.sortBy
             const sortOrder = this.meta.sortOrder
 
             try {
                 const { data } = await $api.get('/organizations', {
                     params: {
-                        page,
-                        limit,
+                        // page,
+                        // limit,
                         sort_by: sortBy,
                         sort_order: sortOrder,
                     },
@@ -161,7 +161,10 @@ export const useOrganizationStore = defineStore('organization', {
                 // { organizations: [...], total, page, limit, total_pages }
                 const list = Array.isArray(data?.organizations) ? data.organizations : []
 
-                this.organizations_select = list.map(this._normalize)
+                this.organizations_select = list.map((e) => ({
+                    value: e.id,
+                    label: e.name
+                }))
             } catch (err) {
                 console.error('❌ Failed to fetch organizations:', err)
                 this.error =
