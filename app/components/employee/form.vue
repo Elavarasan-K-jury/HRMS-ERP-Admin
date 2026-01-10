@@ -3,8 +3,10 @@
         <Loader />
     </div>
     <div v-else class="grid grid-cols-12 gap-2">
-        <span class="col-span-12 text-xl font-semibold text-white/80">
-            Employee Details
+        <span class="col-span-12 grid grid-cols-12 text-xl font-semibold text-white/80">
+            <span class="col-span-8">Employee Details</span>
+            <FormSelect v-model="type" placeholder="Select type" :options="['EMPLOYEE', 'ADMIN']" class="col-span-4"
+                color="#fff" />
         </span>
         <div class="col-span-6 w-full flex flex-col items-start">
             <p class="text-md text-white/80" for="Department Name">
@@ -142,6 +144,7 @@ const departmentStore = useDepartmentStore()
 const loader = ref(false)
 
 const {
+    type,
     first_name,
     last_name,
     email,

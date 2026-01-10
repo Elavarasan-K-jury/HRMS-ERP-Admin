@@ -1,4 +1,4 @@
-<!-- <template>
+<template>
     <div v-if="!preloader" class="h-[calc(100vh-4rem)] overflow-y-auto  text-white">
         <div class="max-w-full mx-auto p-2 space-y-2">
 
@@ -173,12 +173,12 @@ const upcomingBirthdays = ref([
         date: '28 November',
     }
 ]);
-</script> -->
+</script>
 
 
-<template></template>
+<!-- <template></template>
 <script setup>
 definePageMeta({
     layout: 'employee',
 });
-</script>
+</script> -->

@@ -19,7 +19,7 @@
         </div>
 
         <!-- Sidebar -->
-        <UiSidebar v-if="!preloader" :menu-items="menu" :title="title" />
+        <UiSidebar v-if="!preloader" :menu-items="menu" :title="title" :titleShort="titleShort" />
 
         <!-- 🎨 Color Picker Sidebar -->
         <UiColorSidebar />
@@ -44,6 +44,7 @@ import { organization_menu } from '../data/menu'
 import { useThemeStore } from '../stores/theme.store'
 import { useAuthStore } from '../stores/auth.store'
 import { useFinanceStore } from '../stores/finance.store'
+import { useOrganizationStore } from '../stores/organization.store'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -51,9 +52,19 @@ const route = useRoute()
 const authStore = useAuthStore()
 const financeStore = useFinanceStore()
 const themeStore = useThemeStore()
+const organizationStore = useOrganizationStore()
 
 const menu = ref([])
-const title = 'JURY-HRMS'
+const title = computed(() => organizationStore.organization.name)
+const titleShort = computed(() => {
+    const name = organizationStore.organization.name
+    const nameSplitted = name.split(' ')
+    if (nameSplitted.length > 2) {
+        return `${nameSplitted[0][0]}${nameSplitted[1][0]}`
+    } else {
+        return nameSplitted.map(e => e[0]).join('')
+    }
+})
 
 const sidebar = computed(() => themeStore.sidebar)
 const preloader = computed(() => themeStore.preloader)
@@ -93,7 +104,7 @@ onMounted(async () => {
         await authStore.loadLocalData()
 
         if (route.params.organization) {
-            authStore.organization = route.params.organization
+            await organizationStore.saveOrganization(route.params.organization)
             menu.value = organization_menu(route.params.organization)
             await financeStore.checkFinanceEnabled()
             const { $setOrganizationId, $setEmpId } = useNuxtApp()

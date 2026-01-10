@@ -38,7 +38,7 @@
 
 <script setup>
 import { computed, onMounted } from 'vue'
-import { useHolidayStore } from '../../stores/holiday.store'
+import { useHolidayStore } from '../../../stores/holiday.store'
 
 const store = useHolidayStore()
 

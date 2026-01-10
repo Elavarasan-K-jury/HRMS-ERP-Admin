@@ -27,8 +27,10 @@ export const useAuthStore = defineStore('Auth', {
             this.refreshToken = refreshToken
             const c = useCookie('ADMIN_ACCESS_KEY', { maxAge: 60 * 60 * 24 * 7 })
             c.value = token || null
-            const r = useCookie('ADMIN_REFRESH_KEY', { maxAge: 60 * 60 * 24 * 7 })
-            r.value = refreshToken || null
+            if (this.rememberMe) {
+                const r = useCookie('ADMIN_REFRESH_KEY', { maxAge: 60 * 60 * 24 * 7 })
+                r.value = refreshToken || null
+            }
         },
 
         /* ---------------------- CLEAR TOKEN ---------------------- */
@@ -91,6 +93,40 @@ export const useAuthStore = defineStore('Auth', {
                 console.error('[Auth] Login error:', err)
                 toast.error({ title: 'Error!', message: err?.response?.data?.error?.split(':')?.[1] || err.message, timeout: 1500 })
                 return { success: false, message: 'Login request failed' }
+            } finally {
+                this.loading = false
+            }
+        },
+        async refresh_token() {
+            const { $api } = useNuxtApp()
+            const toast = useToast()
+
+            try {
+                this.loading = true
+                const { data } = await $api.post('/admin/token/refresh', {
+                    refresh_token: this.refreshToken
+                })
+                if (data.success) {
+                    await this.setToken(data.access_token, data.refresh_token)
+
+                    const redirectCookie = useCookie('REDIRECT_PATH', { maxAge: 60 * 5 })
+                    const redirectTo = redirectCookie.value || '/'
+                    redirectCookie.value = null
+
+                    await this.getUserDetails()
+                    await nextTick()
+                    toast.success({ title: 'Success!', message: 'Logged in successfully!', timeout: 1500 })
+                    await navigateTo(redirectTo, { replace: true })
+                } else {
+                    toast.error({ title: 'Error!', message: data.message, timeout: 1500 })
+                    this.clearToken()
+                    this.logout()
+                }
+            } catch (err) {
+                console.error('[Auth] Login error:', err)
+                toast.error({ title: 'Error!', message: err?.response?.data?.error?.split(':')?.[1] || err.message, timeout: 1500 })
+                this.clearToken()
+                this.logout()
             } finally {
                 this.loading = false
             }
@@ -162,16 +198,24 @@ export const useAuthStore = defineStore('Auth', {
                     // const redirectTo = redirectCookie.value || '//dashboard'
                     // await navigateTo(redirectTo, { replace: true })
                 } else {
-                    toast.error({ title: 'Error!', message: data.message, timeout: 1500 })
-                    this.clearToken()
+                    if (this.refreshToken) {
+                        return this.refresh_token()
+                    } else {
+                        toast.error({ title: 'Error!', message: data.message, timeout: 1500 })
+                        this.clearToken()
+                    }
                     if (process.client && window.location.pathname !== '/auth') {
                         await navigateTo('/auth', { replace: true })
                     }
                 }
             } catch (err) {
                 console.error('[Auth] Token verification failed:', err)
-                toast.error({ title: 'Error!', message: err.message, timeout: 1500 })
-                this.clearToken()
+                if (this.refreshToken) {
+                    return this.refresh_token()
+                } else {
+                    toast.error({ title: 'Error!', message: err.message, timeout: 1500 })
+                    this.clearToken()
+                }
                 if (process.client && window.location.pathname !== '/auth') {
                     await navigateTo('/auth', { replace: true })
                 }
@@ -182,7 +226,6 @@ export const useAuthStore = defineStore('Auth', {
 
         /* ---------------------- LOGOUT ---------------------- */
         async logout(redirectTo = '/auth') {
-            this.clearToken()
             const toast = useToast()
             const redirectCookie = useCookie('REDIRECT_PATH', { maxAge: 60 * 5 })
             redirectCookie.value = null
@@ -191,6 +234,7 @@ export const useAuthStore = defineStore('Auth', {
                 const themeStore = useThemeStore()
                 themeStore.preloader = true
 
+                this.clearToken()
                 // ✅ Wait a moment for state and cookies to settle before navigating
                 await nextTick()
                 toast.success({ title: 'Success!', message: 'Logged out successfully', timeout: 1500 })

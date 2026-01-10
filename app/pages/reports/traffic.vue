@@ -15,8 +15,8 @@
 
                 <div class="flex gap-2">
                     <button @click="setHourly" :class="btnClass(granularity === 'hourly')">Hourly</button>
-                    <button @click="setDaily(7)"
-                        :class="btnClass(granularity === 'daily' && trafficStore.days === 7)">7d</button>
+                    <!-- <button @click="setDaily(7)"
+                        :class="btnClass(granularity === 'daily' && trafficStore.days === 7)">7d</button> -->
                     <button @click="setDaily(30)"
                         :class="btnClass(granularity === 'daily' && trafficStore.days === 30)">30d</button>
                 </div>

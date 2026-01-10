@@ -15,6 +15,7 @@ export const useEmployeesStore = defineStore('employee', {
         search: null,
         sortBy: 'created_at',
         sortOrder: 'desc',
+        type: "EMPLOYEE",
         first_name: null,
         last_name: null,
         email: null,
@@ -169,6 +170,7 @@ export const useEmployeesStore = defineStore('employee', {
                     const { data } = await $api.put(`/employees/${this.employee_id}`, {
                         organizationId: this.organization_id,
                         firstName: this.first_name,
+                        isAdmin: this.type == 'ADMIN',
                         lastName: this.last_name,
                         fullName: this.first_name + ' ' + this.last_name,
                         email: this.email,
@@ -211,6 +213,7 @@ export const useEmployeesStore = defineStore('employee', {
                 const { data } = await $api.post('/employees', {
                     organizationId: this.organization_id,
                     firstName: this.first_name,
+                    isAdmin: this.type == 'ADMIN',
                     lastName: this.last_name,
                     fullName: this.first_name + ' ' + this.last_name,
                     email: this.email,

@@ -85,6 +85,7 @@ const {
     loading,
     error,
     page,
+    type,
     limit,
     totalPages,
     search,
@@ -156,6 +157,7 @@ const editEmployee = async (emp) => {
     email.value = emp.email
     phone.value = emp.phone
     alt_phone.value = emp.alt_phone
+    type.value = emp.admin_of_organization ? 'ADMIN' : 'EMPLOYEE'
     gender.value = emp.gender
     dateOfBirth.value = emp.date_of_birth
     employee_category.value = empCategories.value.find(c => c.value == emp.category_id) ?? null

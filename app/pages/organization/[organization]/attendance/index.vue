@@ -18,6 +18,10 @@
                     <p class="text-sm text-white/50 mt-1">
                         Day-wise breakdown with employee details and check-in/out logs.
                     </p>
+                    <div class="py-2 flex items-center gap-2">
+                        <FormSelect v-model="year" :options="years" color="#fff" placeholder="Select Year" />
+                        <FormSelect v-model="month" :options="months" color="#fff" placeholder="Select Month" />
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-12 gap-2 min-w-[260px]">
@@ -223,7 +227,7 @@
                                             </div>
                                             <ul class="space-y-0.5 flex justify-between">
                                                 <li>Gross: <span class="font-mono">{{ formatHours(att.gross_hours)
-                                                }}</span></li>
+                                                        }}</span></li>
                                                 <li>Effective: <span class="font-mono">{{
                                                     formatHours(att.effective_hours) }}</span></li>
                                                 <li>Late Minutes: <span class="font-mono">{{ att.late_arrival_minutes ||
@@ -294,7 +298,7 @@
 </template>
 
 <script setup>
-import { computed, reactive, onMounted } from 'vue'
+import { computed, reactive, onMounted, watch } from 'vue'
 import { useAttendanceStore } from '../../../../stores/orgAttendance.store'
 
 definePageMeta({
@@ -307,6 +311,81 @@ const store = useAttendanceStore()
 const loading = computed(() => store.loading)
 const stats = computed(() => store.stats)
 const days = computed(() => store.days)
+const year = ref({
+    value: new Date().getFullYear(),
+    label: new Date().getFullYear()
+})
+const years = computed(() => {
+    const baseYear = 2025
+    const currentYear = new Date().getFullYear()
+    const years = []
+    for (let i = currentYear; i >= baseYear; i--) {
+        years.push({
+            value: i,
+            label: i.toString()
+        })
+    }
+    return years
+})
+const month = ref({
+    value: new Date().getMonth() + 1 < 10 ? `0${new Date().getMonth() + 1}` : (new Date().getMonth() + 1).toString(),
+    label: [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+    ][new Date().getMonth()]
+})
+const months = computed(() => {
+    const selectedYear = year.value.value
+    const now = new Date()
+    const currentYear = now.getFullYear()
+    const currentMonthIndex = now.getMonth() // 0 = Jan
+
+    const allMonths = [
+        { value: '01', label: "Jan" },
+        { value: '02', label: "Feb" },
+        { value: '03', label: "Mar" },
+        { value: '04', label: "Apr" },
+        { value: '05', label: "May" },
+        { value: '06', label: "Jun" },
+        { value: '07', label: "Jul" },
+        { value: '08', label: "Aug" },
+        { value: '09', label: "Sep" },
+        { value: '10', label: "Oct" },
+        { value: '11', label: "Nov" },
+        { value: '12', label: "Dec" },
+    ]
+
+    // If selected year is current year -> only months up to current month (inclusive)
+    if (selectedYear === currentYear) {
+        return allMonths.slice(0, currentMonthIndex + 1)
+    }
+
+    // If selected year is less than current year -> all months
+    if (selectedYear < currentYear) {
+        return allMonths
+    }
+
+    // If selected year is in the future -> no months (or return allMonths if you want)
+    return []
+})
+
+watch(
+    [year, month],
+    async () => {
+        const param = `${year.value.value}-${month.value.value}`
+        await store.fetchMonthlyAttendance(param)
+    }
+)
 
 /**
  * Expansion state
@@ -456,7 +535,8 @@ const bestEmployeeName = computed(() => {
 
 onMounted(async () => {
     // You can later replace hardcoded month with a reactive month picker
-    await store.fetchMonthlyAttendance('2025-11')
+    const param = `${year.value.value}-${month.value.value}`
+    await store.fetchMonthlyAttendance(param)
 });
 </script>
 

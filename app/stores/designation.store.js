@@ -175,7 +175,7 @@ export const useDesignationStore = defineStore('designation', {
                 })
 
                 this.total = data.total
-                this.totalPages = data.totalPages
+                this.totalPages = data.total_pages
                 this.designations = data.designations
             } catch (err) {
                 console.error('❌ Failed to fetch departments:', err)

@@ -13,7 +13,8 @@
             </div>
         </div>
         <DataTable :items="designations" :loading="loading" :total="total" :page="page" :total-pages="totalPages"
-            @refresh="fetchDesignations" @view="view" @edit="editDesignation" @delete="deleteDesignation" />
+            @refresh="fetchDesignations" @view="view" @edit="editDesignation" @delete="deleteDesignation"
+            @next="changePage('+')" @prev="changePage('-')" />
     </div>
     <DetailedView v-model="viewModal" :department="viewData" />
     <UiSidebarModal v-model="addUpdateModal" :title="formTitle">
@@ -105,7 +106,23 @@ const closeDepartmentModal = () => {
     designation_id.value = null
     addUpdateModal.value = false
 }
+watch(page, () => {
+    fetchDesignations()
+})
 
+function changePage(symbol) {
+    switch (symbol) {
+        case '+':
+            page.value = page.value < totalPages.value ? page.value + 1 : page.value
+            break;
+        case '-':
+            page.value = page.value > 1 ? page.value - 1 : page.value
+            break;
+
+        default:
+            break;
+    }
+}
 const editDesignation = async (desig) => {
     await departmentStore.fetchAllDepartments()
     formTitle.value = 'Update Designation'

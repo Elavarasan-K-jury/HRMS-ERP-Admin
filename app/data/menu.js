@@ -112,7 +112,17 @@ export const organization_menu = (org_id) => {
                         { label: 'Settings', path: `/organization/${org_id}/payroll/settings`, icon: 'ion:cog' },
                     ],
                 },
-                { label: 'Expenses', path: '/expenses', icon: 'ion:cash' },
+                {
+                    label: 'Expenses',
+                    path: '/expenses',
+                    icon: 'ion:cash',
+                    children: [
+                        { label: 'Subscription', path: `/organization/${org_id}/expenses/subscription`, icon: 'heroicons:currency-rupee' },
+                        { label: 'Invoices', path: `/organization/${org_id}/expenses/invoices`, icon: 'heroicons:document-currency-rupee' },
+                        { label: 'Office Expenses', path: `/organization/${org_id}/expenses/office`, icon: 'heroicons:currency-rupee' },
+                        { label: 'Other Expenses', path: `/organization/${org_id}/expenses/other`, icon: 'heroicons:document-currency-rupee' },
+                    ],
+                },
                 { label: 'Reimbursement', path: '/reimbursement', icon: 'ion:cash-outline' },
             ],
         },
@@ -159,6 +169,17 @@ export const organization_menu = (org_id) => {
                     ],
                 },
                 { label: 'Employee Self-Service', path: '/ess', icon: 'ion:person-circle' },
+            ],
+        },
+
+        {
+            group: 'Storage',
+            items: [
+                {
+                    label: 'Folders & Files',
+                    path: `/organization/${org_id}/folder-files`,
+                    icon: 'heroicons:folder',
+                },
             ],
         },
 

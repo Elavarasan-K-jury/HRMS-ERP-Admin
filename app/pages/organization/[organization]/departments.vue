@@ -13,7 +13,8 @@
             </div>
         </div>
         <DataTable :items="departments" :loading="loading" :total="total" :page="page" :total-pages="totalPages"
-            @refresh="fetchDepartments" @view="view" @edit="editDept" @delete="deleteDept" />
+            @refresh="fetchDepartments" @view="view" @edit="editDept" @delete="deleteDept" @next="changePage('+')"
+            @prev="changePage('-')" />
     </div>
     <DetailedView v-model="viewModal" :department="viewData" />
 
@@ -92,6 +93,24 @@ watch(search, () => {
         fetchDepartments()
     }, 300)
 })
+
+watch(page, () => {
+    fetchDepartments()
+})
+
+function changePage(symbol) {
+    switch (symbol) {
+        case '+':
+            page.value = page.value < totalPages.value ? page.value + 1 : page.value
+            break;
+        case '-':
+            page.value = page.value > 1 ? page.value - 1 : page.value
+            break;
+
+        default:
+            break;
+    }
+}
 
 const closeDepartmentModal = () => {
     addUpdateModal.value = false

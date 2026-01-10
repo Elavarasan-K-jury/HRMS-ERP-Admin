@@ -64,13 +64,19 @@
                         class="border-b border-white/5 hover:bg-white/5 transition-colors">
                         <!-- 👤 Employee -->
                         <td class="td align-top font-semibold text-white">
-                            <div class="flex flex-col">
-                                <span>{{ emp.full_name || emp.first_name || '—' }}</span>
+                            <div class="flex flex-col gap-3">
+                                <span>
+                                    <span class="text-xm text-white/70 px-1.5 py-0.5 rounded-full text-center mr-1"
+                                        :class="{
+                                            'bg-amber-500': emp.admin_of_organization,
+                                            'bg-violet-500': !emp.admin_of_organization,
+                                        }">
+                                        {{ emp.admin_of_organization ? "A" : 'E' }}
+                                    </span>
+                                    {{ emp.full_name || emp.first_name || '—' }}
+                                </span>
                                 <span v-if="emp.employee_code" class="text-xs text-white/70 mt-0.5">
                                     CODE: {{ emp.employee_code || '—' }}
-                                </span>
-                                <span class="text-xs text-white/70 mt-0.5">
-                                    ID: {{ emp.id.slice(-6) }}
                                 </span>
                             </div>
                         </td>

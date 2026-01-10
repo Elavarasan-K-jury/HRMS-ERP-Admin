@@ -196,7 +196,7 @@ export const useDepartmentStore = defineStore('department', {
                 })
 
                 this.total = data.total
-                this.totalPages = data.totalPages
+                this.totalPages = data.total_pages
                 this.departments = data.departments
             } catch (err) {
                 console.error('❌ Failed to fetch departments:', err)

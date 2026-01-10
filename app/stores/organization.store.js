@@ -1,4 +1,6 @@
 import { defineStore } from 'pinia'
+import { useAuthStore } from './auth.store'
+import { useOrganizationSubscriptionStore } from './organizationSubscription.store'
 
 export const useOrganizationStore = defineStore('organization', {
     state: () => ({
@@ -7,7 +9,8 @@ export const useOrganizationStore = defineStore('organization', {
         loading: false,
         error: null,
 
-        // pagination + sorting state (defaults)
+        organization: null,
+
         meta: {
             total: 0,
             page: 1,
@@ -25,56 +28,59 @@ export const useOrganizationStore = defineStore('organization', {
         deleteData: null,
 
         create: {
-            "name": "QuantLeap Dynamics",
-            "domain": "https://quantleapdynamics.com",
-            "gst_number": "29AAACQ1234F1Z7",
-            "email": "hello@quantleapdynamics.com",
-            "contact_person_name": "Diya Rao",
-            "contact_person_number": "+91 9876543210",
-            "industry": "Artificial Intelligence & Robotics",
-            "size": 120,
-            "address": {
-                "streetName": "Embassy Tech Village",
-                "streetNumber": "Block C, 6th Floor",
-                "landmark": "Opp. Ecospace",
-                "area": "Outer Ring Road",
-                "locality": "Bellandur",
-                "city": "Bengaluru",
-                "state": "Karnataka",
-                "country": "India",
-                "postalCode": "560103"
+            name: null,
+            domain: null,
+            gst_number: null,
+            email: null,
+            contact_person_name: null,
+            contact_person_number: null,
+            industry: null,
+            size: null,
+            plan: null,
+            plan_duration: null,
+            address: {
+                streetName: null,
+                streetNumber: null,
+                landmark: null,
+                area: null,
+                locality: null,
+                city: null,
+                state: null,
+                country: null,
+                postalCode: null,
             },
-            "limits": {
-                "maxEmployees": null,
-                "storageGb": null,
-                "apiRatePerMinute": null,
-                "payrollRunsPerMonth": null,
-                "maxLeavePolicies": null,
-                "maxAdmins": null,
-            }
-        }
+            limits: {
+                maxEmployees: null,
+                storageGb: null,
+                apiRatePerMinute: null,
+                payrollRunsPerMonth: null,
+                maxLeavePolicies: null,
+                maxAdmins: null,
+            },
+        },
     }),
 
     getters: {
         hasData: (s) => s.organizations.length > 0,
-        getById: (s) => (id) => s.organizations.find((o) => o.id === id),
+        getById: (s) => (id) => s.organizations.find(o => o.id === id),
         hasNext: (s) => s.meta.page < s.meta.totalPages,
         hasPrev: (s) => s.meta.page > 1,
     },
 
     actions: {
-        /** Safe JSON parse for address field */
+        /* ===============================
+           HELPERS
+        =============================== */
         _parseAddress(addr) {
             if (!addr) return null
             if (typeof addr === 'object') return addr
             try {
                 return JSON.parse(addr)
             } catch {
-                return addr // keep as-is if not valid JSON
+                return addr
             }
         },
 
-        /** Normalize organization record (parse address, keep field names as-is) */
         _normalize(org = {}) {
             return {
                 ...org,
@@ -82,23 +88,12 @@ export const useOrganizationStore = defineStore('organization', {
             }
         },
 
-        /**
-         * Fetch organizations with pagination/sorting.
-         * @param {Object} opts
-         * @param {number} opts.page
-         * @param {number} opts.limit
-         * @param {string} opts.sortBy  e.g. 'createdAt' | 'updatedAt' | 'name'
-         * @param {string} opts.sortOrder 'asc' | 'desc'
-         */
+        /* ===============================
+           FETCH ORGANIZATIONS
+        =============================== */
         async fetchOrganizations() {
+            const toast = useToast()
             const { $api } = useNuxtApp()
-
-            // merge provided options with current meta defaults
-            const page = this.meta.page
-            const limit = this.meta.limit
-            const sortBy = this.meta.sortBy
-            const sortOrder = this.meta.sortOrder
-            const search = this.meta.search != '' || this.meta.search != null ? this.meta.search : null
 
             this.loading = true
             this.error = null
@@ -106,160 +101,316 @@ export const useOrganizationStore = defineStore('organization', {
             try {
                 const { data } = await $api.get('/organizations', {
                     params: {
-                        page,
-                        limit,
-                        search,
-                        sort_by: sortBy,
-                        sort_order: sortOrder,
+                        page: this.meta.page,
+                        limit: this.meta.limit,
+                        search: this.meta.search || null,
+                        sort_by: this.meta.sortBy,
+                        sort_order: this.meta.sortOrder,
                     },
                 })
 
-                // Response shape:
-                // { organizations: [...], total, page, limit, total_pages }
-                const list = Array.isArray(data?.organizations) ? data.organizations : []
+                const list = Array.isArray(data?.organizations)
+                    ? data.organizations
+                    : []
 
                 this.organizations = list.map(this._normalize)
                 this.meta.total = Number(data?.total ?? 0)
-                this.meta.page = Number(data?.page ?? page)
-                this.meta.limit = Number(data?.limit ?? limit)
-                this.meta.totalPages = Number(data?.total_pages ?? data?.totalPages ?? 0)
-                this.meta.sortBy = sortBy
-                this.meta.sortOrder = sortOrder
+                this.meta.page = Number(data?.page ?? 1)
+                this.meta.limit = Number(data?.limit ?? 10)
+                this.meta.totalPages = Number(data?.total_pages ?? 1)
+
             } catch (err) {
-                console.error('❌ Failed to fetch organizations:', err)
-                this.error =
-                    err?.response?.data?.message ||
-                    err?.message ||
-                    'Failed to load organizations'
+                console.error('❌ fetchOrganizations:', err)
+                this.error = err
+                toast.error({
+                    title: 'Error!',
+                    message: err?.response?.data?.message || err.message,
+                    timeout: 1500,
+                })
             } finally {
                 setTimeout(() => {
                     this.loading = false
-                }, 1000);
+                }, 1000)
             }
         },
 
         async fetchOrganizationsForSelect() {
+            const toast = useToast()
             const { $api } = useNuxtApp()
-
-            // merge provided options with current meta defaults
-            // const page = this.meta.page
-            // const limit = this.meta.total
-            const sortBy = this.meta.sortBy
-            const sortOrder = this.meta.sortOrder
 
             try {
                 const { data } = await $api.get('/organizations', {
                     params: {
-                        // page,
-                        // limit,
-                        sort_by: sortBy,
-                        sort_order: sortOrder,
+                        sort_by: this.meta.sortBy,
+                        sort_order: this.meta.sortOrder,
                     },
                 })
 
-                // Response shape:
-                // { organizations: [...], total, page, limit, total_pages }
-                const list = Array.isArray(data?.organizations) ? data.organizations : []
+                const list = Array.isArray(data?.organizations)
+                    ? data.organizations
+                    : []
 
-                this.organizations_select = list.map((e) => ({
-                    value: e.id,
-                    label: e.name
+                this.organizations_select = list.map(o => ({
+                    value: o.id,
+                    label: o.name,
                 }))
             } catch (err) {
-                console.error('❌ Failed to fetch organizations:', err)
-                this.error =
-                    err?.response?.data?.message ||
-                    err?.message ||
-                    'Failed to load organizations'
-            } finally {
-                setTimeout(() => {
-                    this.loading = false
-                }, 1000);
+                console.error('❌ fetchOrganizationsForSelect:', err)
+                toast.error({
+                    title: 'Error!',
+                    message: err?.response?.data?.message || err.message,
+                    timeout: 1500,
+                })
             }
         },
 
-        /** Create new organization */
+        /* ===============================
+           CREATE ORGANIZATION
+        =============================== */
         async createOrganization() {
+            const toast = useToast()
             const { $api } = useNuxtApp()
-            const limits = JSON.parse(JSON.stringify(this.create.limits))
-            delete this.create.limits
-            const { data } = await $api.post('/organizations', {
-                ...this.create,
-                address: JSON.stringify(this.create.address),
-                ...limits
-            })
-            this.meta.page = 1
-            await this.fetchOrganizations()
-            return data
+
+            try {
+                const limits = JSON.parse(JSON.stringify(this.create.limits))
+                const plan = this.create.plan
+                const planDuration = this.create.plan_duration
+                delete this.create.limits
+                delete this.create.plan
+                delete this.create.plan_duration
+
+                const { data } = await $api.post('/organizations', {
+                    ...this.create,
+                    address: JSON.stringify(this.create.address),
+                    ...limits,
+                })
+
+                if (data.id) {
+                    toast.success({
+                        title: 'Success!',
+                        message: data.message || 'Organization created',
+                        timeout: 1500,
+                    })
+                    if (plan) {
+                        const { data } = await $api.post(`/organizations/${data.id}/subscription`, {
+                            plan_id: plan,
+                            billing_interval: planDuration ? planDuration.toUpperCase() : 'MONTHLY'
+                        })
+                        if (data.success) {
+                            toast.success({
+                                title: 'Success!',
+                                message: data.message || 'Organization created',
+                                timeout: 1500,
+                            })
+                        } else {
+                            toast.error({
+                                title: 'Error!',
+                                message: data.message,
+                                timeout: 1500
+                            })
+                        }
+                    }
+                    this.meta.page = 1
+                    await this.fetchOrganizations()
+                } else {
+                    toast.error({
+                        title: 'Error!',
+                        message: data.message,
+                        timeout: 1500
+                    })
+                }
+                return data
+            } catch (err) {
+                console.error('❌ createOrganization:', err)
+                toast.error({
+                    title: 'Error!',
+                    message: err?.response?.data?.message || err.message,
+                    timeout: 1500,
+                })
+                throw err
+            }
         },
 
-
-        /** Update organization */
+        /* ===============================
+           UPDATE ORGANIZATION
+        =============================== */
         async updateOrganization() {
+            const toast = useToast()
             const { $api } = useNuxtApp()
-            const limits = JSON.parse(JSON.stringify(this.create.limits))
-            delete this.create.limits
-            const { data } = await $api.put(`/organizations/${this.editId}`, {
-                ...this.create,
-                address: JSON.stringify(this.create.address),
-                ...limits
-            })
-            this.meta.page = 1
-            await this.fetchOrganizations()
-            return data
+
+            try {
+                const limits = JSON.parse(JSON.stringify(this.create.limits))
+                const plan = this.create.plan
+                const planDuration = this.create.plan_duration
+                delete this.create.limits
+                delete this.create.plan
+                delete this.create.plan_duration
+
+                const { data } = await $api.put(
+                    `/organizations/${this.editId}`,
+                    {
+                        ...this.create,
+                        address: JSON.stringify(this.create.address),
+                        ...limits,
+                    }
+                )
+                if (data.id) {
+                    toast.success({
+                        title: 'Success!',
+                        message: data.message || 'Organization updated',
+                        timeout: 1500,
+                    })
+                    if (plan) {
+                        const response = await $api.post(`/organizations/${data.id}/subscription`, {
+                            plan_id: plan,
+                            billing_interval: planDuration ? planDuration.toUpperCase() : 'MONTHLY'
+                        })
+                        if (response?.data?.success) {
+                            toast.success({
+                                title: 'Success!',
+                                message: response?.data?.message || 'Subscription data added successfully.',
+                                timeout: 1500,
+                            })
+                        } else {
+                            toast.error({
+                                title: 'Error!',
+                                message: response?.data?.message,
+                                timeout: 1500
+                            })
+                        }
+                    }
+                    this.meta.page = 1
+                    await this.fetchOrganizations()
+                } else {
+                    toast.error({
+                        title: 'Error!',
+                        message: data.message || 'Organization updation error',
+                        timeout: 1500
+                    })
+                }
+                return data
+            } catch (err) {
+                console.error('❌ updateOrganization:', err)
+                toast.error({
+                    title: 'Error!',
+                    message: err?.response?.data?.message || err.message,
+                    timeout: 1500,
+                })
+                throw err
+            }
         },
 
+        async saveOrganization(organizationId) {
+            const toast = useToast()
+            const { $api } = useNuxtApp()
+            const auth = useAuthStore()
+            this.loading = true
 
-        /** Delete organization */
+            try {
+                const { data } = await $api.get(
+                    `/organizations/${organizationId}`
+                )
+
+
+                if (data.success) {
+                    this.organization = data.organization
+                    auth.organization = organizationId
+                } else {
+                    toast.error({
+                        title: 'Error!',
+                        message: data?.message || 'Error fetching organization details!',
+                        timeout: 1500,
+                    })
+                }
+
+            } catch (err) {
+                console.error('❌ deleteOrganization:', err)
+                toast.error({
+                    title: 'Error!',
+                    message: err?.response?.data?.message || err.message,
+                    timeout: 1500,
+                })
+                throw err
+            } finally {
+                setTimeout(() => {
+                    this.loading = false
+                }, 500);
+            }
+        },
+
+        /* ===============================
+           DELETE ORGANIZATION
+        =============================== */
         async deleteOrganization() {
+            const toast = useToast()
             const { $api } = useNuxtApp()
-            const { data } = await $api.delete(`/organizations/${this.deleteId}`)
-            this.meta.page = 1
-            await this.fetchOrganizations()
-            return data
+
+            try {
+                const { data } = await $api.delete(
+                    `/organizations/${this.deleteId}`
+                )
+                toast.success({
+                    title: 'Success!',
+                    message: data.message || 'Organization deleted',
+                    timeout: 1500,
+                })
+
+                this.meta.page = 1
+                await this.fetchOrganizations()
+                return data
+            } catch (err) {
+                console.error('❌ deleteOrganization:', err)
+                toast.error({
+                    title: 'Error!',
+                    message: err?.response?.data?.message || err.message,
+                    timeout: 1500,
+                })
+                throw err
+            }
         },
 
-        /** Refresh with current meta */
+        /* ===============================
+           PAGINATION & HELPERS
+        =============================== */
         async refresh() {
             return this.fetchOrganizations()
         },
 
-        /** Pagination helpers */
-        async setPage(page) {
-            return this.fetchOrganizations({ page })
-        },
         async nextPage() {
             if (this.hasNext) {
-                this.meta.page += 1
-                return this.fetchOrganizations({ page: this.meta.page })
+                this.meta.page++
+                return this.fetchOrganizations()
             }
         },
+
         async prevPage() {
             if (this.hasPrev) {
-                this.meta.page -= 1
-                return this.fetchOrganizations({ page: this.meta.page - 1 })
+                this.meta.page--
+                return this.fetchOrganizations()
             }
         },
 
-        /** Sorting helper */
         async setSort({ sortBy, sortOrder }) {
-            return this.fetchOrganizations({
-                sortBy: sortBy ?? this.meta.sortBy,
-                sortOrder: sortOrder ?? this.meta.sortOrder,
-                page: 1, // reset to first page when sorting changes
-            })
+            this.meta.sortBy = sortBy
+            this.meta.sortOrder = sortOrder
+            this.meta.page = 1
+            return this.fetchOrganizations()
         },
 
-        /** Optional: reset list */
+        /* ===============================
+           RESET
+        =============================== */
         clear() {
             this.organizations = []
+            this.organizations_select = []
             this.error = null
             this.meta = {
                 total: 0,
                 page: 1,
                 limit: 10,
                 totalPages: 0,
-                sortBy: 'createdAt',
+                search: null,
+                sortBy: 'created_at',
                 sortOrder: 'desc',
             }
         },
