@@ -111,12 +111,12 @@
                                     <span
                                         class="text-[10px] text-white/40 uppercase tracking-wider w-16">Subtotal</span>
                                     <span class="text-sm font-semibold text-white/90">₹{{ formatCurrency(inv.amount)
-                                    }}</span>
+                                        }}</span>
                                 </div>
                                 <div class="flex flex-col items-baseline">
                                     <span class="text-[10px] text-white/40 uppercase tracking-wider w-16">Tax</span>
                                     <span class="text-xs font-medium text-white/70">₹{{ formatCurrency(inv.tax)
-                                    }}</span>
+                                        }}</span>
                                 </div>
                             </div>
 
@@ -130,7 +130,7 @@
                                     <div class="text-[9px] text-white/50 uppercase tracking-widest">Total</div>
                                     <div class="flex items-baseline gap-1.5">
                                         <span class="text-2xl font-black text-white">₹{{ formatCurrency(inv.total)
-                                        }}</span>
+                                            }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -139,7 +139,7 @@
                 </div>
 
                 <!-- Actions Footer -->
-                <div class="px-6 py-4 border-t border-white/10 bg-white/5 flex items-center gap-2">
+                <div class="px-6 py-4 border-t border-white/10 bg-white/5 flex items-center justify-end gap-2">
                     <!-- Pay Button (Active) -->
                     <a v-if="inv.payment?.link && inv.status !== 'PAID' && !getExpirationState(inv).expired"
                         :href="inv.payment.link" target="_blank" class="flex-1">
@@ -150,20 +150,14 @@
                     </a>
 
                     <!-- Regenerate Button (Expired) -->
-                    <button v-else-if="getExpirationState(inv).expired && inv.status !== 'PAID'"
-                        @click="$emit('regenerate', inv)" class="btn-regenerate w-full flex-1">
+                    <button v-if="inv.status !== 'PAID'" @click="$emit('regenerate', inv)" class="btn-regenerate">
                         <Icon name="lucide:refresh-cw" class="w-4 h-4" />
-                        New Payment Link
                     </button>
 
                     <!-- Action Buttons -->
-                    <button class="btn-icon" title="Download" @click="$emit('download', inv)">
+                    <NuxtLink class="btn-icon" title="Download" :to="`${apiBaseUrl}${inv.invoice_url}`" target="_blank">
                         <Icon name="lucide:download" class="w-4 h-4" />
-                    </button>
-
-                    <button class="btn-icon" title="View Details" @click="$emit('view', inv)">
-                        <Icon name="lucide:eye" class="w-4 h-4" />
-                    </button>
+                    </NuxtLink>
                 </div>
             </div>
         </div>
@@ -202,6 +196,10 @@ const props = defineProps({
     page: { type: Number, default: 1 },
     total_pages: { type: Number, default: 1 },
 });
+
+const config = useRuntimeConfig()
+
+const apiBaseUrl = config.public.apiBase
 
 defineEmits(["view", "download", "prev", "next", "regenerate"]);
 
@@ -307,7 +305,7 @@ function paymentClass(status) {
 }
 
 .btn-regenerate {
-    @apply px-4 py-2.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl;
+    @apply p-2.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl;
 }
 
 .btn-icon {

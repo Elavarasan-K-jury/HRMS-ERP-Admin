@@ -67,6 +67,7 @@ watch(search, async () => {
     }, 350);
 })
 
+
 const fetchInvoices = async () => {
     await organizationSubscriptionStore.fetchInvoices()
 }
