@@ -21,5 +21,4 @@ services:
 
 networks:
   juryhrms-network:
-    external: true
     name: juryhrms-backend_default
