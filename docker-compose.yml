@@ -1,0 +1,25 @@
+services:
+  admin:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: juryhrms-admin
+    ports:
+      - "3030:3030"
+    env_file:
+      - .env
+    environment:
+      - HOST=0.0.0.0
+      - PORT=3030
+      - NUXT_PUBLIC_ENC_SECRET=wdhwvcdhvdw
+      - NUXT_PUBLIC_API_BASE=http://juryhrms-gateway:3000
+      - NUXT_PUBLIC_API_TRAFFIC_BASE=http://juryhrms-traffic-reporting:50064
+      - NUXT_PUBLIC_API_USAGE_BASE=http://juryhrms-usage-reporting:50065
+    networks:
+      - juryhrms-network
+    restart: unless-stopped
+
+networks:
+  juryhrms-network:
+    external: true
+    name: juryhrms-backend_default
