@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: juryhrms-admin
+    container_name: juryhrms-admin-panel
     ports:
       - "3030:3030"
     env_file:
