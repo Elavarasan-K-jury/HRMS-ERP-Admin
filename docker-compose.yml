@@ -12,9 +12,9 @@ services:
       - HOST=0.0.0.0
       - PORT=3030
       - NUXT_PUBLIC_ENC_SECRET=wdhwvcdhvdw
-      - NUXT_PUBLIC_API_BASE=http://juryhrms-gateway:3000
-      - NUXT_PUBLIC_API_TRAFFIC_BASE=http://juryhrms-traffic-reporting:50064
-      - NUXT_PUBLIC_API_USAGE_BASE=http://juryhrms-usage-reporting:50065
+      - NUXT_PUBLIC_API_BASE=http://103.102.234.246:50050
+      - NUXT_PUBLIC_API_TRAFFIC_BASE=http://103.102.234.246:50064
+      - NUXT_PUBLIC_API_USAGE_BASE=http://103.102.234.246:50065
     networks:
       - juryhrms-network
     restart: unless-stopped
