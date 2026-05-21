@@ -107,6 +107,7 @@ export const organization_menu = (org_id) => {
                     children: [
                         { label: 'Salary Components', path: `/organization/${org_id}/payroll/components`, icon: 'ion:git-branch' },
                         { label: 'Salary Groups', path: `/organization/${org_id}/payroll/groups`, icon: 'heroicons:document-currency-rupee' },
+                        { label: 'Payslip Template', path: `/organization/${org_id}/payroll/payslip-template`, icon: 'ion:receipt-outline' },
                         { label: 'Payslips', path: '/payroll/payslips', icon: 'ion:receipt-outline' },
                         { label: 'Bonuses', path: '/payroll/bonuses', icon: 'ion:gift-outline' },
                         { label: 'Settings', path: `/organization/${org_id}/payroll/settings`, icon: 'ion:cog' },
@@ -123,7 +124,7 @@ export const organization_menu = (org_id) => {
                         { label: 'Other Expenses', path: `/organization/${org_id}/expenses/other`, icon: 'heroicons:document-currency-rupee' },
                     ],
                 },
-                { label: 'Reimbursement', path: '/reimbursement', icon: 'ion:cash-outline' },
+                { label: 'Reimbursement', path: `/organization/${org_id}/reimbursement`, icon: 'ion:cash-outline' },
             ],
         },
 

@@ -16,7 +16,7 @@
         </div>
 
         <!-- SUMMARY INFO GRID -->
-        <div class="grid grid-cols-12 gap-2">
+        <div class="grid grid-cols-8 gap-2">
 
             <InfoBox label="Gross Annual" :value="formatCurrency(salaryDetails.grossAnnual)" />
 
@@ -40,7 +40,8 @@
         <!-- COMPONENT BREAKDOWN -->
         <div class="space-y-2">
 
-            <ComponentGroup title="Earnings" color="green" :items="filterByType('EARNING')" />
+            <ComponentGroup :total="salaryDetails.totalEarnings" title="Earnings" color="green"
+                :items="filterByType('EARNING')" />
 
             <ComponentGroup title="Benefits" color="blue" :items="filterByType('BENEFIT')" />
 
