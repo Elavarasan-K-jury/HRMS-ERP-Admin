@@ -15,10 +15,4 @@ services:
       - NUXT_PUBLIC_API_BASE=http://103.102.234.246:50050
       - NUXT_PUBLIC_API_TRAFFIC_BASE=http://103.102.234.246:50064
       - NUXT_PUBLIC_API_USAGE_BASE=http://103.102.234.246:50065
-    networks:
-      - juryhrms-network
     restart: unless-stopped
-
-networks:
-  juryhrms-network:
-    name: juryhrms-backend_default
