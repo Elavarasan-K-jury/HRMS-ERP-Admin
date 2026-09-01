@@ -1,68 +1,70 @@
 <template>
     <div class="relative flex flex-col items-center">
-
-        <!-- CARD -->
-        <div class="w-52 rounded-lg border border-white/20 bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-2xl 
-                   shadow-[0_8px_40px_rgba(0,0,0,.4),0_0_0_1px_rgba(255,255,255,.05)_inset]
-                   flex flex-col items-center gap-3 text-center
-                   transition-all duration-300 hover:scale-105 hover:shadow-[0_12px_50px_rgba(0,0,0,.5)]
-                   hover:border-white/30 group relative overflow-hidden">
-
-            <!-- HEAD BADGE -->
-            <div v-if="node.isHead" class="absolute top-2 right-2 z-20 px-2 py-0.5 text-[10px] font-bold
-                       rounded-md bg-amber-400 text-slate-900 shadow-lg border border-amber-600/40">
-                HEAD
+        <div class="w-80 rounded-xl border border-white/15 bg-white/5 backdrop-blur-xl shadow-lg relative overflow-visible">
+            <div v-for="dept in node.department_head_of" :key="dept"
+                class="absolute -top-2.5 right-3 z-20 px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-amber-400 text-slate-900 shadow-lg border border-amber-500/60 whitespace-nowrap max-w-[80%] truncate">
+                {{ dept }} Head
             </div>
 
-            <!-- Content wrapper -->
-            <div class="w-full p-4 rounded-lg bg-slate-900 border-2 border-slate-700 transition group">
-
-                <!-- Header Row -->
-                <div class="flex items-center gap-2">
-                    <img v-if="node.profile" :src="node.profile"
-                        class="w-14 h-14 rounded-lg object-cover border-2 border-white/20 shadow-md" />
-
-                    <div v-else class="w-14 h-14 rounded-lg bg-slate-700 flex items-center justify-center
-                               text-white text-lg font-bold border-2 border-white/20 shadow-md">
+            <div class="p-3.5 rounded-xl bg-slate-900/95 border border-slate-700/80">
+                <div class="flex items-start gap-3">
+                    <img v-if="node.profile_image" :src="node.profile_image"
+                        class="w-12 h-12 rounded-lg object-cover border border-white/15 shrink-0" />
+                    <div v-else class="w-12 h-12 rounded-lg bg-slate-700 flex items-center justify-center
+                                text-white font-bold text-sm border border-white/15 shrink-0">
                         {{ initials }}
                     </div>
 
-                    <div class="flex-1 flex flex-col items-start">
-                        <h3 class="text-white text-[15px] font-semibold">{{ node.full_name }}</h3>
-                        <p v-if="node.designation" class="text-emerald-400 text-xs font-bold mt-0.5">
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-white text-sm font-semibold truncate">{{ node.full_name }}</h3>
+                        <p v-if="node.employee_code" class="text-[10px] text-white/40 font-mono mt-0.5">
+                            {{ node.employee_code }}
+                        </p>
+                        <p v-if="node.designation" class="text-emerald-400 text-[11px] font-semibold mt-1 truncate">
                             {{ node.designation }}
                         </p>
+                        <div class="flex items-center gap-1.5 mt-2 flex-wrap">
+                            <span v-if="node.department"
+                                class="px-1.5 py-0.5 text-[10px] font-medium rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 max-w-full truncate">
+                                {{ node.department }}
+                            </span>
+                            <span v-if="node.category"
+                                class="px-1.5 py-0.5 text-[10px] font-medium rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 shrink-0">
+                                {{ node.category }}
+                            </span>
+                        </div>
+                        <span v-if="experienceLabel"
+                            class="block mt-1.5 text-[10px] text-white/40 font-medium">
+                            Age: {{ experienceLabel }}
+                        </span>
                     </div>
                 </div>
 
-                <!-- Button -->
-                <button @click.stop="viewProfile" class="mt-4 w-full py-2 text-xs font-semibold bg-emerald-500 text-slate-900
-                           rounded-lg hover:bg-emerald-400 transition flex items-center justify-center gap-1">
-                    <Icon name="lucide:eye" class="w-3.5 h-3.5" />
-                    View Profile
-                </button>
+                <div class="mt-3 pt-3 border-t border-slate-700/50 flex gap-2">
+                    <button @click.stop="viewProfile"
+                        class="flex-1 py-2 text-[11px] font-semibold rounded-lg bg-emerald-500/90 text-slate-900 hover:bg-emerald-400 transition flex items-center justify-center gap-1">
+                        <Icon name="lucide:eye" class="w-3.5 h-3.5" />
+                        View Profile
+                    </button>
+                </div>
             </div>
         </div>
 
-        <!-- Vertical line under parent -->
-        <div v-if="hasChildren" class="w-0.5 h-6 bg-white/20"></div>
-
-        <!-- CHILDREN WITH PERFECT DIAGONAL LINES -->
-        <div v-if="hasChildren" class="relative mt-10 flex items-start justify-center gap-12" ref="childrenContainer">
-            <!-- SVG attaches to parent (always aligned) -->
-            <svg class="absolute -top-10 pointer-events-none" :width="svgWidth" height="70"
-                :style="{ left: `calc(50% - ${svgWidth / 2}px)` }">
-                <line v-for="(child, index) in node.reportees" :key="child.id" :x1="svgWidth / 2" y1="0"
-                    :x2="childX(index)" y2="70" stroke="rgba(255,255,255,0.2)" stroke-width="2"
-                    stroke-linecap="round" />
-            </svg>
-
-            <!-- CHILD CARDS -->
-            <div v-for="(child, index) in node.reportees" :key="child.id" class="relative flex flex-col items-center">
-                <EmployeeNode :node="child" />
+        <template v-if="hasChildren">
+            <div class="relative shrink-0" :style="{ width: svgWidth + 'px', height: connectorHeight + 'px' }">
+                <svg class="absolute inset-0 w-full h-full pointer-events-none" style="overflow: visible">
+                    <polyline v-for="(child, index) in node.reportees" :key="child.id"
+                        :points="`${svgWidth / 2},0 ${svgWidth / 2},${junctionY} ${childX(index)},${junctionY} ${childX(index)},${connectorHeight}`"
+                        fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"
+                        stroke-linejoin="round" stroke-linecap="round" />
+                </svg>
             </div>
-        </div>
-
+            <div class="flex items-start justify-center gap-12">
+                <div v-for="child in node.reportees" :key="child.id" class="relative z-10">
+                    <EmployeeNode :node="child" />
+                </div>
+            </div>
+        </template>
     </div>
 </template>
 
@@ -92,16 +94,26 @@ const hasChildren = computed(() => {
     return props.node.reportees && props.node.reportees.length > 0
 })
 
-/* ============================================================
-   DIAGONAL SVG LINE CALCULATION
-============================================================ */
+const experienceLabel = computed(() => {
+    if (!props.node.date_of_birth) return ''
+    const dob = new Date(props.node.date_of_birth)
+    if (isNaN(dob.getTime())) return ''
+    const now = new Date()
+    let years = now.getFullYear() - dob.getFullYear()
+    const m = now.getMonth() - dob.getMonth()
+    if (m < 0 || (m === 0 && now.getDate() < dob.getDate())) years--
+    if (years < 0) return ''
+    return `${years} yr${years !== 1 ? 's' : ''}`
+})
 
-const cardWidth = 208
+const connectorHeight = 28
+const junctionY = 10
+const cardWidth = 320
 const gap = 48
 
 const svgWidth = computed(() => {
     const count = props.node.reportees?.length || 1
-    return count * (cardWidth + gap)
+    return count * cardWidth + (count - 1) * gap
 })
 
 function childX(index) {

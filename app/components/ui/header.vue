@@ -174,10 +174,22 @@
                         </div>
                     </div>
 
+                    <NuxtLink :to="profileLink" @click="closeMenu"
+                        class="px-4 py-3 flex items-center gap-3 text-sm text-white/80 hover:bg-white/15 transition-all">
+                        <Icon name="ion:person-outline" class="text-lg" />
+                        <span>My Profile</span>
+                    </NuxtLink>
+
+                    <button
+                        class="px-4 py-3 flex items-center gap-3 text-sm text-white/80 hover:bg-white/15 transition-all">
+                        <Icon name="ion:contrast-outline" class="text-lg" />
+                        <span>Display Mode</span>
+                    </button>
+
                     <button
                         class="px-4 py-3 flex items-center gap-3 text-sm text-white/80 hover:bg-white/15 transition-all">
                         <Icon name="ion:settings-outline" class="text-lg" />
-                        <span>Profile Settings</span>
+                        <span>User Preference</span>
                     </button>
 
                     <button @click="showLogoutConfirm = true"
@@ -217,14 +229,22 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { useRoute } from 'vue-router'
 import { useThemeStore } from '../../stores/theme.store'
 import { useAuthStore } from '../../stores/auth.store'
 
+const route = useRoute()
 const themeStore = useThemeStore()
 const sidebar = computed(() => themeStore.sidebar)
 const adminStore = useAuthStore()
 
 const admin = computed(() => adminStore.admin)
+
+const profileLink = computed(() => {
+    const org = adminStore.organization
+    const emp = adminStore.employee
+    return org && emp ? `/organization/${org}/employee/${emp}/profile` : '/profile'
+})
 
 const props = defineProps({
     breadcrumbs: {

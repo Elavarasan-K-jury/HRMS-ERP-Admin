@@ -12,6 +12,11 @@ export const useHierarchyStore = defineStore('hierarchy', {
         deptLoading: false,
         deptError: null,
 
+        // 🏢 Org chart (reporting tree)
+        orgChart: null,          // { organization_id, department_id, root: {...} }
+        orgChartLoading: false,
+        orgChartError: null,
+
         // Current selection
         currentOrgId: null,
         currentDeptId: null,
@@ -124,9 +129,59 @@ export const useHierarchyStore = defineStore('hierarchy', {
             this.deptLoading = false
         },
 
+        /* ----------------------------------------------------
+         🏢 Fetch org chart (reporting tree)
+         GET /organizations/{organization_id}/org-chart?department_id=...
+        ---------------------------------------------------- */
+        async fetchOrgChart(organizationId, departmentId = null, branchId = null) {
+            if (!organizationId) {
+                throw new Error('organizationId is required')
+            }
+
+            const { $api } = useNuxtApp()
+            this.orgChartLoading = true
+            this.orgChartError = null
+
+            try {
+                const params = {}
+                if (departmentId) {
+                    params.department_id = departmentId
+                }
+                if (branchId) {
+                    params.branch_id = branchId
+                }
+
+                const { data } = await $api.get(
+                    `/organizations/${encodeURIComponent(organizationId)}/org-chart`,
+                    { params }
+                )
+
+                this.orgChart = data
+                return data
+            } catch (err) {
+                console.error('❌ Failed to fetch org chart:', err)
+                this.orgChartError =
+                    err?.response?.data?.error ||
+                    err?.message ||
+                    'Failed to load org chart'
+                throw err
+            } finally {
+                setTimeout(() => {
+                    this.orgChartLoading = false
+                }, 500)
+            }
+        },
+
+        resetOrgChart() {
+            this.orgChart = null
+            this.orgChartError = null
+            this.orgChartLoading = false
+        },
+
         resetAll() {
             this.resetOrgHierarchy()
             this.resetDeptHierarchy()
+            this.resetOrgChart()
             this.currentOrgId = null
             this.currentDeptId = null
         },

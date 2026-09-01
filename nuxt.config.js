@@ -54,6 +54,7 @@ export default defineNuxtConfig({
       apiBase: process.env.NUXT_PUBLIC_API_BASE || '/api',
       apiTrafficBase: process.env.NUXT_PUBLIC_API_TRAFFIC_BASE || '/api',
       apiUsageUrl: process.env.NUXT_PUBLIC_API_USAGE_BASE || '/api',
+      googleMapsKey: process.env.NUXT_PUBLIC_GOOGLE_MAPS_KEY || '',
     },
   },
 })

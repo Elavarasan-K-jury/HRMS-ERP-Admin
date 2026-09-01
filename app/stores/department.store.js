@@ -21,6 +21,7 @@ export const useDepartmentStore = defineStore('department', {
         note: null,
         department_head_id: null,
         department_head_start_date: null,
+        parent_id: null,
         department_id: null
     }),
     actions: {
@@ -56,10 +57,24 @@ export const useDepartmentStore = defineStore('department', {
                     },
                 })
 
-                this.department_select = data.departments.map(e => ({
-                    value: e.id,
-                    label: `${e.name} (${e.code})`
-                }))
+                const depts = data.departments || []
+                const parentMap = {}
+                depts.forEach(d => { if (d.parent_id) parentMap[d.id] = d.parent_id })
+
+                this.department_select = depts.map(e => {
+                    let label = e.name
+                    if (e.parent_id) {
+                        const parent = depts.find(d => d.id === e.parent_id)
+                        if (parent) label = `${parent.name} >> ${e.name}`
+                    }
+                    if (e.code) label += ` (${e.code})`
+                    return {
+                        value: e.id,
+                        label,
+                        parent_id: e.parent_id || null,
+                        children: e.children || [],
+                    }
+                })
             } catch (error) {
                 console.error('[department-store] fetch department error:', err)
                 toast.error({ title: 'Error!', message: err.message, timeout: 1500 })
@@ -100,8 +115,9 @@ export const useDepartmentStore = defineStore('department', {
                         code: this.code,
                         description: this.description,
                         note: this.note,
-                        department_head_id: this.department_head_id.value,
+                        department_head_id: this.department_head_id?.value ?? null,
                         department_head_start_date: this.department_head_start_date,
+                        parent_id: this.parent_id?.value ?? null,
                         organization_id: this.organization_id
                     })
 
@@ -117,6 +133,7 @@ export const useDepartmentStore = defineStore('department', {
                         this.note = null
                         this.department_head_id = null
                         this.department_head_start_date = null
+                        this.parent_id = null
                     } else {
                         toast.error({
                             title: 'Error!',
@@ -130,8 +147,9 @@ export const useDepartmentStore = defineStore('department', {
                         code: this.code,
                         description: this.description,
                         note: this.note,
-                        department_head_id: this.department_head_id.value,
+                        department_head_id: this.department_head_id?.value ?? null,
                         department_head_start_date: this.department_head_start_date,
+                        parent_id: this.parent_id?.value ?? null,
                         organization_id: this.organization_id
                     })
 
@@ -147,6 +165,7 @@ export const useDepartmentStore = defineStore('department', {
                         this.note = null
                         this.department_head_id = null
                         this.department_head_start_date = null
+                        this.parent_id = null
                     } else {
                         toast.error({
                             title: 'Error!',

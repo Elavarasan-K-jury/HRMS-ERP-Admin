@@ -72,6 +72,7 @@ const {
     department_id,
     department_head_id,
     department_head_start_date,
+    parent_id,
     description,
     name,
     code,
@@ -122,6 +123,7 @@ const closeDepartmentModal = () => {
     note.value = null
     department_head_id.value = null
     department_head_start_date.value = null
+    parent_id.value = null
 }
 
 
@@ -138,6 +140,7 @@ const editDept = (dept) => {
     note.value = dept.note
     department_head_start_date.value = new Date(dept.department_head_start_date)
     department_head_id.value = dept.department_head_id
+    parent_id.value = dept.parent_id
     formTitle.value = 'Update Department'
     addUpdateModal.value = true
 }
@@ -166,6 +169,7 @@ const openDepartmentModal = () => {
     note.value = null
     department_head_start_date.value = new Date()
     department_head_id.value = null
+    parent_id.value = null
     formTitle.value = 'Add New Department'
     addUpdateModal.value = true
 }
@@ -178,6 +182,7 @@ onMounted(async () => {
     if (authStore.organization) {
         organization_id.value = authStore.organization
     }
+    await departmentStore.fetchAllDepartments()
     await fetchDepartments()
 });
 </script>

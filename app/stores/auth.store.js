@@ -17,8 +17,23 @@ export const useAuthStore = defineStore('Auth', {
         loading: false,
 
         organization: null,
-        employee: null
+        employee: null,
+
+        permissions: [],
     }),
+
+    getters: {
+        isSuperAdmin: (state) => state.admin?.is_super_admin === true,
+        hasPermission: (state) => (key) => {
+            if (state.admin?.is_super_admin) return true
+            return state.permissions.includes(key)
+        },
+        defaultRoute: (state) => {
+            if (state.admin?.is_super_admin) return '/'
+            if (state.admin?.organization_id) return `/organization/${state.admin.organization_id}/dashboard`
+            return '/'
+        },
+    },
 
     actions: {
         /* ---------------------- SET TOKEN ---------------------- */
@@ -40,6 +55,7 @@ export const useAuthStore = defineStore('Auth', {
             this.admin = null
             this.isLoggedIn = false
             this.otpSent = false
+            this.permissions = []
 
             if (!process.client) return
             const c = useCookie('ADMIN_ACCESS_KEY', { maxAge: 60 * 60 * 24 * 7 })
@@ -109,14 +125,17 @@ export const useAuthStore = defineStore('Auth', {
                 if (data.success) {
                     await this.setToken(data.access_token, data.refresh_token)
 
+                    await this.getUserDetails()
                     const redirectCookie = useCookie('REDIRECT_PATH', { maxAge: 60 * 5 })
-                    const redirectTo = redirectCookie.value || '/'
+                    const redirectTo = redirectCookie.value || this.defaultRoute
                     redirectCookie.value = null
 
-                    await this.getUserDetails()
                     await nextTick()
                     toast.success({ title: 'Success!', message: 'Logged in successfully!', timeout: 1500 })
-                    await navigateTo(redirectTo, { replace: true })
+
+                    // Single clean full-page load to the target (no SPA nav + reload flash)
+                    themeStore.preloader = false
+                    window.location.href = redirectTo
                 } else {
                     toast.error({ title: 'Error!', message: data.message, timeout: 1500 })
                     this.clearToken()
@@ -150,17 +169,17 @@ export const useAuthStore = defineStore('Auth', {
                 if (data?.success) {
                     await this.setToken(data.access_token, data.refresh_token)
 
+                    await this.getUserDetails()
                     const redirectCookie = useCookie('REDIRECT_PATH', { maxAge: 60 * 5 })
-                    const redirectTo = redirectCookie.value || '/'
+                    const redirectTo = redirectCookie.value || this.defaultRoute
                     redirectCookie.value = null
 
-                    await this.getUserDetails()
                     await nextTick()
                     toast.success({ title: 'Success!', message: 'Logged in successfully!', timeout: 1500 })
-                    await navigateTo(redirectTo, { replace: true })
+
+                    // Single clean full-page load to the target (no SPA nav + reload flash)
                     themeStore.preloader = false
-                    // 👇 This line fixes the blank white screen
-                    window.location.reload()
+                    window.location.href = redirectTo
                 } else {
                     console.warn('[Auth] Verify failed:', data.message)
                     toast.error({ title: 'Error!', message: data.message, timeout: 1500 })
@@ -193,10 +212,7 @@ export const useAuthStore = defineStore('Auth', {
                 if (data?.success) {
                     this.admin = data.user
                     this.isLoggedIn = true
-                    // console.log('Redirecting to //dashboard');
-                    // const redirectCookie = useCookie('REDIRECT_PATH', { maxAge: 60 * 5 })
-                    // const redirectTo = redirectCookie.value || '//dashboard'
-                    // await navigateTo(redirectTo, { replace: true })
+                    await this.fetchPermissions()
                 } else {
                     if (this.refreshToken) {
                         return this.refresh_token()
@@ -224,8 +240,23 @@ export const useAuthStore = defineStore('Auth', {
             }
         },
 
+        /* ---------------------- FETCH PERMISSIONS ---------------------- */
+        async fetchPermissions() {
+            if (!process.client || !this.accessToken) return
+            try {
+                const { $api } = useNuxtApp()
+                const { data } = await $api.get(`/admin/admins/${this.admin?.id}/permissions`)
+                if (data?.success) {
+                    this.permissions = data.permission_keys || []
+                    this.admin.is_super_admin = data.is_super_admin || false
+                }
+            } catch (err) {
+                console.error('[Auth] Failed to fetch permissions:', err)
+            }
+        },
+
         /* ---------------------- LOGOUT ---------------------- */
-        async logout(redirectTo = '/auth') {
+        async logout(redirectTo = '/login') {
             const toast = useToast()
             const redirectCookie = useCookie('REDIRECT_PATH', { maxAge: 60 * 5 })
             redirectCookie.value = null
@@ -238,12 +269,10 @@ export const useAuthStore = defineStore('Auth', {
                 // ✅ Wait a moment for state and cookies to settle before navigating
                 await nextTick()
                 toast.success({ title: 'Success!', message: 'Logged out successfully', timeout: 1500 })
-                await navigateTo(redirectTo, { replace: true })
 
-                // ✅ Force refresh of router state to ensure login.vue renders immediately
+                // ✅ Single clean full-page load to the login page (no SPA nav + reload flash)
                 themeStore.preloader = false
-                // 👇 This line fixes the blank white screen
-                window.location.reload()
+                window.location.href = redirectTo
             }
         }
     },

@@ -16,18 +16,9 @@ export const useEmpCategoryStore = defineStore('EmployeeCategory', {
         loading: false,
         error: null,
         name: null,
-        code: null,
         description: null,
-        id_prefix: null,
-        is_permanent: true,
-        benefits_applicable: true,
         is_active: true,
-        training_required: true,
-        training_months: 0,
-        probation_required: true,
-        probation_months: 0,
-        notice_required: true,
-        notice_months: 0,
+        employment_type: 'PROBATION',
         empCategoryId: null
     }),
     actions: {
@@ -71,7 +62,8 @@ export const useEmpCategoryStore = defineStore('EmployeeCategory', {
                 if (res.data.success) {
                     this.category_list = res.data.categories.map(e => ({
                         value: e.id,
-                        label: `${e.name} (${e.id_prefix})`
+                        label: e.name,
+                        employment_type: e.employment_type || 'PROBATION',
                     }))
                 }
             } catch (err) {
@@ -85,7 +77,9 @@ export const useEmpCategoryStore = defineStore('EmployeeCategory', {
             const toast = useToast()
             try {
                 const { $api } = useNuxtApp()
-                const { data } = await $api.delete(`/employee-categories/${this.empCategoryId}`)
+                const { data } = await $api.delete(`/employee-categories/${this.empCategoryId}`, {
+                    params: { organization_id: this.organization_id }
+                })
                 if (data.success) {
                     toast.success({
                         title: 'Success!',
@@ -101,23 +95,15 @@ export const useEmpCategoryStore = defineStore('EmployeeCategory', {
         },
         async saveEmpCategory() {
             const toast = useToast()
+            const normalizeEmploymentType = (v) => v && typeof v === 'object' && 'value' in v ? v.value : v
             try {
                 const { $api } = useNuxtApp()
                 if (this.empCategoryId) {
                     const { data } = await $api.put(`/employee-categories/${this.empCategoryId}`, {
                         name: this.name,
-                        code: this.code,
                         description: this.description,
-                        id_prefix: this.id_prefix,
-                        is_permanent: this.is_permanent,
-                        benefits_applicable: this.benefits_applicable,
                         is_active: this.is_active,
-                        training_required: this.training_required,
-                        training_months: Number(this.training_months),
-                        probation_required: this.probation_required,
-                        probation_months: Number(this.probation_months),
-                        notice_required: this.notice_required,
-                        notice_months: Number(this.notice_months),
+                        employment_type: normalizeEmploymentType(this.employment_type),
                         organization_id: this.organization_id
                     }
                     )
@@ -138,18 +124,9 @@ export const useEmpCategoryStore = defineStore('EmployeeCategory', {
                 } else {
                     const { data } = await $api.post('/employee-categories', {
                         name: this.name,
-                        code: this.code,
                         description: this.description,
-                        id_prefix: this.id_prefix,
-                        is_permanent: this.is_permanent,
-                        benefits_applicable: this.benefits_applicable,
                         is_active: this.is_active,
-                        training_required: this.training_required,
-                        training_months: Number(this.training_months),
-                        probation_required: this.probation_required,
-                        probation_months: Number(this.probation_months),
-                        notice_required: this.notice_required,
-                        notice_months: Number(this.notice_months),
+                        employment_type: normalizeEmploymentType(this.employment_type),
                         organization_id: this.organization_id
                     }
                     )

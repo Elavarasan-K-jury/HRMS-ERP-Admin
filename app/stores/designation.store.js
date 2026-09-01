@@ -13,6 +13,8 @@ export const useDesignationStore = defineStore('designation', {
         sortOrder: 'desc',
         organization_id: null,
         department_id: null,
+        band_id: null,
+        band_list: [],
         loading: false,
         error: null,
         name: null,
@@ -53,10 +55,11 @@ export const useDesignationStore = defineStore('designation', {
                 if (this.designation_id) {
                     const { data } = await $api.put(`/designations/${this.designation_id}`, {
                         name: this.name,
-                        level: this.designation_level.value,
+                        level: this.designation_level?.value ?? null,
                         description: this.description,
                         organization_id: this.organization_id,
-                        department_id: this.department_id ? this.department_id.value : null,
+                        department_id: this.department_id?.value ?? null,
+                        band_id: this.band_id?.value ?? null,
                     })
 
                     if (data.success) {
@@ -69,6 +72,7 @@ export const useDesignationStore = defineStore('designation', {
                         this.designation_level = null
                         this.description = null
                         this.department_id = null
+                        this.band_id = null
                     } else {
                         toast.error({
                             title: 'Error!',
@@ -79,10 +83,11 @@ export const useDesignationStore = defineStore('designation', {
                 } else {
                     const { data } = await $api.post('/designations', {
                         name: this.name,
-                        level: this.designation_level.value,
+                        level: this.designation_level?.value ?? null,
                         organization_id: this.organization_id,
                         description: this.description,
-                        department_id: this.department_id ? this.department_id.value : null,
+                        department_id: this.department_id?.value ?? null,
+                        band_id: this.band_id?.value ?? null,
                     })
 
                     if (data.success) {
@@ -95,6 +100,7 @@ export const useDesignationStore = defineStore('designation', {
                         this.designation_level = null
                         this.description = null
                         this.department_id = null
+                        this.band_id = null
                     } else {
                         toast.error({
                             title: 'Error!',
@@ -134,7 +140,9 @@ export const useDesignationStore = defineStore('designation', {
                 if (data.success) {
                     this.designation_list = data.designations.map(e => ({
                         value: e.id,
-                        label: `${e.name} (${e.level.replaceAll('_', ' ').toUpperCase()})`
+                        label: `${e.name} (${e.level.replaceAll('_', ' ').toUpperCase()})`,
+                        band_id: e.band_id || null,
+                        band_name: e.band_name || '',
                     }))
                 }
             } catch (err) {

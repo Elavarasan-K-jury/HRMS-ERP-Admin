@@ -38,6 +38,8 @@ export const useOrganizationStore = defineStore('organization', {
             size: null,
             plan: null,
             plan_duration: null,
+            admin_email: null,
+            admin_phone: null,
             address: {
                 streetName: null,
                 streetNumber: null,
@@ -86,6 +88,22 @@ export const useOrganizationStore = defineStore('organization', {
                 ...org,
                 address: this._parseAddress(org.address),
             }
+        },
+
+        _cleanPayload(obj) {
+            const out = {}
+            for (const [k, v] of Object.entries(obj || {})) {
+                if (v === null || v === undefined || v === '') continue
+                if (Array.isArray(v)) {
+                    out[k] = v
+                } else if (typeof v === 'object') {
+                    const cleaned = this._cleanPayload(v)
+                    if (Object.keys(cleaned).length) out[k] = cleaned
+                } else {
+                    out[k] = v
+                }
+            }
+            return out
         },
 
         /* ===============================
@@ -172,18 +190,19 @@ export const useOrganizationStore = defineStore('organization', {
             const { $api } = useNuxtApp()
 
             try {
-                const limits = JSON.parse(JSON.stringify(this.create.limits))
-                const plan = this.create.plan
-                const planDuration = this.create.plan_duration
-                delete this.create.limits
-                delete this.create.plan
-                delete this.create.plan_duration
+                const form = JSON.parse(JSON.stringify(this.create))
+                const { limits, plan, plan_duration, planDuration, ...orgFields } = form
 
-                const { data } = await $api.post('/organizations', {
-                    ...this.create,
-                    address: JSON.stringify(this.create.address),
-                    ...limits,
-                })
+                const { data } = await $api.post('/organizations', this._cleanPayload({
+                    ...orgFields,
+                    address: orgFields.address,
+                    max_employees: limits?.maxEmployees ?? null,
+                    max_storage_in_gb: limits?.storageGb ?? null,
+                    max_api_rate_per_minute: limits?.apiRatePerMinute ?? null,
+                    max_payroll_runs_per_month: limits?.payrollRunsPerMonth ?? null,
+                    max_leave_policies: limits?.maxLeavePolicies ?? null,
+                    max_admin_accounts: limits?.maxAdmins ?? null,
+                }))
 
                 if (data.id) {
                     toast.success({
@@ -192,20 +211,20 @@ export const useOrganizationStore = defineStore('organization', {
                         timeout: 1500,
                     })
                     if (plan) {
-                        const { data } = await $api.post(`/organizations/${data.id}/subscription`, {
+                        const { data: subData } = await $api.post(`/organizations/${data.id}/subscription`, {
                             plan_id: plan,
                             billing_interval: planDuration ? planDuration.toUpperCase() : 'MONTHLY'
                         })
-                        if (data.success) {
+                        if (subData.success) {
                             toast.success({
                                 title: 'Success!',
-                                message: data.message || 'Organization created',
+                                message: subData.message || 'Organization created',
                                 timeout: 1500,
                             })
                         } else {
                             toast.error({
                                 title: 'Error!',
-                                message: data.message,
+                                message: subData.message,
                                 timeout: 1500
                             })
                         }
@@ -237,22 +256,24 @@ export const useOrganizationStore = defineStore('organization', {
         async updateOrganization() {
             const toast = useToast()
             const { $api } = useNuxtApp()
+            const organizationSubscriptionStore = useOrganizationSubscriptionStore()
 
             try {
-                const limits = JSON.parse(JSON.stringify(this.create.limits))
-                const plan = this.create.plan
-                const planDuration = this.create.plan_duration
-                delete this.create.limits
-                delete this.create.plan
-                delete this.create.plan_duration
+                const form = JSON.parse(JSON.stringify(this.create))
+                const { limits, plan, plan_duration, planDuration, ...orgFields } = form
 
                 const { data } = await $api.put(
                     `/organizations/${this.editId}`,
-                    {
-                        ...this.create,
-                        address: JSON.stringify(this.create.address),
-                        ...limits,
-                    }
+                    this._cleanPayload({
+                        ...orgFields,
+                        address: orgFields.address,
+                        max_employees: limits?.maxEmployees ?? null,
+                        max_storage_in_gb: limits?.storageGb ?? null,
+                        max_api_rate_per_minute: limits?.apiRatePerMinute ?? null,
+                        max_payroll_runs_per_month: limits?.payrollRunsPerMonth ?? null,
+                        max_leave_policies: limits?.maxLeavePolicies ?? null,
+                        max_admin_accounts: limits?.maxAdmins ?? null,
+                    })
                 )
                 if (data.id) {
                     toast.success({
@@ -261,22 +282,39 @@ export const useOrganizationStore = defineStore('organization', {
                         timeout: 1500,
                     })
                     if (plan) {
-                        const response = await $api.post(`/organizations/${data.id}/subscription`, {
-                            plan_id: plan,
-                            billing_interval: planDuration ? planDuration.toUpperCase() : 'MONTHLY'
-                        })
-                        if (response?.data?.success) {
-                            toast.success({
-                                title: 'Success!',
-                                message: response?.data?.message || 'Subscription data added successfully.',
-                                timeout: 1500,
-                            })
+                        const currentSub = await organizationSubscriptionStore.fetchOrganizationSubscription(this.editId)
+                        if (currentSub) {
+                            if (currentSub.plan_id !== plan) {
+                                const { data: changeData } = await $api.post(`/organizations/${this.editId}/subscription/change-plan`, {
+                                    new_plan_id: plan,
+                                    effective_immediately: true,
+                                })
+                                if (changeData.success) {
+                                    toast.success({
+                                        title: 'Success!',
+                                        message: changeData.message || 'Subscription plan updated successfully.',
+                                        timeout: 1500,
+                                    })
+                                }
+                            }
                         } else {
-                            toast.error({
-                                title: 'Error!',
-                                message: response?.data?.message,
-                                timeout: 1500
+                            const { data: subData } = await $api.post(`/organizations/${this.editId}/subscription`, {
+                                plan_id: plan,
+                                billing_interval: planDuration ? planDuration.toUpperCase() : 'MONTHLY'
                             })
+                            if (subData.success) {
+                                toast.success({
+                                    title: 'Success!',
+                                    message: subData.message || 'Subscription data added successfully.',
+                                    timeout: 1500,
+                                })
+                            } else {
+                                toast.error({
+                                    title: 'Error!',
+                                    message: subData.message,
+                                    timeout: 1500
+                                })
+                            }
                         }
                     }
                     this.meta.page = 1

@@ -57,6 +57,24 @@
                         placeholder="Organization Contact Person Phone" />
                 </div>
 
+                <!-- Admin Login Credentials -->
+                <span class="col-span-12 text-xl font-semibold text-white/80 mt-4">Admin Login Credentials</span>
+                <span class="col-span-12 text-sm text-white/50 -mt-2">
+                    The org admin logs in with these on the Admin login (OTP is sent to the email).
+                </span>
+
+                <div class="col-span-12 w-full flex flex-col gap-1 items-start">
+                    <label class="text-sm text-white/80" for="admin_email">Admin Email:</label>
+                    <FormInput id="admin_email" class="w-full" v-model="create.admin_email" prepend-icon="lucide:mail"
+                        color="#fff" size="lg" rounded="lg" placeholder="Org Admin Login Email" />
+                </div>
+
+                <div class="col-span-12 w-full flex flex-col gap-1 items-start">
+                    <label class="text-sm text-white/80" for="admin_phone">Admin Phone:</label>
+                    <FormInput id="admin_phone" class="w-full" v-model="create.admin_phone" prepend-icon="lucide:smartphone"
+                        color="#fff" size="lg" rounded="lg" placeholder="Org Admin Phone (10 digits)" />
+                </div>
+
                 <div class="col-span-6 w-full flex flex-col gap-1 items-start">
                     <label class="text-sm text-white/80" for="size">Organization Size:</label>
                     <FormInput id="size" class="w-full" v-model="create.size" prepend-icon="lucide:building"
@@ -229,6 +247,7 @@ definePageMeta({
 const organizationStore = useOrganizationStore()
 const subscriptionPlanStore = useSubscriptionPlanStore()
 const organizationSubscriptionStore = useOrganizationSubscriptionStore()
+const toast = useToast()
 
 // ─── UI State ────────────────────────────────
 const open = ref(false)
@@ -303,6 +322,8 @@ function resetCreate() {
         size: null,
         plan: null,
         planDuration: null,
+        admin_email: null,
+        admin_phone: null,
         address: {
             streetNumber: null,
             streetName: null,
@@ -345,8 +366,13 @@ function closeOrganizationModal() {
 async function saveOrganization() {
     if (!industry.value || !country.value) return
 
+    if (!editId.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(create.value.admin_email || '')) {
+        toast.error({ title: 'Error!', message: 'Org admin login email is required', timeout: 1500 })
+        return
+    }
+
     create.value.industry = industry.value.label
-    create.value.plan = plan.value.value
+    create.value.plan = plan.value?.value ?? null
     create.value.address.country = country.value.label
     create.value.size = Number(create.value.size || 0)
     create.value.plan_duration = planDuration.value
@@ -370,6 +396,8 @@ async function edit(org) {
     editData.value = structuredClone(org)
 
     create.value = structuredClone(org)
+    create.value.admin_email = org.admin_email ?? null
+    create.value.admin_phone = org.admin_phone ?? null
     industry.value = industries.find(i => i.label.toUpperCase() === org.industry?.toUpperCase())
     country.value = countries.find(c => c.label.toUpperCase() === org.address?.country?.toUpperCase())
     const subscription = await organizationSubscriptionStore.fetchOrganizationSubscription(org.id)

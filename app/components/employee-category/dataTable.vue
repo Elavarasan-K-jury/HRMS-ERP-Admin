@@ -14,10 +14,8 @@
             <table class="min-w-full text-sm text-white/90">
                 <thead class="bg-white/10 backdrop-blur-md border-b border-white/10 sticky top-0 z-10">
                     <tr>
-                        <th class="th">Designation Name</th>
-                        <th class="th">Code</th>
+                        <th class="th">Category Name</th>
                         <th class="th">Organization</th>
-                        <th class="th">Details</th>
                         <th class="th">Status</th>
                         <th class="th">Created</th>
                         <th class="th">Updated</th>
@@ -33,13 +31,7 @@
                                 <div class="skeleton w-40" />
                             </td>
                             <td class="td">
-                                <div class="skeleton w-16" />
-                            </td>
-                            <td class="td">
                                 <div class="skeleton w-40" />
-                            </td>
-                            <td class="td">
-                                <div class="skeleton w-60" />
                             </td>
                             <td class="td">
                                 <div class="skeleton w-16" />
@@ -62,13 +54,7 @@
                         <!-- Name -->
                         <td class="td align-top font-semibold text-white capitalize">
                             {{ item.name || '—' }}
-                            <div class="text-xs text-white/70 mt-1">
-                                ID Prefix: {{ item.id_prefix || '—' }}
-                            </div>
                         </td>
-
-                        <!-- Code -->
-                        <td class="td align-top">{{ item.code || '—' }}</td>
 
                         <!-- Organization -->
                         <td class="td align-top">
@@ -81,18 +67,7 @@
                             </div>
                         </td>
 
-                        <!-- Details -->
-                        <td class="td align-top">
-                            <div class="grid grid-cols-2 gap-x-2 gap-y-1 text-xs text-white/80">
-                                <span>Permanent: <b>{{ bool(item.is_permanent) }}</b></span>
-                                <span>Benefits: <b>{{ bool(item.benefits_applicable) }}</b></span>
-                                <span>Training: <b>{{ bool(item.training_required) }}</b></span>
-                                <span>Probation: <b>{{ bool(item.probation_required) }}</b></span>
-                                <span>Notice: <b>{{ bool(item.notice_required) }}</b></span>
-                            </div>
-                        </td>
-
-                        <!-- Status -->
+                        <!-- Probation Policy -->
                         <td class="td align-top">
                             <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-medium"
                                 :class="item.is_active ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-300'">
@@ -162,10 +137,6 @@ const props = defineProps({
 
 defineEmits(['view', 'edit', 'delete', 'prev', 'next'])
 const showPagination = computed(() => props.totalPages > 1)
-
-function bool(v) {
-    return v ? 'Yes' : 'No'
-}
 </script>
 
 <style scoped>

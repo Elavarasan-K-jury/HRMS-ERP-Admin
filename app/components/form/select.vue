@@ -117,7 +117,14 @@ const innerValue = computed({
 })
 
 /* Helpers */
-const labelOf = (o) => (o == null ? '' : typeof o === 'string' ? o : o.label ?? o.value ?? '')
+const labelOf = (o) => {
+    if (o == null) return ''
+    if (typeof o === 'string') {
+        const match = props.options.find((opt) => valueOf(opt) === o)
+        return match ? (typeof match === 'string' ? match : match.label ?? match.value ?? o) : o
+    }
+    return o.label ?? o.value ?? ''
+}
 const valueOf = (o) => (o == null ? '' : typeof o === 'string' ? o : o.value ?? o.label ?? '')
 const keyOf = (o, i) => (o == null ? i : valueOf(o) ?? i)
 
@@ -262,9 +269,9 @@ function choose(opt) {
         const exists = innerValue.value.some((v) => valueOf(v) === valueOf(opt))
         innerValue.value = exists
             ? innerValue.value.filter((v) => valueOf(v) !== valueOf(opt))
-            : [...innerValue.value, opt]
+            : [...innerValue.value, valueOf(opt)]
     } else {
-        innerValue.value = opt
+        innerValue.value = valueOf(opt)
         open.value = false
         removeGlobalListeners()
     }

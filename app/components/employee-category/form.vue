@@ -10,30 +10,15 @@
             <FormInput class="w-full" v-model="name" prepend-icon="lucide:git-fork" color="#fff" size="lg" rounded="lg"
                 placeholder="Category Name" />
         </div>
-        <div class="col-span-6 w-full flex gap-1 flex-col items-start">
-            <label class="text-md text-white/80" for="Designation Level">
-                Category Code:
-            </label>
-            <FormInput disabled class="w-full" v-model="code" prepend-icon="lucide:git-fork" color="#fff" size="lg"
-                rounded="lg" placeholder="Category Code" />
-        </div>
-        <div class="col-span-6 w-full flex gap-1 flex-col items-start">
-            <label class="text-md text-white/80" for="Designation Level">
-                ID Prefix:
-            </label>
-            <FormInput class="w-full" v-model="id_prefix" prepend-icon="heroicons:hashtag" color="#fff" size="lg"
-                rounded="lg" placeholder="ID Prefix" />
-        </div>
         <div class="col-span-12 w-full flex gap-1 flex-col items-start">
             <label class="text-md text-white/80" for="Department Code">Description: (Optional)</label>
             <FormTextArea v-model="description" placeholder="Write a description..." color="#fff" rounded="lg" :rows="3"
                 :autoresize="true" clearable />
         </div>
-        <div class="col-span-2 w-full flex gap-1 flex-col items-center justify-evenly">
-            <label class="text-md text-white/80" for="Designation Level">
-                Permanent:
-            </label>
-            <UiSwitch v-model="is_permanent" color="#fff" />
+        <div class="col-span-12 w-full flex gap-1 flex-col items-start">
+            <label class="text-md text-white/80" for="Employment Type">Employment Type</label>
+            <FormSelect class="w-full" color="#fff" size="lg" rounded="lg" v-model="employment_type"
+                :options="employmentTypeOptions" placeholder="Select employment type" />
         </div>
         <div class="col-span-2 w-full flex gap-1 flex-col items-center justify-evenly">
             <label class="text-md text-white/80" for="Designation Level">
@@ -41,87 +26,39 @@
             </label>
             <UiSwitch v-model="is_active" color="#fff" />
         </div>
-        <div class="col-span-2 w-full flex gap-1 flex-col items-center justify-evenly">
-            <label class="text-md text-white/80" for="Designation Level">
-                Benefits Applicable:
-            </label>
-            <UiSwitch v-model="benefits_applicable" color="#fff" />
-        </div>
-        <div class="col-span-2 w-full flex gap-1 flex-col items-center justify-evenly">
-            <label class="text-md text-white/80" for="Designation Level">
-                Training Required:
-            </label>
-            <UiSwitch v-model="training_required" color="#fff" />
-        </div>
-        <div class="col-span-2 w-full flex gap-1 flex-col items-center justify-evenly">
-            <label class="text-md text-white/80" for="Designation Level">
-                Probation Required:
-            </label>
-            <UiSwitch v-model="probation_required" color="#fff" />
-        </div>
-        <div class="col-span-2 w-full flex gap-1 flex-col items-center justify-evenly">
-            <label class="text-md text-white/80" for="Designation Level">
-                Notice Required:
-            </label>
-            <UiSwitch v-model="notice_required" color="#fff" />
-        </div>
-        <div v-if="training_required" class="col-span-4 w-full flex gap-1 flex-col items-start">
-            <label class="text-md text-white/80" for="Designation Level">
-                Training Months:
-            </label>
-            <FormInput class="w-full" v-model="training_months" prepend-icon="heroicons:calendar-days" color="#fff"
-                size="lg" rounded="lg" placeholder="Training Months" />
-        </div>
-        <div v-if="probation_required" class="col-span-4 w-full flex gap-1 flex-col items-start">
-            <label class="text-md text-white/80" for="Designation Level">
-                Probation Months:
-            </label>
-            <FormInput class="w-full" v-model="probation_months" prepend-icon="heroicons:calendar-days" color="#fff"
-                size="lg" rounded="lg" placeholder="Probation Months" />
-        </div>
-        <div v-if="notice_required" class="col-span-4 w-full flex gap-1 flex-col items-start">
-            <label class="text-md text-white/80" for="Designation Level">
-                Notice Months:
-            </label>
-            <FormInput class="w-full" v-model="notice_months" prepend-icon="heroicons:calendar-days" color="#fff"
-                size="lg" rounded="lg" placeholder="Notice Months" />
-        </div>
     </div>
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue';
-import { useEmpCategoryStore } from '../../stores/empCategory.store'
-import { useAuthStore } from '../../stores/auth.store'
+import { onMounted, ref } from 'vue';
+import { useEmpCategoryStore } from '../../stores/empCategory.store';
+import { useAuthStore } from '../../stores/auth.store';
 import { storeToRefs } from 'pinia';
+
+const props = defineProps({
+    show: { type: Boolean, default: false },
+})
+
 const empCategoryStore = useEmpCategoryStore();
 const authStore = useAuthStore();
 
+const loading = ref(false);
+
+const employmentTypeOptions = [
+    { value: 'PROBATION', label: 'Probation' },
+    { value: 'INTERNSHIP', label: 'Internship' },
+    { value: 'TRAINEE', label: 'Trainee' },
+    { value: 'CONTRACT', label: 'Contract' },
+    { value: 'PERMANENT', label: 'Permanent' },
+]
+
 const {
     name,
-    code,
     description,
-    id_prefix,
-    is_permanent,
-    benefits_applicable,
     is_active,
-    training_required,
-    training_months,
-    probation_required,
-    probation_months,
-    notice_required,
-    notice_months,
+    employment_type,
+    empCategoryId,
 } = storeToRefs(empCategoryStore);
-
-watch(name, () => {
-    if (name.value) {
-        code.value = name.value.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase();
-    } else {
-        code.value = '';
-    }
-}, { deep: true });
-
-const loading = ref(false);
 
 onMounted(async () => {
     loading.value = true
@@ -130,4 +67,48 @@ onMounted(async () => {
         loading.value = false
     }, 1000);
 });
+
+const saveCategory = async () => {
+    loading.value = true
+    try {
+        if (!name.value || !name.value.trim()) {
+            return
+        }
+        const { $api } = useNuxtApp()
+        if (empCategoryId.value) {
+            await $api.put(`/employee-categories/${empCategoryId.value}`, {
+                name: name.value.trim(),
+                description: description.value,
+                is_active: is_active.value,
+                employment_type: employment_type.value,
+            })
+        } else {
+            await $api.post('/employee-categories', {
+                organization_id: empCategoryStore.organization_id,
+                name: name.value.trim(),
+                description: description.value,
+                is_active: is_active.value,
+                employment_type: employment_type.value,
+            })
+        }
+    } catch (err) {
+        console.error('Failed to save category:', err)
+    } finally {
+        loading.value = false
+    }
+}
+
+const closeForm = () => {
+    name.value = null
+    description.value = null
+    is_active.value = true
+    employment_type.value = 'PROBATION'
+    empCategoryId.value = null
+}
+
+watch(() => props.show, (val) => {
+    if (!val) {
+        closeForm()
+    }
+})
 </script>

@@ -24,39 +24,162 @@ A comprehensive **Human Resource Management System (HRMS)** admin panel built wi
 
 ## Architecture
 
+### Complete Folder Structure
+
 ```
-app/
-├── app.vue                 # Root component (NuxtLayout + NuxtPage)
-├── components/             # Reusable Vue components (21 categories)
-│   ├── asset/
-│   ├── charts/
-│   ├── department/
-│   ├── designation/
-│   ├── employee/
-│   ├── employee-category/
-│   ├── expense/
-│   ├── form/
-│   ├── hierarchy/
-│   ├── holiday/
-│   ├── invoices/
-│   ├── onboardingProcess/
-│   ├── organization/
-│   ├── policies/
-│   ├── reports/
-│   ├── salary-templates/
-│   ├── subscriptionPlans/
-│   ├── traffic/
-│   ├── ui/                 # Base UI components (Sidebar, Header, Button, Modal, etc.)
-│   └── usage/
-├── constants/              # Static data (countries, industries, designations, input types)
-├── data/                   # Menu definitions (employee_menu, organization_menu, super_admin menu)
-├── layouts/                # Layout components (auth, default, employee, organization)
-├── middleware/              # Route guard (auth.global.js)
-├── pages/                  # Route pages (index, login, invoices, plans, pdf-view)
-├── plugins/                # Nuxt plugins (axios, apexcharts, quill, error-handler)
-├── stores/                 # Pinia stores (28 stores across business domains)
-└── utils/                  # Utility functions (encrypt-download, decrypt-upload)
+Admin/
+├── nuxt.config.js          # Modules, dev port 3030, runtime config (API base URLs)
+├── .env                    # API base URLs, encryption secret
+├── docker-compose.yml      # Docker setup
+├── Dockerfile
+├── app/
+│   ├── app.vue             # Root component (NuxtLayout + NuxtPage, theme class, Toaster)
+│   ├── pages/              # ⭐ ROUTES — auto-registered, folder = URL (no router config)
+│   ├── layouts/            # ⭐ Page shells (default, auth, organization, employee)
+│   ├── components/         # ⭐ Auto-imported components (21+ categories)
+│   │   ├── ui/             # Shared UI: button, card, modal, tabs, search, switch, otp, sidebar, header, sidebarModal, panel, loader, colorSidebar
+│   │   ├── form/           # FormInput, FormSelect, FormTextArea...
+│   │   ├── employees/      # Tab components: DirectoryTab, OrgTreeTab, ProfileChangesTab, PrivateProfilesTab, ProbationTab, SettingsTab, LoginTab
+│   │   ├── employee/       # dataTable, form, detailedView
+│   │   ├── organization/   # dataTable, form...
+│   │   ├── charts/         # Chart widgets per domain (platform/employee/payroll/attendance/...)
+│   │   └── <module>/       # Each module has its own folder (department, designation, asset, payroll, holiday...)
+│   ├── stores/             # ⭐ Pinia stores — one per module (auth, employee, department, designation, organization, ...)
+│   ├── data/
+│   │   └── menu.js         # ⭐ Sidebar menu definitions + permissions (menu, organization_menu, employee_menu)
+│   ├── middleware/
+│   │   └── auth.global.js  # Route guard: no token → redirect /login
+│   ├── plugins/
+│   │   └── axios.js        # $api instance + auth interceptor + x-org-id / x-employee-id headers
+│   ├── constants/          # Static data (countries, industries, designations, input types)
+│   └── utils/              # Helpers (encrypt/decrypt uploads, treeLayout)
+└── server/                 # Not present — API is an external gateway (see .env)
 ```
+
+### Routing Rules (pages → URLs)
+
+Nuxt 4 registers every route automatically from the folder/file structure under `app/pages/` — there is **no router config file to edit**.
+
+```
+[organization]  → dynamic segment → route.params.organization
+[employee]      → dynamic segment → route.params.employee
+index.vue       → folder root page (e.g. organization/employees/index.vue → /organization/:org/organization/employees)
+```
+
+| Route | File |
+|---|---|
+| `/` | `app/pages/index.vue` |
+| `/login` | `app/pages/login.vue` |
+| `/organization/list` | `app/pages/organization/list.vue` |
+| `/organization/:org/dashboard` | `app/pages/organization/[organization]/dashboard.vue` |
+| `/organization/:org/organization/employees` | `.../[organization]/organization/employees/index.vue` |
+| `/organization/:org/organization/employees/login` | `.../[organization]/organization/employees/login.vue` |
+| `/organization/:org/employee/list` | `.../[organization]/employee/list.vue` |
+| `/organization/:org/employee/categories` | `.../[organization]/employee/categories.vue` |
+| `/organization/:org/employee/onboarding` | `.../[organization]/employee/onboarding.vue` |
+| `/organization/:org/employee/:empId/home` | `.../[organization]/employee/[employee]/home.vue` |
+| `/organization/:org/employee/:empId/attendance` | `.../[organization]/employee/[employee]/attendance.vue` |
+| `/organization/:org/employee/:empId/holidays` | `.../[organization]/employee/[employee]/holidays.vue` |
+| `/organization/:org/employee/:empId/finance/salary` | `.../[organization]/employee/[employee]/finance/salary.vue` |
+
+Every page chooses its shell via `definePageMeta({ layout: 'organization' })` (or `default`, `auth`, `employee`).
+
+### Super Admin vs Org Admin
+
+| | Super Admin | Org Admin |
+|---|---|---|
+| Menu source | `menu` (`data/menu.js`) | `organization_menu(org_id)` (`data/menu.js`) |
+| Layout | `default.vue` | `organization.vue` (sidebar + header + color picker) |
+| Sidebar injection | Via `UiSidebar` in layout | `organization.vue` onMounted: `menu.value = organization_menu(route.params.organization)` |
+| Dynamic menu | `/organization/list`, `/plans`, `/invoices`, `/modules`, `/settings/...` | `/organization/:org/...` |
+| Route guard | `middleware/auth.global.js` | same middleware; redirects non-super-admin from `/` to their org dashboard |
+
+The sidebar menu structure is defined in `app/data/menu.js`:
+
+```
+export const menu = [...]                    // super-admin menu
+export const organization_menu = (org_id) => [...]   // org-admin menu
+export const employee_menu = (org_id, employee_id) => [...]   // employee portal menu
+```
+
+Menu items support parent/children, `permission` keys (filtered via `auth.hasPermission`), icons, and full URLs with dynamic params.
+
+### Page Creation Recipe (4-layer pattern)
+
+Every module uses the same structure:
+
+```
+page (thin shell)
+  └─ components/<module>/dataTable.vue     ← table + toolbar
+  └─ components/<module>/form.vue          ← create/edit form (modal)
+  └─ components/<module>/detailedView.vue  ← view modal
+  └─ stores/<module>.store.js              ← API calls + state
+```
+
+Example — **Designations** (org level):
+
+1. **Page** — `pages/organization/[organization]/designations.vue`: `definePageMeta({ layout: 'organization' })`, header card + `<DataTable :items="designations" />` + `<UiSidebarModal>` + `<DetailedView>` + `<UiModal>`. `onMounted` sets org id and calls `designationStore.fetchDesignations()`.
+2. **Store** — `stores/designation.store.js`: state (`designations`, `loading`, pagination) + actions calling `await $api.get('/designations', { params })`.
+3. **Components** — `components/designation/dataTable.vue`, `form.vue`, `detailedView.vue`: dumb display components receiving `items`/`loading` and emitting `@view/@edit/@delete`.
+4. **Route** — automatic via file placement; register the page in `data/menu.js` to expose it in the sidebar.
+
+### Tab Pages Pattern
+
+Tab pages keep a single URL while switching panels via `v-show`:
+
+- `organization/employees/index.vue` — `tabConfig` array + `<UiTabs v-model="activeTab" :tabs="tabConfig">` + one `<EmployeesXxxTab />` per index.
+- `organization/employees/login.vue` — `<EmployeesLoginTab />` (its own internal tabs: Login Registrations / Login History / Failed Logins).
+
+**Auto-import naming convention** (no import statements needed):
+
+```
+app/components/<dir>/<Name>.vue  →  use as  <DirName><Name />
+app/components/employees/DirectoryTab.vue       → <EmployeesDirectoryTab />
+app/components/charts/platform/SummaryKpis.vue  → <ChartsPlatformSummaryKpis />
+app/components/ui/button.vue                    → <UiButton />
+```
+
+### API Layer & Functions
+
+- Central Axios instance in `app/plugins/axios.js`: base URL from runtime config, 15s timeout, Bearer token injected from `ADMIN_ACCESS_KEY` cookie, `x-org-id` / `x-employee-id` headers set via `$setOrganizationId()` / `$setEmpId()`.
+- **Auth flow** (`stores/auth.store.js`): OTP request/verify → `setToken()` → `getUserDetails()` → cookies `ADMIN_ACCESS_KEY` / `ADMIN_REFRESH_KEY`; `logout()` clears cookies and does a full-page reload to `/login`.
+- **Store action pattern**:
+
+```js
+import { defineStore } from 'pinia'
+
+export const useDesignationStore = defineStore('designation', {
+    state: () => ({ designations: [], loading: false }),
+    actions: {
+        async fetchDesignations() {
+            const { $api } = useNuxtApp()
+            this.loading = true
+            try {
+                const { data } = await $api.get('/designations', { params: { page: 1 } })
+                this.designations = data.designations
+            } finally {
+                this.loading = false
+            }
+        },
+    },
+})
+```
+
+Supported calls: `$api.get(url, { params })`, `$api.post(url, payload)`, `$api.put('/designations/:id', payload)`, `$api.delete('/designations/:id')`.
+
+### How to Create New Pages / Tabs / APIs
+
+**New page (no tabs):**
+1. Create `app/pages/organization/[organization]/<name>/index.vue` (or `<name>.vue`)
+2. `definePageMeta({ layout: 'organization' })`
+3. Add a child entry in `organization_menu()` inside `app/data/menu.js` (optionally with `permission: 'module.action'`)
+4. Create `stores/<name>.store.js` + `components/<name>/dataTable.vue` (+ `form.vue`/`detailedView.vue` as needed)
+
+**New tab inside a tab page:**
+1. Add an entry to `tabConfig` + a `<div v-show>` block with the auto-imported component in `app/components/employees/`
+2. No route changes needed.
+
+**New API call:** add an action to the module's store using `$api`, then call it from a page `onMounted` or a component event.
 
 ## Tech Stack
 

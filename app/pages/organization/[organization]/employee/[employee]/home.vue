@@ -1,5 +1,5 @@
 <template>
-    <div v-if="!preloader" class="h-[calc(100vh-4rem)] overflow-y-auto  text-white">
+    <div v-if="!preloader && !loading" class="h-[calc(100vh-4rem)] overflow-y-auto  text-white">
         <div class="max-w-full mx-auto p-2 space-y-2">
 
             <feedHero :username="username" />
@@ -114,8 +114,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useAuthStore } from '../../../../../stores/auth.store'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { useEmployeesStore } from '../../../../../stores/employee.store'
 import { useThemeStore } from '../../../../../stores/theme.store'
 
 import feedHero from '../../../../../components/employee/feed/feedHero.vue'
@@ -126,11 +127,27 @@ import FeedHoliday from '../../../../../components/employee/feed/holiday.vue'
 
 definePageMeta({ layout: 'employee' })
 
+const route = useRoute()
 const themeStore = useThemeStore()
-const authStore = useAuthStore()
+const employeesStore = useEmployeesStore()
 
 const preloader = computed(() => themeStore.preloader)
-const username = computed(() => authStore.user?.name || 'Debanjan Dasgupta')
+const loading = ref(true)
+const employee = ref(null)
+
+const username = computed(() =>
+    employee.value?.full_name ||
+    [employee.value?.first_name, employee.value?.last_name].filter(Boolean).join(' ') ||
+    'Employee'
+)
+
+onMounted(async () => {
+    if (route.params.employee) {
+        const data = await employeesStore.fetchEmployee(route.params.employee)
+        employee.value = data?.employee || null
+    }
+    loading.value = false
+})
 
 const posts = ref([])
 

@@ -30,6 +30,8 @@
                 <thead class="bg-white/10 backdrop-blur-md border-b border-white/10 sticky top-0 z-10">
                     <tr>
                         <th class="th">Department / Code</th>
+                        <th class="th">Parent Department</th>
+                        <th class="th">Sub-Depts</th>
                         <th class="th">Organization</th>
                         <th class="th">Department Head</th>
                         <th class="th">Head Start Date</th>
@@ -78,6 +80,24 @@
                         <td class="td align-top">
                             <div class="font-semibold text-white">{{ dept.name }}</div>
                             <div class="text-xs text-white/70">Code: {{ dept.code || '—' }}</div>
+                        </td>
+
+                        <!-- Parent Department -->
+                        <td class="td align-top">
+                            <span v-if="dept.parent_id" class="text-white/90">
+                                <Icon name="lucide:git-merge" class="w-3.5 h-3.5 inline-block mr-1 opacity-80" />
+                                {{ dept.parent?.name || dept.parent_id }}
+                            </span>
+                            <span v-else class="text-white/50">—</span>
+                        </td>
+
+                        <!-- Sub-departments -->
+                        <td class="td align-top">
+                            <span v-if="dept.children?.length" class="inline-flex items-center gap-1">
+                                <Icon name="lucide:layers" class="w-3.5 h-3.5 opacity-80" />
+                                {{ dept.children.length }}
+                            </span>
+                            <span v-else class="text-white/50">0</span>
                         </td>
 
                         <!-- Organization -->

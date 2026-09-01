@@ -19,7 +19,7 @@
 
         <!-- Navigation -->
         <nav class="flex-1 space-y-4 px-3 pt-4 overflow-y-auto glass-scroll">
-            <div v-for="group in menuItems" :key="group.group" class="space-y-2">
+            <div v-for="group in filteredMenuItems" :key="group.group" class="space-y-2">
                 <!-- Group Title -->
                 <transition name="fade" mode="out-in">
                     <h2 v-if="sidebar" class="text-xs font-semibold uppercase tracking-wider text-white/50 px-3">
@@ -109,8 +109,10 @@
 import { computed, reactive, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from '#imports'
 import { useThemeStore } from '~/stores/theme.store'
+import { useAuthStore } from '~/stores/auth.store'
 
 const themeStore = useThemeStore()
+const auth = useAuthStore()
 const sidebar = computed(() => themeStore.sidebar)
 
 const props = defineProps({
@@ -159,6 +161,22 @@ const props = defineProps({
 const route = useRoute()
 const router = useRouter()
 
+const filteredMenuItems = computed(() => {
+    return props.menuItems
+        .map(group => ({
+            ...group,
+            items: group.items
+                .map(item => {
+                    const itemPass = item.permission ? auth.hasPermission(item.permission) : true
+                    if (!item.children) return itemPass ? { ...item } : null
+                    const filteredChildren = item.children.filter(c => c.permission ? auth.hasPermission(c.permission) : true)
+                    return itemPass && filteredChildren.length > 0 ? { ...item, children: filteredChildren } : null
+                })
+                .filter(Boolean)
+        }))
+        .filter(group => group.items.length > 0)
+})
+
 /** Open-state map for items with children (keyed by path or label) */
 const openMap = reactive(new Map())
 
@@ -167,7 +185,7 @@ const keyOf = (item) => item.path || item.label
 const hasChildren = (item) => Array.isArray(item.children) && item.children.length > 0
 
 const isChildActive = (item) =>
-    hasChildren(item) && item.children.some((c) => route.path.startsWith(c.path))
+    hasChildren(item) && item.children.some((c) => route.path === c.path || route.path.startsWith(c.path + '/'))
 
 const isSelfActive = (item) => !!item.path && route.path === item.path
 
@@ -187,7 +205,7 @@ function onItemClick(item) {
 
 /** Ensure correct submenu is open if current route matches a child */
 function syncOpenFromRoute() {
-    props.menuItems.forEach((group) => {
+    filteredMenuItems.value.forEach((group) => {
         group.items.forEach((item) => {
             if (!hasChildren(item)) return
             const shouldOpen = isChildActive(item)

@@ -52,6 +52,8 @@
 
                     <FormSelect v-model="currentDepartmentId" :options="departmentOptions"
                         placeholder="Select Department" color="#fff" />
+                    <FormSelect v-if="currentDepartmentId" v-model="subDepartmentId" :options="subDepartmentOptions"
+                        placeholder="Sub Department" color="#fff" />
 
                     <p class="text-[11px] text-white/60 leading-snug">
                         Select a department to view its reporting hierarchy (head → reportees).
@@ -88,7 +90,7 @@
                     </div>
 
                     <div v-else class="flex-1 overflow-x-auto pr-1">
-                        <HierarchyHorizontal :root="deptTree" />
+                        <OrgChartTree :root="deptTree" />
                     </div>
                 </div>
 
@@ -106,7 +108,7 @@ import { useAuthStore } from '../../../stores/auth.store'
 import { useDepartmentStore } from '../../../stores/department.store'
 import { useHierarchyStore } from '../../../stores/hierarchy.store'
 
-import HierarchyHorizontal from '../../../components/hierarchy/HierarchyHorizontal.vue'
+import OrgChartTree from '../../../components/hierarchy/OrgChartTree.vue'
 import OrganizationTree from '../../../components/hierarchy/OrganizationTree.vue'
 
 definePageMeta({
@@ -150,9 +152,17 @@ const deptTree = computed(() => (deptHierarchy.value?.hierarchy ? {
     }
 } : null))
 
-const departmentOptions = computed(() => departmentStore.department_select)
+const departmentOptions = computed(() =>
+    departmentStore.department_select.filter(d => !d.parent_id)
+)
 
 const currentDepartmentId = ref(null)
+const subDepartmentId = ref(null)
+
+const subDepartmentOptions = computed(() => {
+    if (!currentDepartmentId.value) return []
+    return departmentStore.department_select.filter(d => d.parent_id === currentDepartmentId.value)
+})
 
 const reloadOrg = async () => {
     if (!authStore.organization) return
@@ -161,13 +171,18 @@ const reloadOrg = async () => {
 
 const reloadDept = async () => {
     if (!authStore.organization || !currentDepartmentId.value) return
+    const deptId = subDepartmentId.value || currentDepartmentId.value
     await hierarchyStore.fetchDepartmentHierarchy(
         authStore.organization,
-        currentDepartmentId.value
+        deptId
     )
 }
 
 const loadDeptHierarchy = reloadDept
+
+watch(currentDepartmentId, () => {
+    subDepartmentId.value = null
+})
 
 onMounted(async () => {
     if (route.query.tab && ['organization', 'department'].includes(route.query.tab)) {

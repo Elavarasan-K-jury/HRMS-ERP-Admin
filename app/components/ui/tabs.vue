@@ -1,11 +1,9 @@
 <template>
     <div class="w-full">
         <!-- Tab Navigation -->
-        <div class="flex gap-2 p-2 rounded-lg backdrop-blur-md bg-white/10 border border-white/10">
+        <div class="flex items-center gap-1 border-b border-white/15">
             <button v-for="(tab, index) in tabs" :key="index" :disabled="tab.disabled" :style="getTabStyle(index)"
-                class="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-semibold rounded-lg
-                       transition-all duration-300 select-none whitespace-nowrap
-                       active:scale-[.98] capitalize
+                class="tabs-btn relative inline-flex items-center justify-center gap-2 px-3.5 py-2.5 text-sm font-semibold capitalize select-none whitespace-nowrap transition-all duration-300
                        disabled:opacity-50 disabled:cursor-not-allowed" :class="getTabClasses(index)"
                 @click="selectTab(index)">
                 <Icon v-if="tab.icon" :name="tab.icon" class="text-lg" />
@@ -71,7 +69,7 @@ function getTabClasses(index) {
 
     if (isDisabled) return ''
 
-    return isActive ? '' : 'hover:bg-white/5 hover:-translate-y-0.5'
+    return isActive ? 'tabs-btn-active' : 'tabs-btn-idle'
 }
 
 function getTabStyle(index) {
@@ -80,37 +78,19 @@ function getTabStyle(index) {
     const isDisabled = props.tabs[index]?.disabled
 
     if (isDisabled) {
-        return {
-            color: 'rgba(255, 255, 255, 0.3)',
-            background: 'rgba(255, 255, 255, 0.02)',
-            border: '1px solid rgba(255, 255, 255, 0.05)',
-        }
+        return { color: 'rgba(255, 255, 255, 0.3)' }
     }
 
     if (isActive) {
-        const fill = `rgba(${r}, ${g}, ${b}, ${props.fillOpacity})`
-        const frost = `rgba(255,255,255,${props.frostOpacity})`
-        const border = `rgba(${r}, ${g}, ${b}, ${props.borderOpacity})`
-        const glow = `rgba(${r}, ${g}, ${b}, ${props.glow})`
-
         return {
             '--tab-color': `${r}, ${g}, ${b}`,
             color: `rgba(${r}, ${g}, ${b}, 0.95)`,
-            background: `linear-gradient(to bottom right, ${frost}, transparent), ${fill}`,
-            backdropFilter: `blur(${props.blur}px)`,
-            WebkitBackdropFilter: `blur(${props.blur}px)`,
-            border: `1px solid ${border}`,
-            boxShadow: `inset 0 1px 0 rgba(255,255,255,.25), 0 6px 25px -10px ${glow}`,
-            textShadow: '0 1px 0 rgba(0,0,0,0.2)',
-            filter: 'saturate(1.1) brightness(1.08)',
         }
     }
 
     return {
         '--tab-color': `${r}, ${g}, ${b}`,
         color: 'rgba(255, 255, 255, 0.7)',
-        background: 'transparent',
-        border: '1px solid transparent',
     }
 }
 
@@ -125,8 +105,29 @@ const badgeStyle = computed(() => {
 </script>
 
 <style scoped>
-button:not(:disabled):hover {
-    border-color: rgba(var(--tab-color), 0.25) !important;
+.tabs-btn {
+    position: relative;
+}
+
+.tabs-btn::after {
+    content: '';
+    position: absolute;
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: -1px;
+    height: 2px;
+    border-radius: 9999px;
+    background: transparent;
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.tabs-btn-active::after {
+    background: rgba(var(--tab-color), 1);
+    box-shadow: 0 0 12px rgba(var(--tab-color), 0.8);
+}
+
+.tabs-btn-idle:hover {
+    color: rgba(255, 255, 255, 0.9);
 }
 
 button:active:not(:disabled) {

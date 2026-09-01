@@ -21,6 +21,14 @@
                 rounded="lg" placeholder="Department Code" />
         </div>
         <div class="col-span-12 w-full flex gap-1 flex-col items-start">
+            <label class="text-md text-white/80" for="Parent Department">
+                Parent Department: (Optional)
+            </label>
+            <FormSelect id="parent_department" class="w-full" color="#fff" prepend-icon="lucide:git-merge"
+                v-model="parent_id" :options="parentDeptOptions" searchable size="lg" rounded="lg"
+                placeholder="Select Parent Department" />
+        </div>
+        <div class="col-span-12 w-full flex gap-1 flex-col items-start">
             <label class="text-md text-white/80" for="Department Code">
                 Department Head:
             </label>
@@ -57,10 +65,17 @@ const {
     description,
     note,
     department_head_id,
+    parent_id,
 } = storeToRefs(departmentStore);
 
 const loading = ref(false);
 
+const parentDeptOptions = computed(() => {
+    const currentId = departmentStore.department_id
+    return departmentStore.department_select
+        .filter(d => d.value !== currentId)
+        .map(d => ({ value: d.value, label: d.label }))
+})
 
 const employees = computed(() => employeeStore.all_employees.map(e => ({
     value: e.id,
@@ -78,9 +93,15 @@ watch(name, () => {
 onMounted(async () => {
     loading.value = true
     employeeStore.organization_id = authStore.organization
+    departmentStore.organization_id = authStore.organization
+    await departmentStore.fetchAllDepartments()
     await employeeStore.fetchAllEmployees();
     if (department_head_id.value) {
         department_head_id.value = employees.value.find(e => e.value == department_head_id.value)
+    }
+    if (parent_id.value) {
+        const found = departmentStore.department_select.find(d => d.value === parent_id.value)
+        if (found) parent_id.value = found
     }
     setTimeout(() => {
         loading.value = false

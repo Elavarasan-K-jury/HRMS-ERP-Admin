@@ -30,6 +30,14 @@ export default defineNuxtRouteMiddleware(async (to) => {
         }
     }
 
+    // 🧠 2️⃣b️⃣ Org admin (non-super) visiting the super-admin home → send to their org dashboard
+    if (authStore.isLoggedIn && !authStore.isSuperAdmin && authStore.admin?.organization_id) {
+        const orgPath = `/organization/${authStore.admin.organization_id}/dashboard`
+        if (to.path === '/' && to.path !== orgPath) {
+            return navigateTo(orgPath, { replace: true })
+        }
+    }
+
     // 🧠 3️⃣ If visiting login but already logged in → redirect to dashboard
     if (isPublic && hasToken) {
         // Try verifying before redirecting (avoid redirect loop)

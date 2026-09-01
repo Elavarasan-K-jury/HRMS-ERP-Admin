@@ -601,7 +601,15 @@ function isImage(url) {
 }
 
 function getFileUrl(url) {
-    return `${useRuntimeConfig().public.apiBase}${url}`
+    const base = `${useRuntimeConfig().public.apiBase}${url}`
+    if (String(url).startsWith('/file/') && typeof document !== 'undefined') {
+        const match = document.cookie.split('; ').find(r => r.startsWith('ADMIN_ACCESS_KEY='))
+        if (match) {
+            const token = decodeURIComponent(match.slice('ADMIN_ACCESS_KEY='.length))
+            if (token) return `${base}?token=${encodeURIComponent(token)}`
+        }
+    }
+    return base
 }
 function getFileIcon(url) {
     const ext = url.split('.').pop()?.toLowerCase()

@@ -25,6 +25,18 @@ export default defineNuxtPlugin(() => {
         }
     }
 
+    // Attach the admin access token from the cookie to every request
+    api.interceptors.request.use((config) => {
+        if (process.client && !config.headers.Authorization) {
+            const match = document.cookie.split('; ').find(r => r.startsWith('ADMIN_ACCESS_KEY='))
+            if (match) {
+                const token = decodeURIComponent(match.slice('ADMIN_ACCESS_KEY='.length))
+                if (token) config.headers.Authorization = `Bearer ${token}`
+            }
+        }
+        return config
+    })
+
     api.interceptors.response.use(
         (res) => res,
         (err) => Promise.reject(err)

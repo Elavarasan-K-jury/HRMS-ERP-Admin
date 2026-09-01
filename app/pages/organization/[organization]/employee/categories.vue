@@ -13,10 +13,11 @@
             </div>
         </div>
         <DataTable :items="empCategories" :loading="loading" :total="total" :page="page" :total-pages="totalPages"
-            @refresh="fetchDepartments" @view="view" @edit="editEmpCategory" @delete="deleteEmpCategory" />
+            @refresh="fetchEmpCategory" @view="view" @edit="editEmpCategory" @delete="deleteEmpCategory"
+            @next="changePage('+')" @prev="changePage('-')" />
     </div>
     <UiSidebarModal width="980px" v-model="addUpdateModal" :title="formTitle">
-        <CategoryForm />
+        <CategoryForm :show="addUpdateModal" />
         <template #footer>
             <UiButton :disabled="loading" @click="closeAddUpdateModal" color="#fff" text="Cancel"
                 prepend-icon="ion:close-circle" />
@@ -64,18 +65,8 @@ const {
     search,
     empCategoryId,
     name,
-    code,
     description,
-    id_prefix,
-    is_permanent,
-    benefits_applicable,
     is_active,
-    training_required,
-    training_months,
-    probation_required,
-    probation_months,
-    notice_required,
-    notice_months,
 } = storeToRefs(empCategoryStore)
 
 const addUpdateModal = ref(false)
@@ -84,24 +75,16 @@ const deleteModal = ref(false)
 const deleteData = ref(null)
 
 const openAddModal = () => {
+    empCategoryStore.employment_type = 'PROBATION'
     addUpdateModal.value = true
     formTitle.value = 'Add New Employee Category'
 }
 
 const closeAddUpdateModal = () => {
     name.value = null
-    code.value = null
     description.value = null
-    id_prefix.value = null
-    is_permanent.value = false
-    benefits_applicable.value = false
-    is_active.value = false
-    training_required.value = false
-    training_months.value = null
-    probation_required.value = false
-    probation_months.value = null
-    notice_required.value = false
-    notice_months.value = null
+    is_active.value = true
+    empCategoryStore.employment_type = 'PROBATION'
     empCategoryId.value = null
     formTitle.value = null
     addUpdateModal.value = false
@@ -111,23 +94,27 @@ const saveOnboarding = async () => {
     closeAddUpdateModal()
 }
 
+const view = (item) => {
+    editEmpCategory(item)
+}
+
 const editEmpCategory = (item) => {
     empCategoryId.value = item.id
     name.value = item.name
-    code.value = item.code
     description.value = item.description
-    id_prefix.value = item.id_prefix
-    is_permanent.value = item.is_permanent
-    benefits_applicable.value = item.benefits_applicable
     is_active.value = item.is_active
-    training_required.value = item.training_required
-    training_months.value = item.training_months
-    probation_required.value = item.probation_required
-    probation_months.value = item.probation_months
-    notice_required.value = item.notice_required
-    notice_months.value = item.notice_months
+    empCategoryStore.employment_type = item.employment_type || 'PROBATION'
     formTitle.value = 'Edit Employee Category'
     addUpdateModal.value = true
+}
+
+const changePage = (direction) => {
+    if (direction === '+') {
+        if (page.value < totalPages.value) page.value += 1
+    } else {
+        if (page.value > 1) page.value -= 1
+    }
+    fetchEmpCategory()
 }
 
 const deleteEmpCategory = (item) => {
