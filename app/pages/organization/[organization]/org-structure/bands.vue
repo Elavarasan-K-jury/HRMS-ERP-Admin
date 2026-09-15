@@ -62,8 +62,8 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useBandStore } from '~/stores/band.store'
-import { useAuthStore } from '~/stores/auth.store'
+import { useBandStore } from '~/stores/organization/band.store'
+import { useAuthStore } from '~/stores/shared/auth.store'
 import { storeToRefs } from 'pinia'
 
 definePageMeta({

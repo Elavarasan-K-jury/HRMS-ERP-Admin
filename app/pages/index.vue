@@ -4,27 +4,27 @@
         <div class="col-span-12 xl:col-span-8 flex flex-col gap-2">
             <div class="grid grid-col-12 gap-2">
                 <div class="col-span-12">
-                    <ChartsPlatformSummaryKpis class="h-full w-full" />
+                    <SuperAdminChartsPlatformSummaryKpis class="h-full w-full" />
                 </div>
                 <div class="col-span-12 lg:col-span-6">
-                    <ChartsPlatformOrgGrowth class="h-full w-full" />
+                    <SuperAdminChartsPlatformOrgGrowth class="h-full w-full" />
                 </div>
                 <div class="col-span-12 lg:col-span-6">
-                    <ChartsPlatformRevenueTrends class="h-full w-full" />
+                    <SuperAdminChartsPlatformRevenueTrends class="h-full w-full" />
                 </div>
                 <div class="col-span-12 lg:col-span-7">
-                    <ChartsPlatformUsageByModule class="h-full w-full" />
+                    <SuperAdminChartsPlatformUsageByModule class="h-full w-full" />
                 </div>
                 <div class="col-span-12 lg:col-span-5">
-                    <ChartsPlatformTopOrgs class="h-full w-full" />
+                    <SuperAdminChartsPlatformTopOrgs class="h-full w-full" />
                 </div>
                 <div class="col-span-12">
-                    <ChartsPlatformSubscriptionRisk class="h-full w-full" />
+                    <SuperAdminChartsPlatformSubscriptionRisk class="h-full w-full" />
                 </div>
             </div>
         </div>
         <div class="col-span-12 xl:col-span-4">
-            <ChartsPlatformServiceHealth class="h-full w-full" />
+            <SuperAdminChartsPlatformServiceHealth class="h-full w-full" />
         </div>
     </div>
 
@@ -35,7 +35,7 @@
 
 <script setup>
 import { computed } from 'vue';
-import { useThemeStore } from '../stores/theme.store';
+import { useThemeStore } from '../stores/shared/theme.store';
 
 definePageMeta({
     layout: 'auth',

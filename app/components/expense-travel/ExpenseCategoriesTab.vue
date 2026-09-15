@@ -159,8 +159,8 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
-import { useExpenseCategoryStore } from '~/stores/expenseCategory.store'
-import { useUsageTypeStore } from '~/stores/usageType.store'
+import { useExpenseCategoryStore } from '~/stores/organization/expenseCategory.store'
+import { useUsageTypeStore } from '~/stores/organization/usageType.store'
 
 const props = defineProps({ organizationId: { type: String, required: true } })
 const store = useExpenseCategoryStore()

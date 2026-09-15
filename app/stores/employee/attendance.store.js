@@ -1,8 +1,8 @@
-// app/stores/attendance.store.js
+// app/stores/organization/attendance.store.js
 import { defineStore } from 'pinia'
-import { useAuthStore } from '../auth.store'
+import { useAuthStore } from '../shared/auth.store'
 
-export const useAttendanceStore = defineStore('attendance', {
+export const useEmployeeAttendanceStore = defineStore('employee-attendance', {
     state: () => ({
         attendanceList: [],
         month: {

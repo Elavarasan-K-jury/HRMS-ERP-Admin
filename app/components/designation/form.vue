@@ -64,10 +64,10 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue';
 import designations from '../../constants/designations';
-import { useDepartmentStore } from '../../stores/department.store'
-import { useDesignationStore } from '../../stores/designation.store'
-import { useBandStore } from '../../stores/band.store'
-import { useAuthStore } from '../../stores/auth.store'
+import { useDepartmentStore } from '../../stores/organization/department.store'
+import { useDesignationStore } from '../../stores/organization/designation.store'
+import { useBandStore } from '../../stores/organization/band.store'
+import { useAuthStore } from '../../stores/shared/auth.store'
 import { storeToRefs } from 'pinia';
 const departmentStore = useDepartmentStore();
 const designationStore = useDesignationStore();

@@ -58,8 +58,8 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useAssetsModelStore } from '../../../../stores/assetModel.store';
-import { useAuthStore } from '../../../../stores/auth.store';
+import { useAssetsModelStore } from '../../../../stores/organization/assetModel.store';
+import { useAuthStore } from '../../../../stores/shared/auth.store';
 
 import DataTable from '../../../../components/asset/AssetModelsTable.vue';
 import AssetModelForm from '../../../../components/asset/AssetModelForm.vue';

@@ -1,8 +1,8 @@
 <script setup>
 import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue";
 import { useRuntimeConfig } from "nuxt/app";
-import { useAuthStore } from "@/stores/auth.store";
-import { useOrganizationStore } from "@/stores/organization.store";
+import { useAuthStore } from "@/stores/shared/auth.store";
+import { useOrganizationStore } from "@/stores/organization/organization.store";
 
 definePageMeta({ layout: "auth" });
 

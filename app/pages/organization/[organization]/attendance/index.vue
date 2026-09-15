@@ -299,7 +299,7 @@
 
 <script setup>
 import { computed, reactive, onMounted, watch } from 'vue'
-import { useAttendanceStore } from '../../../../stores/orgAttendance.store'
+import { useAttendanceStore } from '../../../../stores/organization/orgAttendance.store'
 
 definePageMeta({
     layout: 'organization',

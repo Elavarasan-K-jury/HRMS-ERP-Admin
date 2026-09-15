@@ -277,7 +277,7 @@
 
 <script setup>
 import { onMounted, computed, watch, ref } from 'vue';
-import { useExpenseStore } from '../../../stores/expense.store';
+import { useExpenseStore } from '../../../stores/shared/expense.store';
 import { storeToRefs } from 'pinia';
 
 const expenseStore = useExpenseStore()

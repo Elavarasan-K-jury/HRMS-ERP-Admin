@@ -336,8 +336,8 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
-import { useStorageStore } from '~/stores/storage.store'
-import { useAuthStore } from '~/stores/auth.store'
+import { useStorageStore } from '~/stores/organization/storage.store'
+import { useAuthStore } from '~/stores/shared/auth.store'
 
 definePageMeta({
     layout: 'organization',

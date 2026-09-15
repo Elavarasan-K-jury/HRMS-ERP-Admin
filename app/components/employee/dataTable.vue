@@ -136,7 +136,7 @@
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import { useDepartmentStore } from '../../stores/department.store'
+import { useDepartmentStore } from '../../stores/organization/department.store'
 
 const departmentStore = useDepartmentStore()
 

@@ -50,7 +50,7 @@
 <script setup>
 import { storeToRefs } from "pinia";
 import { watch, computed } from "vue";
-import { useAssetsModelStore } from "../../stores/assetModel.store";
+import { useAssetsModelStore } from "../../stores/organization/assetModel.store";
 
 import SpecsEditor from "./SpecsEditor.vue";
 

@@ -71,7 +71,7 @@
 
 <script setup>
 import { storeToRefs } from 'pinia'
-import { useAttendancePolicyStore } from '@/stores/attendancePolicy.store'
+import { useAttendancePolicyStore } from '@/stores/organization/attendancePolicy.store'
 
 const store = useAttendancePolicyStore()
 

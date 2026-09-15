@@ -37,8 +37,8 @@
 
 <script setup>
 import { onMounted, watch, ref, computed } from 'vue';
-import { useAuthStore } from '../../../stores/auth.store';
-import { useBranchStore } from '../../../stores/branch.store';
+import { useAuthStore } from '../../../stores/shared/auth.store';
+import { useBranchStore } from '../../../stores/organization/branch.store';
 import DataTable from '../../../components/branch/dataTable.vue';
 import BranchForm from '../../../components/branch/form.vue';
 import { storeToRefs } from 'pinia';

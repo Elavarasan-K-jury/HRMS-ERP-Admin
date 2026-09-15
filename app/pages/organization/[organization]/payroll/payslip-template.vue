@@ -215,7 +215,8 @@
 
 <script setup>
 import { onMounted, ref } from "vue";
-import { usePayslipTemplateStore } from "@/stores/payslipTemplate.store";
+import { useAuthStore } from "~/stores/shared/auth.store";
+import { usePayslipTemplateStore } from "@/stores/organization/payslipTemplate.store";
 
 definePageMeta({
     layout: "organization",

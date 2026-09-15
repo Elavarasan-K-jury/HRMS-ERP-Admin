@@ -279,10 +279,10 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useEmployeesStore } from '~/stores/employee.store'
-import { useDepartmentStore } from '~/stores/department.store'
-import { useBranchStore } from '~/stores/branch.store'
-import { useLocationStore } from '~/stores/location.store'
+import { useEmployeesStore } from '~/stores/organization/employee.store'
+import { useDepartmentStore } from '~/stores/organization/department.store'
+import { useBranchStore } from '~/stores/organization/branch.store'
+import { useLocationStore } from '~/stores/organization/location.store'
 
 const activeTab = ref(0)
 const loading = ref(false)

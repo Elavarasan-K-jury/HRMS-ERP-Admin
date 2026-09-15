@@ -68,18 +68,44 @@
         </section>
 
         <section class="card">
-            <h2 class="hdr"><Icon name="lucide:shield" class="ic" /> Identity Information</h2>
-            <div class="grid2">
-                <div><span class="label">PAN</span>—</div>
-                <div><span class="label">Aadhaar</span>—</div>
-                <div><span class="label">Passport Number</span>—</div>
+            <div class="hdr-row">
+                <h2 class="hdr"><Icon name="lucide:users" class="ic" /> Relationships</h2>
+                <button class="edit-btn" title="Manage Relationships" @click="openRelModal">
+                    <Icon name="lucide:plus" class="ic" />
+                </button>
+            </div>
+            <div v-if="relLoading" class="rel-loading">
+                <Icon name="lucide:loader-2" class="animate-spin" style="width:18px;height:18px;opacity:0.5" />
+            </div>
+            <div v-else-if="relationships.length === 0" class="empty">No relationships added yet.</div>
+            <div v-else class="rel-list">
+                <div v-for="rel in relationships" :key="rel.id" class="rel-card">
+                    <div class="rel-card-header">
+                        <span class="rel-badge">{{ formatRelType(rel.relationship) }}</span>
+                        <div class="rel-actions">
+                            <button class="rel-action-btn" title="Edit" @click="openRelModal"><Icon name="lucide:pencil" class="ic" /></button>
+                            <button class="rel-action-btn rel-action-delete" title="Delete" @click="deleteRelationship(rel)"><Icon name="lucide:trash-2" class="ic" /></button>
+                        </div>
+                    </div>
+                    <div class="rel-card-grid">
+                        <div><span class="label">First Name</span>{{ rel.first_name }}</div>
+                        <div v-if="rel.last_name"><span class="label">Last Name</span>{{ rel.last_name }}</div>
+                        <div v-if="rel.gender"><span class="label">Gender</span>{{ formatGender(rel.gender) }}</div>
+                        <div v-if="rel.date_of_birth"><span class="label">Date of Birth</span>{{ formatRelDate(rel.date_of_birth) }}</div>
+                        <div v-if="rel.email" class="rel-field-wide"><span class="label">Email</span>{{ rel.email }}</div>
+                        <div v-if="rel.phone"><span class="label">Mobile</span>{{ rel.phone }}</div>
+                        <div v-if="rel.profession" class="rel-field-wide"><span class="label">Profession</span>{{ rel.profession }}</div>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <section class="card">
-            <h2 class="hdr"><Icon name="lucide:graduation-cap" class="ic" /> Education</h2>
-            <p class="empty">No education information available.</p>
-        </section>
+
+        <ProfileEducation :docTypes="educationDocTypes" :loading="docLoading" @download="downloadDoc" @edit="editDoc" />
+
+        <ProfileExperience :docTypes="experienceDocTypes" :loading="docLoading" @download="downloadDoc" @edit="editDoc" />
+
+        <ProfileIdentity :docTypes="identityDocTypes" :loading="docLoading" @download="downloadDoc" @edit="editDoc" />
     </div>
 
     <UiSidebarModal v-model="modalOpen" :title="modalTitle" width="620px">
@@ -219,12 +245,85 @@
             </div>
         </template>
     </UiSidebarModal>
+
+    <UiSidebarModal v-model="relModalOpen" title="Relationships" width="580px">
+        <template #default>
+            <div v-if="relForms.length === 0" class="empty" style="padding:24px 0;text-align:center">
+                No relationships. Click "+ Add Relationship" below to get started.
+            </div>
+            <div v-for="(form, idx) in relForms" :key="form._key" class="rel-form-card">
+                <div class="rel-form-header">
+                    <span class="rel-form-num">Relationship {{ idx + 1 }}</span>
+                    <button v-if="relForms.length > 1" class="rel-form-remove" title="Remove" @click="removeRelForm(idx)">
+                        <Icon name="lucide:trash-2" class="ic" /> Remove
+                    </button>
+                </div>
+                <div class="form-grid">
+                    <div class="field">
+                        <p class="lbl">Relationship <span class="text-red-400">*</span></p>
+                        <FormSelect v-model="form.relationship" class="w-full" color="#fff" prepend-icon="lucide:users"
+                            :options="relationshipTypeOptions" size="md" rounded="lg" placeholder="Select Relationship" />
+                    </div>
+                    <div class="field">
+                        <p class="lbl">Gender</p>
+                        <FormSelect v-model="form.gender" class="w-full" color="#fff" prepend-icon="bx:bx-user"
+                            :options="genderOptionsList" size="md" rounded="lg" placeholder="Select Gender" clearable />
+                    </div>
+                    <div class="field">
+                        <p class="lbl">First Name <span class="text-red-400">*</span></p>
+                        <FormInput v-model="form.first_name" class="w-full" color="#fff" prepend-icon="bx:bx-user"
+                            size="md" rounded="lg" placeholder="First Name" />
+                    </div>
+                    <div class="field">
+                        <p class="lbl">Last Name</p>
+                        <FormInput v-model="form.last_name" class="w-full" color="#fff" prepend-icon="bx:bx-user"
+                            size="md" rounded="lg" placeholder="Last Name" />
+                    </div>
+                    <div class="field">
+                        <p class="lbl">Email</p>
+                        <FormInput v-model="form.email" type="email" class="w-full" color="#fff" prepend-icon="heroicons:envelope"
+                            size="md" rounded="lg" placeholder="Email" />
+                    </div>
+                    <div class="field">
+                        <p class="lbl">Mobile</p>
+                        <FormInput v-model="form.phone" type="tel" class="w-full" color="#fff" prepend-icon="heroicons:phone"
+                            size="md" rounded="lg" placeholder="Mobile" />
+                    </div>
+                    <div class="field">
+                        <p class="lbl">Profession</p>
+                        <FormInput v-model="form.profession" class="w-full" color="#fff" prepend-icon="lucide:briefcase"
+                            size="md" rounded="lg" placeholder="Profession" />
+                    </div>
+                    <div class="field">
+                        <p class="lbl">Date of Birth</p>
+                        <FormInput v-model="form.date_of_birth" type="date" class="w-full" color="#fff" prepend-icon="bx:bx-calendar"
+                            size="md" rounded="lg" placeholder="Date of Birth" />
+                    </div>
+                </div>
+            </div>
+            <button class="rel-add-btn" @click="addRelForm">
+                <Icon name="lucide:plus" class="ic" /> Add Relationship
+            </button>
+        </template>
+        <template #footer>
+            <div class="w-full flex justify-end gap-3">
+                <UiButton :disabled="relSaving" @click="closeRelModal" color="#fff" text="Cancel" />
+                <UiButton :disabled="relSaving" @click="saveAllRelationships" color="#4aff7a" text="Save" prepend-icon="ion:checkmark-circle" />
+            </div>
+        </template>
+    </UiSidebarModal>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
-import { useEmployeesStore } from '../../../stores/employee.store'
+import { computed, ref, onMounted, watch } from 'vue'
+import { useEmployeesStore } from '../../../stores/organization/employee.store'
+import { useEmployeeDocumentStore } from '../../../stores/organization/employeeDocument.store'
 import { apiAddressToStore, formatAddress } from '../../../utils/employeeProfile'
+import { resolveMediaUrl } from '../../../utils/media'
+
+import ProfileEducation from './ProfileEducation.vue'
+import ProfileExperience from './ProfileExperience.vue'
+import ProfileIdentity from './ProfileIdentity.vue'
 
 const props = defineProps({
     employee: { type: Object, required: true },
@@ -233,6 +332,7 @@ const props = defineProps({
 const emit = defineEmits(['updated'])
 
 const employeesStore = useEmployeesStore()
+const docStore = useEmployeeDocumentStore()
 
 const currentAddress = computed(() => formatAddress(props.employee.current_address))
 const permanentAddress = computed(() => formatAddress(props.employee.permanent_address))
@@ -404,6 +504,269 @@ async function saveSection() {
         saving.value = false
     }
 }
+
+// ---------- Relationships (self-service API) ----------
+const relLoading = ref(true)
+const relationships = ref([])
+const relModalOpen = ref(false)
+const relSaving = ref(false)
+const relForms = ref([])
+const relOriginalIds = ref([])
+let relKeySeq = 0
+
+const relationshipTypeOptions = [
+    { value: 'CHILD', label: 'Child' },
+    { value: 'FATHER', label: 'Father' },
+    { value: 'FATHER_IN_LAW', label: 'Father-in-law' },
+    { value: 'MOTHER', label: 'Mother' },
+    { value: 'MOTHER_IN_LAW', label: 'Mother-in-law' },
+    { value: 'OTHERS', label: 'Others' },
+    { value: 'PARTNER', label: 'Partner' },
+    { value: 'SPOUSE', label: 'Spouse' },
+    { value: 'SELF', label: 'Self' },
+    { value: 'SIBLING', label: 'Sibling' },
+]
+
+const genderOptionsList = [
+    { value: 'MALE', label: 'Male' },
+    { value: 'FEMALE', label: 'Female' },
+    { value: 'OTHER', label: 'Other' },
+]
+
+function formatRelType(type) {
+    if (!type) return ''
+    return type.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase())
+}
+
+function formatRelDate(iso) {
+    if (!iso) return ''
+    const d = new Date(iso)
+    if (isNaN(d)) return ''
+    return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
+function blankRelForm() {
+    return { _key: ++relKeySeq, _id: null, relationship: '', first_name: '', last_name: '', gender: '', email: '', phone: '', profession: '', date_of_birth: '' }
+}
+
+function relToForm(r) {
+    return { _key: ++relKeySeq, _id: r.id || null, relationship: r.relationship || '', first_name: r.first_name || '', last_name: r.last_name || '', gender: r.gender || '', email: r.email || '', phone: r.phone || '', profession: r.profession || '', date_of_birth: toInputDate(r.date_of_birth) }
+}
+
+function relPayload(form) {
+    return {
+        relationship: form.relationship,
+        first_name: form.first_name.trim(),
+        last_name: form.last_name?.trim() || null,
+        gender: form.gender || null,
+        email: form.email?.trim() || null,
+        phone: form.phone?.trim() || null,
+        profession: form.profession?.trim() || null,
+        date_of_birth: form.date_of_birth || null,
+    }
+}
+
+async function loadRelationships() {
+    if (!props.employee?.id) return
+    relLoading.value = true
+    try {
+        const { $api } = useNuxtApp()
+        const { data } = await $api.get('/employee-profile/my/relationships')
+        relationships.value = data?.relationships || []
+    } catch (err) {
+        console.error('[ProfileTab] Failed to load relationships:', err)
+        relationships.value = []
+    } finally {
+        relLoading.value = false
+    }
+}
+
+function openRelModal() {
+    relForms.value = relationships.value.map(r => relToForm(r))
+    if (relForms.value.length === 0) relForms.value.push(blankRelForm())
+    relOriginalIds.value = relationships.value.map(r => r.id).filter(Boolean)
+    relModalOpen.value = true
+}
+
+function closeRelModal() {
+    relModalOpen.value = false
+    relSaving.value = false
+}
+
+function addRelForm() {
+    relForms.value.push(blankRelForm())
+}
+
+function removeRelForm(idx) {
+    if (relForms.value.length <= 1) return
+    relForms.value.splice(idx, 1)
+}
+
+function validateAllRelForms() {
+    for (let i = 0; i < relForms.value.length; i++) {
+        const f = relForms.value[i]
+        if (!f.relationship) {
+            useToast().error({ title: 'Required', message: `Relationship ${i + 1}: please select a relationship type.`, timeout: 3000 })
+            return false
+        }
+        if (!f.first_name?.trim()) {
+            useToast().error({ title: 'Required', message: `Relationship ${i + 1}: first name is required.`, timeout: 3000 })
+            return false
+        }
+        if (f.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.email)) {
+            useToast().error({ title: 'Invalid email', message: `Relationship ${i + 1}: email format is invalid.`, timeout: 3000 })
+            return false
+        }
+    }
+    return true
+}
+
+async function saveAllRelationships() {
+    if (relSaving.value) return
+    if (!validateAllRelForms()) return
+    relSaving.value = true
+    try {
+        const { $api } = useNuxtApp()
+        const currentIds = relForms.value.map(f => f._id).filter(Boolean)
+        const toDelete = relOriginalIds.value.filter(id => !currentIds.includes(id))
+        for (const id of toDelete) {
+            await $api.delete(`/employee-profile/my/relationships/${id}`)
+        }
+        for (const f of relForms.value) {
+            if (f._id) {
+                await $api.put(`/employee-profile/my/relationships/${f._id}`, relPayload(f))
+            } else {
+                await $api.post('/employee-profile/my/relationships', relPayload(f))
+            }
+        }
+        useToast().success({ title: 'Saved', message: 'Relationships saved successfully.', timeout: 1500 })
+        closeRelModal()
+        await loadRelationships()
+    } catch (err) {
+        relSaving.value = false
+        const msg = err?.response?.data?.error || err.message || 'Failed to save relationships'
+        useToast().error({ title: 'Error', message: String(msg).replace(/^\d+ [A-Z_]+:\s*/, ''), timeout: 3000 })
+    }
+}
+
+async function deleteRelationship(rel) {
+    const name = `${rel.first_name}${rel.last_name ? ' ' + rel.last_name : ''}`
+    const confirmed = window.confirm(`Remove relationship "${name}"?`)
+    if (!confirmed) return
+    try {
+        const { $api } = useNuxtApp()
+        await $api.delete(`/employee-profile/my/relationships/${rel.id}`)
+        useToast().success({ title: 'Removed', message: 'Relationship removed.', timeout: 1500 })
+        await loadRelationships()
+    } catch (err) {
+        const msg = err?.response?.data?.error || err.message || 'Failed to delete relationship'
+        useToast().error({ title: 'Error', message: String(msg).replace(/^\d+ [A-Z_]+:\s*/, ''), timeout: 3000 })
+    }
+}
+
+// ---------- Employee Documents ----------
+const docLoading = ref(true)
+
+const EDUCATION_KEYWORDS = ['education', 'qualification', 'certificate', 'degree', 'academic', 'training', 'course', 'diploma']
+const IDENTITY_KEYWORDS = ['identity', 'proof', 'id', 'aadhaar', 'aadhar', 'pan', 'passport', 'verification', 'photo id', 'driving', 'voter']
+const EXPERIENCE_KEYWORDS = ['experience', 'employment', 'work history', 'career', 'references', 'recommendation']
+
+const groupedDocs = ref({})
+
+const educationDocTypes = computed(() => {
+    const result = []
+    for (const group of Object.values(groupedDocs.value)) {
+        if (EDUCATION_KEYWORDS.some(kw => group.folderName.toLowerCase().includes(kw))) {
+            result.push(...group.types)
+        }
+    }
+    return result
+})
+
+const identityDocTypes = computed(() => {
+    const result = []
+    for (const group of Object.values(groupedDocs.value)) {
+        if (IDENTITY_KEYWORDS.some(kw => group.folderName.toLowerCase().includes(kw))) {
+            result.push(...group.types)
+        }
+    }
+    return result
+})
+
+const experienceDocTypes = computed(() => {
+    const result = []
+    for (const group of Object.values(groupedDocs.value)) {
+        if (EXPERIENCE_KEYWORDS.some(kw => group.folderName.toLowerCase().includes(kw))) {
+            result.push(...group.types)
+        }
+    }
+    return result
+})
+
+async function loadDocuments() {
+    if (!props.employee?.id || !props.employee?.organization_id) return
+    docLoading.value = true
+    try {
+        docStore.organizationId = props.employee.organization_id
+        const verifiedDocs = await docStore.fetchMyVerifiedDocuments({ limit: 50 })
+
+        const groups = {}
+        for (const doc of verifiedDocs) {
+            const folderName = doc.folder_name || 'Uncategorized'
+            if (!groups[folderName]) {
+                groups[folderName] = {
+                    folderId: doc.folder_id || null,
+                    folderName,
+                    types: [],
+                }
+            }
+            const existing = groups[folderName].types.find(t => t.typeId === doc.document_type_id)
+            if (existing) {
+                existing.submissions.push(doc)
+                continue
+            }
+            groups[folderName].types.push({
+                typeId: doc.document_type_id,
+                typeName: doc.document_type_name,
+                assignmentId: doc.assignment_id,
+                isMandatory: doc.document_is_mandatory || false,
+                isMultiple: doc.document_is_multiple || false,
+                isVerificationRequired: doc.document_is_verification_required || false,
+                submissions: [doc],
+            })
+        }
+        groupedDocs.value = groups
+    } catch (err) {
+        console.error('[ProfileTab] Failed to load documents:', err)
+    } finally {
+        docLoading.value = false
+    }
+}
+
+function downloadDoc(submission) {
+    if (submission?.file_url) {
+        const a = document.createElement('a')
+        a.href = resolveMediaUrl(submission.file_url)
+        a.download = submission.file_name || 'document'
+        a.click()
+    }
+}
+
+function editDoc() {
+    navigateTo('/employee/profile?tab=documents')
+}
+
+onMounted(() => {
+    loadDocuments()
+    loadRelationships()
+})
+
+watch(() => props.employee?.id, () => {
+    if (props.employee?.id) {
+        loadDocuments()
+        loadRelationships()
+    }
+})
 </script>
 
 <style scoped>
@@ -532,9 +895,170 @@ async function saveSection() {
     border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+/* Relationships */
+.rel-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 0;
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.rel-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.rel-card {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 14px;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.rel-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.rel-card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 16px;
+    font-size: 13.5px;
+    line-height: 1.35;
+}
+
+.rel-field-wide {
+    grid-column: span 2;
+}
+
+.rel-badge {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: rgba(74, 255, 122, 0.12);
+    color: #4aff7a;
+    flex-shrink: 0;
+}
+
+.rel-actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.rel-action-btn {
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    border-radius: 6px;
+    color: rgba(255, 255, 255, 0.45);
+    transition: all 0.15s ease;
+}
+
+.rel-action-btn:hover {
+    color: #4aff7a;
+    background: rgba(74, 255, 122, 0.12);
+}
+
+.rel-action-delete:hover {
+    color: #ff4a4a;
+    background: rgba(255, 74, 74, 0.12);
+}
+
+/* Multi-form relationship sidebar */
+.rel-form-card {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.rel-form-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.rel-form-num {
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.rel-form-remove {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(255, 100, 100, 0.8);
+    background: rgba(255, 74, 74, 0.08);
+    border: 1px solid rgba(255, 74, 74, 0.15);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.rel-form-remove:hover {
+    color: #ff4a4a;
+    background: rgba(255, 74, 74, 0.15);
+}
+
+.rel-form-remove .ic {
+    width: 13px;
+    height: 13px;
+}
+
+.rel-add-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px dashed rgba(74, 255, 122, 0.25);
+    background: rgba(74, 255, 122, 0.04);
+    color: #4aff7a;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    margin-top: 4px;
+}
+
+.rel-add-btn:hover {
+    background: rgba(74, 255, 122, 0.1);
+    border-color: rgba(74, 255, 122, 0.4);
+}
+
+.rel-add-btn .ic {
+    width: 15px;
+    height: 15px;
+}
+
 @media (max-width: 640px) {
     .grid2 { grid-template-columns: 1fr; }
     .form-grid { grid-template-columns: 1fr; }
     .field.col-span-2 { grid-column: span 1; }
+    .rel-card-grid { grid-template-columns: 1fr; }
+    .rel-field-wide { grid-column: span 1; }
 }
 </style>

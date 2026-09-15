@@ -6,6 +6,8 @@
 </template>
 
 <script setup>
+import { useAuthStore } from '~/stores/shared/auth.store'
+
 const props = defineProps({
     permission: { type: String, required: true },
     showFallback: { type: Boolean, default: true },

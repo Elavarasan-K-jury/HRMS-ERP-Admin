@@ -56,8 +56,8 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 
-import { useAttendancePolicyStore } from '../../../../stores/attendancePolicy.store'
-import { useAuthStore } from '../../../../stores/auth.store'
+import { useAttendancePolicyStore } from '../../../../stores/organization/attendancePolicy.store'
+import { useAuthStore } from '../../../../stores/shared/auth.store'
 
 import AttendancePolicyTable from '../../../../components/policies/PolicyTable.vue'
 import AttendancePolicyForm from '../../../../components/policies/PolicyForm.vue'

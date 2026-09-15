@@ -24,8 +24,8 @@ Layout for organization-specific admin pages. Displays organization name in side
 
 ```js
 import { organization_menu } from '../data/menu'
-import { useOrganizationStore } from '../stores/organization.store'
-import { useFinanceStore } from '../stores/finance.store'
+import { useOrganizationStore } from '../stores/organization/organization.store'
+import { useFinanceStore } from '../stores/super-admin/finance.store'
 
 const title = computed(() => organizationStore.organization.name)
 const titleShort = computed(() => {

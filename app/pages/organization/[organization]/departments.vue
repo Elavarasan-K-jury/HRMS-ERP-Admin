@@ -42,8 +42,8 @@
 
 <script setup>
 import { onMounted, watch } from 'vue';
-import { useAuthStore } from '../../../stores/auth.store';
-import { useDepartmentStore } from '../../../stores/department.store';
+import { useAuthStore } from '../../../stores/shared/auth.store';
+import { useDepartmentStore } from '../../../stores/organization/department.store';
 import DataTable from '../../../components/department/dataTable.vue';
 import DetailedView from '../../../components/department/detailedView.vue';
 import DepartmentForm from '../../../components/department/form.vue';

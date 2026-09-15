@@ -3,7 +3,7 @@
     <div v-if="!items?.length && !loading"
         class="rounded-lg border border-white/15 bg-white/10 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,.25)] px-4 py-10 flex items-center justify-center w-full gap-2 text-white/70">
         <Icon name="lucide:inbox" class="w-6 h-6 opacity-80" />
-        <span>No asset categories found.</span>
+        <span>No assets found.</span>
     </div>
 
     <!-- 🧠 Table -->
@@ -70,7 +70,7 @@
 
                         <!-- Description -->
                         <td class="td">
-                            {{ item.category.name || '-' }}
+                            {{ item.category?.name || '-' }}
                         </td>
 
                         <!-- Status -->
@@ -110,21 +110,7 @@
                                         {{ item.credentials?.user_name }}
                                     </span>
                                 </span>
-
-                                <span v-if="item.credentials?.password"
-                                    class="group cursor-pointer inline-flex items-center select-none gap-2">
-                                    <span class="text-white/70">Password:</span>
-
-                                    <!-- masked (default) -->
-                                    <span class="group-hover:hidden font-mono">
-                                        {{ "*".repeat(item.credentials.password.length) }}
-                                    </span>
-
-                                    <!-- real (on hover) -->
-                                    <span class="hidden group-hover:inline font-mono">
-                                        {{ item.credentials.password }}
-                                    </span>
-                                </span>
+                                <!-- Phase 00: Password field removed from display — backend no longer returns it -->
                             </div>
                         </td>
 
@@ -141,10 +127,9 @@
                                     <Icon name="lucide:eye" class="w-4 h-4" />
                                 </button> -->
                                 <UiButton color="#fff" :disabled="item.assignments?.find(a =>
-                                    ['ASSIGNMENT_PENDING', 'REQUESTED', 'ASSIGNED', 'IN_REPAIR', 'DAMAGED', 'LOST', 'RETIRED',
-                                        'DISPOSED'].includes(a.status)
-                                ) || (item.status == 'ASSIGNED' || item.status == 'RETIRED')" class="btn-icon"
-                                    title="Edit" @click="$emit('assign', item)">
+                                    ['ASSIGNED', 'ASSIGNMENT_PENDING'].includes(a.status)
+                                ) || (item.status == 'ASSIGNED' || item.status == 'RETIRED' || item.status == 'DISPOSED' || item.status == 'LOST' || item.status == 'IN_REPAIR')" class="btn-icon"
+                                    title="Assign" @click="$emit('assign', item)">
                                     <div class="flex gap-2 items-center">
                                         <Icon name="heroicons:user" />
                                         <Icon name="heroicons:arrow-left-16-solid" />
@@ -215,7 +200,6 @@ const getCureentAssignmentStatus = (data = []) => {
         const bTime = new Date(b.updated_at || b.created_at || b.assigned_at || 0).getTime();
         return bTime - aTime;
     });
-    console.log('assetList.vue @ Line 217:', activeAssignments[0].status || null);
     return activeAssignments[0].status || 'AVAILABLE';
 }
 const showPagination = computed(() => props.totalPages > 1);
@@ -227,8 +211,14 @@ function statusBadgeClass(status) {
             return 'bg-sky-500/20 text-sky-300'
         case 'IN_REPAIR':
             return 'bg-amber-500/20 text-amber-300'
+        case 'DAMAGED':
+            return 'bg-red-600/20 text-red-400'
+        case 'LOST':
+            return 'bg-rose-600/20 text-rose-400'
         case 'RETIRED':
-            return 'bg-rose-500/20 text-rose-300'
+            return 'bg-gray-500/20 text-gray-300'
+        case 'DISPOSED':
+            return 'bg-zinc-600/20 text-zinc-300'
         default:
             return 'bg-white/10 text-white/70'
     }
@@ -242,8 +232,14 @@ function statusIcon(status) {
             return 'lucide:user-check'
         case 'IN_REPAIR':
             return 'lucide:wrench'
+        case 'DAMAGED':
+            return 'lucide:alert-triangle'
+        case 'LOST':
+            return 'lucide:help-circle'
         case 'RETIRED':
             return 'lucide:archive'
+        case 'DISPOSED':
+            return 'lucide:trash-2'
         default:
             return 'lucide:help-circle'
     }

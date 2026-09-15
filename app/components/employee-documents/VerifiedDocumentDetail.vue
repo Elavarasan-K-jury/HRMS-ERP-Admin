@@ -63,13 +63,25 @@
                     <!-- File -->
                     <div v-if="!submission?.is_na" class="rounded-xl border border-white/10 bg-white/5 p-4">
                         <p class="text-sm font-semibold text-white/85 mb-3">Document File</p>
-                        <div v-if="submission?.file_id" class="flex items-center gap-3">
-                            <Icon name="ion:document-attach-outline" class="w-6 h-6 text-emerald-300" />
-                            <div class="min-w-0 flex-1">
-                                <p class="text-sm text-white/85 truncate">{{ submission?.file_name || 'Document file' }}</p>
-                                <p class="text-xs text-white/45">{{ submission?.file_type || '' }}</p>
+                        <div v-if="submission?.file_id">
+                            <!-- Image preview -->
+                            <div v-if="isImage(submission?.file_type)" class="rounded-lg overflow-hidden border border-white/10 bg-white/5">
+                                <img :src="resolveMediaUrl(submission?.file_url)" :alt="submission?.file_name || 'Document'" class="max-w-full max-h-80 object-contain mx-auto" @error="imgError = true" />
+                                <p v-if="imgError" class="text-xs text-rose-400 text-center py-3">Failed to load image.</p>
                             </div>
-                            <a :href="resolveFileUrl(submission?.file_url)" target="_blank" rel="noopener" class="text-xs text-emerald-300 hover:text-emerald-200 underline underline-offset-2">View / Download</a>
+                            <!-- PDF preview -->
+                            <div v-else-if="isPdf(submission?.file_type)" class="rounded-lg overflow-hidden border border-white/10 bg-white/5">
+                                <iframe :src="resolveMediaUrl(submission?.file_url)" class="w-full h-96" frameborder="0"></iframe>
+                            </div>
+                            <!-- Other file -->
+                            <div v-else class="flex items-center gap-3">
+                                <Icon name="ion:document-attach-outline" class="w-6 h-6 text-emerald-300" />
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-sm text-white/85 truncate">{{ submission?.file_name || 'Document file' }}</p>
+                                    <p class="text-xs text-white/45">{{ submission?.file_type || '' }}</p>
+                                </div>
+                                <a :href="resolveMediaUrl(submission?.file_url)" class="text-xs text-emerald-300 hover:text-emerald-200 underline underline-offset-2">View / Download</a>
+                            </div>
                         </div>
                         <p v-else class="text-xs text-white/40">No file attached.</p>
                     </div>
@@ -115,11 +127,13 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { useEmployeeDocumentStore } from '~/stores/employeeDocument.store'
+import { useEmployeeDocumentStore } from '~/stores/organization/employeeDocument.store'
+import { resolveMediaUrl } from '~/utils/media'
 
 const props = defineProps({
     modelValue: { type: Boolean, default: false },
     pending: { type: Object, default: null },
+    organizationId: { type: String, default: '' },
 })
 const emit = defineEmits(['update:modelValue'])
 
@@ -131,17 +145,12 @@ const submission = ref(null)
 const fields = ref([])
 const historySubmissions = ref([])
 const showHistory = ref(false)
+const imgError = ref(false)
 
 function initials(name) { return String(name || '').split(' ').map(p => p[0]).slice(0, 2).join('').toUpperCase() }
 function formatDateTime(d) { if (!d) return '—'; return new Date(d).toLocaleDateString() + ' ' + new Date(d).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }
-function resolveFileUrl(url) { if (!url) return '#'; const token = getAuthToken(); return token ? `${url}?token=${encodeURIComponent(token)}` : url }
-function getAuthToken() {
-    if (process.client) {
-        const m = document.cookie.split('; ').find(r => r.startsWith('ADMIN_ACCESS_KEY='))
-        return m ? decodeURIComponent(m.slice('ADMIN_ACCESS_KEY='.length)) : ''
-    }
-    return ''
-}
+function isImage(type) { return /^image\//.test(type || '') }
+function isPdf(type) { return /^application\/pdf/.test(type || '') }
 function displayFieldValue(f) {
     const v = submission.value?.field_values?.[f.key]
     if (f.field_type === 'DATE' && v) return formatDateTime(v)
@@ -159,7 +168,7 @@ function statusBadgeClass(status) {
 async function loadSubmission() {
     loading.value = true
     try {
-        submission.value = await store.getSubmission(props.pending.submission_id)
+        submission.value = await store.getSubmission(props.pending.submission_id, { organization_id: props.organizationId })
         fields.value = submission.value?.fields || []
         // Load history (replaced submissions for the same assignment)
         if (submission.value?.assignment_id) {
@@ -179,6 +188,7 @@ watch(() => props.modelValue, (v) => {
         fields.value = []
         historySubmissions.value = []
         showHistory.value = false
+        imgError.value = false
         if (props.pending?.submission_id) loadSubmission()
     }
 })

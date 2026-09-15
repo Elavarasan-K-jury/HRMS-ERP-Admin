@@ -176,7 +176,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
-import { useEmployeeDocumentStore } from '~/stores/employeeDocument.store'
+import { useEmployeeDocumentStore } from '~/stores/organization/employeeDocument.store'
 import FolderNavigation from './FolderNavigation.vue'
 import FolderFormDrawer from './FolderFormDrawer.vue'
 import DocumentTypeFormDrawer from './DocumentTypeFormDrawer.vue'

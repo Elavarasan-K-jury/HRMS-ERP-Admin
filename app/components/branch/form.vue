@@ -30,7 +30,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
-import { useBranchStore } from '~/stores/branch.store';
+import { useBranchStore } from '~/stores/organization/branch.store';
 import { storeToRefs } from 'pinia';
 
 const branchStore = useBranchStore();

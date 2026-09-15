@@ -76,7 +76,7 @@
 
 <script setup>
 import { storeToRefs } from 'pinia'
-import { useProbationPolicyStore } from '@/stores/probationPolicy.store'
+import { useProbationPolicyStore } from '@/stores/organization/probationPolicy.store'
 import ProbationPolicyStepDetails from './steps/ProbationPolicyStepDetails.vue'
 import ProbationPolicyStepEvaluation from './steps/ProbationPolicyStepEvaluation.vue'
 import ProbationPolicyStepConfirmation from './steps/ProbationPolicyStepConfirmation.vue'

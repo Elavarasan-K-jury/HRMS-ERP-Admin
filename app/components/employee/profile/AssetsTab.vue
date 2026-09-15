@@ -1,109 +1,201 @@
 <template>
-    <section class="card">
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="hdr"><Icon name="lucide:package" class="ic" /> Assets</h2>
-            <button v-if="assets.length" class="lnk-btn" @click="fetchAssets">
-                <Icon name="lucide:refresh-cw" class="h-4 w-4" /> Refresh
-            </button>
-        </div>
+    <div class="assets-tab">
+        <!-- My Assigned Assets -->
+        <section class="card">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="hdr"><Icon name="lucide:package" class="ic" /> My Assets</h2>
+                <button v-if="assignments.length" class="lnk-btn" @click="fetchMyAssets">
+                    <Icon name="lucide:refresh-cw" class="h-4 w-4" /> Refresh
+                </button>
+            </div>
 
-        <div v-if="loading" class="center"><UiLoader /></div>
+            <div v-if="loadingAssets" class="center"><UiLoader /></div>
 
-        <div v-else-if="error" class="empty-state">
-            <Icon name="lucide:triangle-alert" class="h-10 w-10 text-red-400/50 mb-3" />
-            <p class="text-sm text-white/50 mb-3">Failed to load assets.</p>
-            <UiButton size="xs" color="#4aff7a" text="Retry" prepend-icon="ion:refresh" @click="fetchAssets" />
-        </div>
+            <div v-else-if="assetError" class="empty-state">
+                <Icon name="lucide:triangle-alert" class="h-10 w-10 text-red-400/50 mb-3" />
+                <p class="text-sm text-white/50 mb-3">Failed to load assets.</p>
+                <UiButton size="xs" color="#4aff7a" text="Retry" prepend-icon="ion:refresh" @click="fetchMyAssets" />
+            </div>
 
-        <div v-else-if="assets.length" class="table-wrap">
-            <table class="tbl">
-                <thead>
-                    <tr>
-                        <th>Asset Name</th>
-                        <th>Asset ID</th>
-                        <th>Category</th>
-                        <th>Assigned Date</th>
-                        <th>Return Date</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="row in rows" :key="row.id">
-                        <td class="doc-name">
-                            <span class="doc-icon"><Icon name="lucide:laptop" class="h-4 w-4" /></span>
-                            {{ row.name }}
-                        </td>
-                        <td>{{ row.asset_id }}</td>
-                        <td>{{ row.category }}</td>
-                        <td>{{ row.assigned_date }}</td>
-                        <td>{{ row.return_date || '—' }}</td>
-                        <td>
-                            <span class="chip" :class="row.status === 'Active' || row.status === 'Assigned' ? 'chip-green' : 'chip-soft'">
-                                {{ row.status }}
-                            </span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+            <div v-else-if="assignments.length" class="table-wrap">
+                <table class="tbl">
+                    <thead>
+                        <tr>
+                            <th>Asset Name</th>
+                            <th>Asset Tag</th>
+                            <th>Category</th>
+                            <th>Model</th>
+                            <th>Assigned Date</th>
+                            <th>Return Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="row in assetRows" :key="row.id">
+                            <td class="doc-name">
+                                <span class="doc-icon"><Icon name="lucide:laptop" class="h-4 w-4" /></span>
+                                {{ row.name }}
+                            </td>
+                            <td>{{ row.asset_tag }}</td>
+                            <td>{{ row.category }}</td>
+                            <td>{{ row.model }}</td>
+                            <td>{{ row.assigned_date }}</td>
+                            <td>{{ row.return_date || '—' }}</td>
+                            <td>
+                                <span class="chip" :class="row.status === 'ASSIGNED' ? 'chip-green' : 'chip-soft'">
+                                    {{ row.status }}
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-        <div v-else class="empty-state">
-            <Icon name="lucide:package-open" class="h-10 w-10 text-white/25 mb-3" />
-            <p class="text-sm text-white/50">No assets assigned</p>
-        </div>
-    </section>
+            <div v-else class="empty-state">
+                <Icon name="lucide:package-open" class="h-10 w-10 text-white/25 mb-3" />
+                <p class="text-sm text-white/50">No assets assigned to you</p>
+            </div>
+        </section>
+
+        <!-- My Asset Requests -->
+        <section class="card">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="hdr"><Icon name="lucide:file-text" class="ic" /> Asset Requests</h2>
+                <div class="flex items-center gap-3">
+                    <button v-if="requests.length" class="lnk-btn" @click="fetchMyRequests">
+                        <Icon name="lucide:refresh-cw" class="h-4 w-4" /> Refresh
+                    </button>
+                    <UiButton size="xs" color="#4aff7a" text="Request Asset" prepend-icon="lucide:plus" @click="showRequestModal = true" />
+                </div>
+            </div>
+
+            <div v-if="loadingRequests" class="center"><UiLoader /></div>
+
+            <div v-else-if="requestError" class="empty-state">
+                <Icon name="lucide:triangle-alert" class="h-10 w-10 text-red-400/50 mb-3" />
+                <p class="text-sm text-white/50 mb-3">Failed to load requests.</p>
+                <UiButton size="xs" color="#4aff7a" text="Retry" prepend-icon="ion:refresh" @click="fetchMyRequests" />
+            </div>
+
+            <div v-else-if="requests.length" class="table-wrap">
+                <table class="tbl">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Model</th>
+                            <th>Priority</th>
+                            <th>Reason</th>
+                            <th>Requested Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="row in requestRows" :key="row.id">
+                            <td>{{ row.category }}</td>
+                            <td>{{ row.model }}</td>
+                            <td>
+                                <span class="chip" :class="priorityClass(row.priority)">{{ row.priority }}</span>
+                            </td>
+                            <td class="max-w-[200px] truncate">{{ row.reason || '—' }}</td>
+                            <td>{{ row.created_date }}</td>
+                            <td>
+                                <span class="chip" :class="statusClass(row.status)">{{ row.status }}</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div v-else class="empty-state">
+                <Icon name="lucide:file-plus" class="h-10 w-10 text-white/25 mb-3" />
+                <p class="text-sm text-white/50">No asset requests yet</p>
+            </div>
+        </section>
+
+        <RequestAssetModal v-model="showRequestModal" :employee="employee" @submitted="onRequestSubmitted" />
+    </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import RequestAssetModal from './RequestAssetModal.vue'
 
 const props = defineProps({
     employee: { type: Object, required: true },
 })
 
-const loading = ref(true)
-const error = ref(null)
-const assets = ref([])
+// --- Assigned Assets ---
+const loadingAssets = ref(true)
+const assetError = ref(null)
+const assignments = ref([])
 
-const rows = computed(() => {
-    const empId = props.employee?.id
-    const list = []
-    for (const asset of assets.value) {
-        const assignments = (asset.assignments || []).filter(a => a.employee_id === empId)
-        const assignment = assignments[assignments.length - 1]
-        if (!assignment) continue
-        list.push({
-            id: asset.id,
-            name: [asset.model?.brand, asset.model?.model_name].filter(Boolean).join(' ').trim() || asset.asset_tag || 'Asset',
-            asset_id: asset.asset_tag || asset.id,
-            category: asset.category?.name || '—',
-            assigned_date: formatDate(assignment.assigned_at),
-            return_date: formatDate(assignment.returned_at),
-            status: assignment.status || asset.status || 'Assigned',
-        })
-    }
-    return list
-})
+const assetRows = computed(() =>
+    assignments.value.map((a) => ({
+        id: a.id,
+        name: [a.asset?.model?.brand, a.asset?.model?.model_name].filter(Boolean).join(' ').trim() || a.asset?.asset_tag || 'Asset',
+        asset_tag: a.asset?.asset_tag || '—',
+        category: a.asset?.category?.name || '—',
+        model: [a.asset?.model?.brand, a.asset?.model?.model_name].filter(Boolean).join(' ') || '—',
+        assigned_date: formatDate(a.assigned_date),
+        return_date: formatDate(a.return_date),
+        status: a.status || 'ASSIGNED',
+    }))
+)
 
-async function fetchAssets() {
-    loading.value = true
-    error.value = null
+async function fetchMyAssets() {
+    loadingAssets.value = true
+    assetError.value = null
     const { $api } = useNuxtApp()
     try {
-        const res = await $api.get('/assets', {
-            params: {
-                organization_id: props.employee?.organization_id,
-                page: 1,
-                limit: 100,
-            },
+        const res = await $api.get('/employee-assets/my-assigned', {
+            params: { organization_id: props.employee?.organization_id },
         })
-        assets.value = res.data?.assets || []
+        assignments.value = res.data?.assignments || []
     } catch (err) {
-        console.error('[AssetsTab] Failed to load assets:', err)
-        error.value = err
+        console.error('[AssetsTab] Failed to load my assets:', err)
+        assetError.value = err
     } finally {
-        loading.value = false
+        loadingAssets.value = false
     }
+}
+
+// --- My Requests ---
+const loadingRequests = ref(true)
+const requestError = ref(null)
+const requests = ref([])
+const showRequestModal = ref(false)
+
+const requestRows = computed(() =>
+    requests.value.map((r) => ({
+        id: r.id,
+        category: r.category?.name || '—',
+        model: r.model ? `${r.model.brand} ${r.model.model_name}` : '—',
+        priority: r.priority || 'MEDIUM',
+        reason: r.reason || '',
+        created_date: formatDate(r.created_at),
+        status: r.status || 'PENDING',
+    }))
+)
+
+async function fetchMyRequests() {
+    loadingRequests.value = true
+    requestError.value = null
+    const { $api } = useNuxtApp()
+    try {
+        const res = await $api.get('/employee-assets/my-requests', {
+            params: { organization_id: props.employee?.organization_id },
+        })
+        requests.value = res.data?.requests || []
+    } catch (err) {
+        console.error('[AssetsTab] Failed to load my requests:', err)
+        requestError.value = err
+    } finally {
+        loadingRequests.value = false
+    }
+}
+
+function onRequestSubmitted() {
+    fetchMyRequests()
 }
 
 function formatDate(iso) {
@@ -113,10 +205,39 @@ function formatDate(iso) {
     return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
-onMounted(fetchAssets)
+function statusClass(status) {
+    switch (status) {
+        case 'APPROVED': return 'chip-green'
+        case 'REJECTED': return 'chip-red'
+        case 'PENDING': return 'chip-amber'
+        default: return 'chip-soft'
+    }
+}
+
+function priorityClass(priority) {
+    switch (priority) {
+        case 'CRITICAL': return 'chip-red'
+        case 'URGENT': return 'chip-red'
+        case 'HIGH': return 'chip-amber'
+        case 'MEDIUM': return 'chip-soft'
+        case 'LOW': return 'chip-soft'
+        default: return 'chip-soft'
+    }
+}
+
+onMounted(() => {
+    fetchMyAssets()
+    fetchMyRequests()
+})
 </script>
 
 <style scoped>
+.assets-tab {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
 .card {
     padding: 18px;
     border-radius: 16px;
@@ -206,6 +327,18 @@ onMounted(fetchAssets)
     border-color: rgba(34, 197, 94, 0.7);
     background: rgba(34, 197, 94, 0.18);
     color: #bbf7d0;
+}
+
+.chip-red {
+    border-color: rgba(239, 68, 68, 0.7);
+    background: rgba(239, 68, 68, 0.18);
+    color: #fca5a5;
+}
+
+.chip-amber {
+    border-color: rgba(245, 158, 11, 0.7);
+    background: rgba(245, 158, 11, 0.18);
+    color: #fcd34d;
 }
 
 .empty-state {

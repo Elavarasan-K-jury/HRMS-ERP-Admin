@@ -46,13 +46,13 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import { useEmployeesStore } from '../../../../../stores/employee.store'
-import { useEmpCategoryStore } from '../../../../../stores/empCategory.store'
-import { useDesignationStore } from '../../../../../stores/designation.store'
-import { useDepartmentStore } from '../../../../../stores/department.store'
-import { useBranchStore } from '../../../../../stores/branch.store'
-import { useLocationStore } from '../../../../../stores/location.store'
-import { useProbationPolicyStore } from '../../../../../stores/probationPolicy.store'
+import { useEmployeesStore } from '../../../../../stores/organization/employee.store'
+import { useEmpCategoryStore } from '../../../../../stores/organization/empCategory.store'
+import { useDesignationStore } from '../../../../../stores/organization/designation.store'
+import { useDepartmentStore } from '../../../../../stores/organization/department.store'
+import { useBranchStore } from '../../../../../stores/organization/branch.store'
+import { useLocationStore } from '../../../../../stores/organization/location.store'
+import { useProbationPolicyStore } from '../../../../../stores/organization/probationPolicy.store'
 
 import EmployeeProfileHeader from '../../../../../components/employee/profile/EmployeeProfileHeader.vue'
 import EmployeeContactInfo from '../../../../../components/employee/profile/EmployeeContactInfo.vue'
@@ -66,7 +66,7 @@ import AssetsTab from '../../../../../components/employee/profile/AssetsTab.vue'
 import EmployeeForm from '../../../../../components/employee/form.vue'
 import { apiAddressToStore } from '../../../../../utils/employeeProfile'
 
-definePageMeta({ layout: 'employee' })
+definePageMeta({ layout: 'auth' })
 
 const route = useRoute()
 const router = useRouter()
@@ -117,6 +117,7 @@ const {
     cost_center_id,
     pay_grade_id,
     notice_period_policy_id,
+    relationships,
 } = storeToRefs(employeesStore)
 
 const employee = ref(null)
@@ -231,6 +232,7 @@ const openEditModal = async () => {
     })
     number_series_id.value = preselectedSeries ? { value: preselectedSeries.id, label: `${preselectedSeries.name} (${preselectedSeries.preview})` } : null
     employeesStore.series_preset_id = preselectedSeries?.id || null
+    await employeesStore.fetchRelationships(emp.id)
     employee_department.value = emp.departments.length ? await Promise.all(emp.departments.map(async (d) => {
         const isSubDept = d.department?.parent_id
         const parentDept = isSubDept ? departmentStore.department_select.find(ds => ds.value == d.department.parent_id) : null
@@ -287,6 +289,7 @@ const closeEditModal = () => {
     cost_center_id.value = null
     pay_grade_id.value = null
     notice_period_policy_id.value = null
+    relationships.value = []
 }
 
 const saveEmployee = async () => {

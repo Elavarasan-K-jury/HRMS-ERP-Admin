@@ -33,7 +33,7 @@
     </div>
     <!-- ADD/EDIT MODEL -->
     <UiSidebarModal width="600px" v-model="addModal" :title="formTitle">
-        <AssetForm />
+        <AssetForm ref="assetFormRef" />
 
         <template #footer>
             <UiButton @click="close" color="#fff" text="Cancel" prepend-icon="ion:close-circle" />
@@ -43,11 +43,11 @@
     </UiSidebarModal>
     <UiModal v-model="deleteModal" title="Are you sure?" size="sm">
         <template #default>
-            <span>Are you sure you want to delete {{ deleteData.name }}?</span>
+            <span>Are you sure you want to delete {{ deleteData.serial_number || deleteData.asset_tag || 'this asset' }}?</span>
         </template>
         <template #footer>
             <UiButton @click="cancelDelete" color="#fff" text="Cancel" prepend-icon="ion:close-circle" />
-            <UiButton @click="confirmDelete" color="#750d0d" text="Delete Asset Category" prepend-icon="ion:trash" />
+            <UiButton @click="confirmDelete" color="#750d0d" text="Delete Asset" prepend-icon="ion:trash" />
         </template>
     </UiModal>
     <UiModal v-model="assignModal" title="Asset assignment">
@@ -86,9 +86,10 @@
 </template>
 <script setup>
 import { computed, onMounted, watch } from 'vue';
-import { useAssetsStore } from '../../../../stores/assets.store';
-import { useAssetsModelStore } from '../../../../stores/assetModel.store';
-import { useEmployeesStore } from '../../../../stores/employee.store';
+import { useAssetsStore } from '../../../../stores/organization/assets.store';
+import { useAssetsModelStore } from '../../../../stores/organization/assetModel.store';
+import { useAssetIdSeriesStore } from '../../../../stores/organization/assetIdSeries.store';
+import { useEmployeesStore } from '../../../../stores/organization/employee.store';
 import DataTable from '../../../../components/asset/assetList.vue'
 import AssetForm from '../../../../components/asset/assetForm.vue';
 import { storeToRefs } from 'pinia';
@@ -99,6 +100,7 @@ definePageMeta({
 const assetStore = useAssetsStore()
 const employeeStore = useEmployeesStore()
 const assetModel = useAssetsModelStore()
+const seriesStore = useAssetIdSeriesStore()
 const assets = computed(() => assetStore.assets)
 const {
     loading,
@@ -127,32 +129,12 @@ const {
 } = storeToRefs(assetStore)
 
 const assetStatusOptions = [
-    // Availability
+    // Phase 02: Authoritative Asset Lifecycle
     { value: "AVAILABLE", label: "Available" },
-
-    // Request & Approval Flow
-    { value: "REQUESTED", label: "Requested" },
-    { value: "APPROVAL_PENDING", label: "Approval Pending" },
-    { value: "APPROVED", label: "Approved" },
-    { value: "REJECTED", label: "Rejected" },
-
-    // Assignment Lifecycle
-    { value: "ASSIGNMENT_PENDING", label: "Assignment Pending" },
     { value: "ASSIGNED", label: "Assigned" },
-
-    // Return Lifecycle
-    { value: "RETURN_REQUESTED", label: "Return Requested" },
-    { value: "RETURN_APPROVED", label: "Return Approved" },
-    { value: "RETURN_REJECTED", label: "Return Rejected" },
-    { value: "RETURNED", label: "Returned" },
-
-    // Maintenance & Issues
     { value: "IN_REPAIR", label: "In Repair" },
-    { value: "REPAIR_COMPLETED", label: "Repair Completed" },
     { value: "DAMAGED", label: "Damaged" },
     { value: "LOST", label: "Lost" },
-
-    // End of Life
     { value: "RETIRED", label: "Retired" },
     { value: "DISPOSED", label: "Disposed" },
 ];
@@ -203,6 +185,7 @@ const employees = computed(() => employeeStore.all_employees.map(e => ({
 })))
 const deleteModal = ref(false)
 const deleteData = ref(null)
+const assetFormRef = ref(null)
 
 const fetchAssets = async () => {
     await assetStore.fetchAssets()
@@ -233,15 +216,10 @@ const editModel = (data) => {
     serial_number.value = data.serial_number
     asset_tag.value = data.asset_tag
     user_name.value = data.credentials?.user_name
-    password.value = data.credentials?.password
+    password.value = ''
     purchase_date.value = formatDate(data.purchase_date)
     warranty_expire.value = formatDate(data.warranty_expire)
-    status.value = [
-        { value: 'AVAILABLE', label: 'Available' },
-        { value: 'ASSIGNED', label: 'Assigned' },
-        { value: 'IN_REPAIR', label: 'In Repair' },
-        { value: 'RETIRED', label: 'Retired' },
-    ].find(e => e.value == data.status)
+    status.value = assetStatusOptions.find(e => e.value == data.status)
     location.value = data.location
     addModal.value = true
 }
@@ -256,6 +234,7 @@ const openAddModal = async () => {
     formTitle.value = "Add new asset"
     await assetModel.fetchAllAssetModels()
     await assetModel.fetchAllCategories()
+    await seriesStore.fetchSeries()
     addModal.value = true
 }
 
@@ -263,6 +242,20 @@ const save = async () => {
     if (selectedAsset.value) {
         await assetStore.updateAsset()
     } else {
+        const form = assetFormRef.value
+        if (form) {
+            const tagValue = form.getAssetTagValue()
+            if (tagValue) {
+                assetStore.generated_asset_id = tagValue
+            }
+            const customVals = form.getCustomAttributeValues()
+            if (Object.keys(customVals).length > 0) {
+                assetStore.custom_attribute_values = JSON.stringify(customVals)
+            }
+            if (form.idSource === 'series' && form.selectedSeriesId) {
+                await form.confirmGenerateId()
+            }
+        }
         await assetStore.createAsset()
     }
 }

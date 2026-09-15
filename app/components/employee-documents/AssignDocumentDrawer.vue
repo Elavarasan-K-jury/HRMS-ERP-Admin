@@ -75,10 +75,10 @@
                                 <Icon :name="expandedFolders[group.folder_id] ? 'lucide:chevron-down' : 'lucide:chevron-right'" class="w-4 h-4 text-white/40 shrink-0" />
                                 <Icon name="ion:folder" class="w-4 h-4 text-emerald-300 shrink-0" />
                                 <span class="text-xs font-semibold text-white/70 text-left flex-1">{{ group.folder_name }}</span>
-                                <button type="button" @click.stop="toggleFolderSelectAll(group)"
-                                    class="text-[11px] text-white/40 hover:text-white/70 transition-colors px-1.5 py-0.5 rounded hover:bg-white/10">
+                                <span type="button" @click.stop="toggleFolderSelectAll(group)"
+                                    class="text-[11px] text-white/40 hover:text-white/70 transition-colors px-1.5 py-0.5 rounded hover:bg-white/10 cursor-pointer">
                                     {{ folderSelectedCount(group) }}/{{ folderActiveCount(group) }}
-                                </button>
+                                </span>
                             </button>
                             <!-- Document types -->
                             <div v-if="expandedFolders[group.folder_id]" class="border-t border-white/5">
@@ -125,7 +125,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { useEmployeeDocumentStore } from '~/stores/employeeDocument.store'
+import { useEmployeeDocumentStore } from '~/stores/organization/employeeDocument.store'
 
 const props = defineProps({
     modelValue: { type: Boolean, default: false },

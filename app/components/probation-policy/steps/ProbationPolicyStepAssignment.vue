@@ -65,7 +65,7 @@
 <script setup>
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useProbationPolicyStore } from '@/stores/probationPolicy.store'
+import { useProbationPolicyStore } from '@/stores/organization/probationPolicy.store'
 
 const store = useProbationPolicyStore()
 

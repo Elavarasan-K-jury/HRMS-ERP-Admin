@@ -22,7 +22,7 @@
 
         <!-- RIGHT -->
         <div class="flex items-center gap-3 relative">
-            <!-- 🔔 Notifications -->
+            <!-- Notifications -->
             <div class="relative" ref="notifWrapper">
                 <button @click="toggleMenu('notif')" ref="notifBtn"
                     class="relative p-2 rounded-lg flex items-center hover:bg-white/20 transition-all"
@@ -36,7 +36,7 @@
                 </button>
             </div>
 
-            <!-- 💰 Wallet -->
+            <!-- Wallet -->
             <div class="relative" ref="walletWrapper">
                 <button @click="toggleMenu('wallet')" ref="walletBtn"
                     class="p-2 rounded-lg flex items-center hover:bg-white/20 transition-all" aria-label="Wallet">
@@ -44,7 +44,7 @@
                 </button>
             </div>
 
-            <!-- 👤 Profile -->
+            <!-- Profile -->
             <div class="relative" ref="profileWrapper">
                 <button @click="toggleMenu('profile')" ref="profileBtn"
                     class="p-1.5 flex items-center rounded-full hover:ring-2 hover:ring-white/30 transition-all"
@@ -55,18 +55,9 @@
         </div>
     </header>
 
-    <!-- ======================= -->
-    <!-- Teleported Dropdowns -->
-    <!-- ======================= -->
     <teleport to="body">
 
-        <!-- 🔲 Background blur overlay -->
-        <!-- <transition name="fade-blur">
-            <div v-if="openMenu" class="fixed inset-0 z-[90] bg-black/40 backdrop-blur-sm transition-all"
-                @click="closeMenu"></div>
-        </transition> -->
-
-        <!-- 🔔 Notifications -->
+        <!-- Notifications -->
         <transition name="fade-scale">
             <div v-if="openMenu === 'notif'" class="fixed top-[65px] right-4 w-80 max-w-[92vw] rounded-2xl overflow-hidden
                bg-white/10 backdrop-blur-xl border border-white/15 shadow-xl z-[100]">
@@ -99,7 +90,7 @@
                         </div>
                     </li>
                     <li v-if="notifications.length === 0" class="px-4 py-6 text-center">
-                        <p class="text-sm text-white/70">No new notifications ✨</p>
+                        <p class="text-sm text-white/70">No new notifications</p>
                     </li>
                 </ul>
 
@@ -112,7 +103,7 @@
             </div>
         </transition>
 
-        <!-- 💰 Wallet -->
+        <!-- Wallet -->
         <transition name="fade-scale">
             <div v-if="openMenu === 'wallet'" class="fixed top-[65px] right-4 w-80 max-w-[92vw] rounded-2xl overflow-hidden
                bg-white/10 backdrop-blur-3xl border border-white/15 shadow-xl z-[100]">
@@ -127,7 +118,7 @@
 
                 <div class="px-4 py-4 flex items-center justify-between">
                     <span class="text-white/70 text-sm">Current Balance</span>
-                    <span class="text-lg font-semibold text-white/90">{{ balance | currency }}</span>
+                    <span class="text-lg font-semibold text-white/90">{{ currency(balance) }}</span>
                 </div>
 
                 <div class="h-px bg-white/10"></div>
@@ -145,7 +136,7 @@
                             </div>
                         </div>
                         <p :class="t.amount > 0 ? 'text-green-400' : 'text-red-400'" class="text-sm font-medium">
-                            {{ t.amount > 0 ? '+' : '' }}₹{{ t.amount }}
+                            {{ t.amount > 0 ? '+' : '' }}{{ currency(t.amount) }}
                         </p>
                     </li>
                 </ul>
@@ -159,7 +150,7 @@
             </div>
         </transition>
 
-        <!-- 👤 Profile -->
+        <!-- Profile -->
         <transition name="fade-scale">
             <div v-if="openMenu === 'profile'" class="fixed top-[65px] right-4 w-64 max-w-[90vw] rounded-2xl overflow-hidden
                bg-white/10 backdrop-blur-xl border border-white/15 shadow-xl z-[100]">
@@ -169,8 +160,8 @@
                             <Icon name="ion:person" class="text-white text-xl" />
                         </div>
                         <div>
-                            <p class="text-white/90 font-medium text-sm">Admin</p>
-                            <p class="text-white/60 text-xs">{{ admin.email }}</p>
+                            <p class="text-white/90 font-medium text-sm">{{ displayName }}</p>
+                            <p class="text-white/60 text-xs">{{ displayEmail }}</p>
                         </div>
                     </div>
 
@@ -203,7 +194,7 @@
 
     </teleport>
 
-    <!-- 🔒 Logout Confirmation -->
+    <!-- Logout Confirmation -->
     <transition name="fade-scale">
         <div v-if="showLogoutConfirm"
             class="fixed inset-0 z-[999] flex items-center justify-center bg-white/10 backdrop-blur-sm">
@@ -230,20 +221,35 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
-import { useThemeStore } from '../../stores/theme.store'
-import { useAuthStore } from '../../stores/auth.store'
+import { useThemeStore } from '../../stores/shared/theme.store'
+import { useAuthStore } from '../../stores/shared/auth.store'
 
 const route = useRoute()
 const themeStore = useThemeStore()
 const sidebar = computed(() => themeStore.sidebar)
 const adminStore = useAuthStore()
 
-const admin = computed(() => adminStore.admin)
+const currentUser = computed(() => adminStore.admin || adminStore.user)
+
+const displayName = computed(() => {
+    if (adminStore.isSuperAdmin) return 'Super Admin'
+    if (adminStore.isEmployee) {
+        return currentUser.value?.full_name || 'Employee'
+    }
+    return 'Admin'
+})
+
+const displayEmail = computed(() => currentUser.value?.email || '')
 
 const profileLink = computed(() => {
+    if (adminStore.isEmployee) return '/employee/profile'
     const org = adminStore.organization
     const emp = adminStore.employee
-    return org && emp ? `/organization/${org}/employee/${emp}/profile` : '/profile'
+    if (org && emp) return `/organization/${org}/employee/${emp}/profile`
+    if (adminStore.admin?.organization_id && adminStore.admin?.id) {
+        return `/organization/${adminStore.admin.organization_id}/employee/${adminStore.admin.id}/profile`
+    }
+    return '/profile'
 })
 
 const props = defineProps({
@@ -253,7 +259,6 @@ const props = defineProps({
     },
 })
 
-// dropdown state
 const openMenu = ref(null)
 const showLogoutConfirm = ref(false)
 
@@ -264,9 +269,8 @@ function closeMenu() {
     openMenu.value = null
 }
 
-// Dummy data
 const notifications = ref([
-    { id: 1, title: 'Payment received', message: '₹1,200 added to your wallet.', time: '2m ago', unread: true, icon: 'ion:card-outline' },
+    { id: 1, title: 'Payment received', message: '1,200 added to your wallet.', time: '2m ago', unread: true, icon: 'ion:card-outline' },
     { id: 2, title: 'New message', message: 'Support replied to your ticket.', time: '1h ago', unread: true, icon: 'ion:chatbubbles-outline' },
 ])
 const unreadCount = computed(() => notifications.value.filter(n => n.unread).length)
@@ -274,12 +278,16 @@ function markAllRead() { notifications.value.forEach(n => (n.unread = false)) }
 
 const balance = ref(12450)
 const transactions = ref([
-    { id: 1, title: 'Deposit', time: 'Today • 3:45 PM', amount: 2500, icon: 'ion:cash-outline' },
-    { id: 2, title: 'Subscription Renewal', time: 'Yesterday • 9:10 AM', amount: -799, icon: 'ion:card-outline' },
+    { id: 1, title: 'Deposit', time: 'Today 3:45 PM', amount: 2500, icon: 'ion:cash-outline' },
+    { id: 2, title: 'Subscription Renewal', time: 'Yesterday 9:10 AM', amount: -799, icon: 'ion:card-outline' },
 ])
 function addFunds() {
     balance.value += 1000
     transactions.value.unshift({ id: Date.now(), title: 'Manual Top-up', time: 'Just now', amount: 1000, icon: 'ion:add-circle-outline' })
+}
+
+function currency(v) {
+    return v.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })
 }
 
 function logout() {
@@ -288,7 +296,6 @@ function logout() {
     closeMenu()
 }
 
-// click outside
 const notifWrapper = ref(null)
 const walletWrapper = ref(null)
 const profileWrapper = ref(null)
@@ -299,10 +306,6 @@ function onClickOutside(e) {
 }
 onMounted(() => document.addEventListener('click', onClickOutside))
 onBeforeUnmount(() => document.removeEventListener('click', onClickOutside))
-
-function currency(v) {
-    return v.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })
-};
 </script>
 
 <style scoped>

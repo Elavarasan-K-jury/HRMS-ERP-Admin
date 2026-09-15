@@ -5,6 +5,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
+  experimental: {
+    appManifest: false,
+  },
   devtools: { enabled: true },
   pages: true,
   modules: [
@@ -24,8 +27,6 @@ export default defineNuxtConfig({
     mode: 'css', // or 'svg' if you want inline
     autoInstall: true
   },
-  serverDir: 'server',
-
   nitro: {
     devErrorHandler: async (error, event) => {
       const errorMessage = typeof error === 'string'
@@ -33,7 +34,6 @@ export default defineNuxtConfig({
         : error?.message || error?.stack || String(error);
 
       console.error('[Nitro Error]:', errorMessage);
-      return;
     },
   },
 

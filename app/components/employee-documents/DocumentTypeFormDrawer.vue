@@ -41,6 +41,11 @@
                 <div class="rounded-xl border border-white/10 bg-white/5 p-4 flex flex-col gap-3">
                     <p class="text-sm font-semibold text-white/85">Document Configuration</p>
                     <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="checkbox" v-model="form.is_active" class="w-4 h-4 rounded border-white/20 bg-white/10 text-emerald-500" />
+                        <span class="text-sm text-white/80">Active</span>
+                        <span class="text-xs text-white/45">(inactive document types are hidden from assignment)</span>
+                    </label>
+                    <label class="flex items-center gap-3 cursor-pointer">
                         <input type="checkbox" v-model="form.is_mandatory" class="w-4 h-4 rounded border-white/20 bg-white/10 text-emerald-500" />
                         <span class="text-sm text-white/80">This document is mandatory</span>
                     </label>
@@ -90,7 +95,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { useEmployeeDocumentStore } from '~/stores/employeeDocument.store'
+import { useEmployeeDocumentStore } from '~/stores/organization/employeeDocument.store'
 import { countries } from '~/constants/countries'
 import DynamicFieldsEditor from './DynamicFieldsEditor.vue'
 
@@ -121,6 +126,7 @@ function initialForm() {
     return {
         name: '',
         description: '',
+        is_active: true,
         is_multiple: false,
         is_mandatory: false,
         is_appliable_na: false,
@@ -162,6 +168,7 @@ async function loadExisting() {
         form.value = {
             name: cfg.name || '',
             description: cfg.description || '',
+            is_active: cfg.is_active ?? true,
             is_multiple: !!cfg.is_multiple,
             is_mandatory: !!cfg.is_mandatory,
             is_appliable_na: !!cfg.is_appliable_na,
@@ -208,6 +215,7 @@ function basePayload() {
     return {
         name: form.value.name.trim(),
         description: form.value.description?.trim() || null,
+        is_active: !!form.value.is_active,
         is_multiple: !!form.value.is_multiple,
         is_mandatory: !!form.value.is_mandatory,
         is_appliable_na: !!form.value.is_appliable_na,

@@ -45,7 +45,7 @@
 
 <script setup>
 import { storeToRefs } from 'pinia'
-import { useHolidayStore } from '@/stores/holiday.store'
+import { useHolidayStore } from '@/stores/organization/holiday.store'
 
 const holidayStore = useHolidayStore()
 const { name, date, type, region, policy_id } = storeToRefs(holidayStore);

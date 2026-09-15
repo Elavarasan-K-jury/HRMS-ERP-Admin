@@ -302,7 +302,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import PolicyItem from '../policies/item.vue'
-import { useProbationPolicyStore } from '../../stores/probationPolicy.store'
+import { useProbationPolicyStore } from '../../stores/organization/probationPolicy.store'
 
 const props = defineProps({
     items: Array,

@@ -51,7 +51,7 @@
 import { ref, computed, watch, onMounted } from "vue"
 import { storeToRefs } from "pinia"
 
-import { useAttendanceReportsStore } from "../../../../stores/attendanceReport.store"
+import { useAttendanceReportsStore } from "../../../../stores/organization/attendanceReport.store"
 import AttendanceReportsTable from "../../../../components/reports/AttendanceReportsTable.vue"
 import AttendanceReportView from "../../../../components/reports/AttendanceReportView.vue"
 import GenerateReportForm from "../../../../components/reports/AttendanceGenerateReportForm.vue"

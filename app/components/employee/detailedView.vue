@@ -214,8 +214,8 @@
 
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
-import { useEmployeesStore } from '../../stores/employee.store'
-import { useDepartmentStore } from '../../stores/department.store'
+import { useEmployeesStore } from '../../stores/organization/employee.store'
+import { useDepartmentStore } from '../../stores/organization/department.store'
 import { useRouter, useRoute } from 'vue-router'
 const router = useRouter()
 const route = useRoute()

@@ -66,7 +66,7 @@
 
                         <!-- Description -->
                         <td class="td">
-                            <div v-html="item.description"></div>
+                            <div>{{ stripHtml(item.description) }}</div>
                         </td>
 
                         <!-- Status -->
@@ -144,6 +144,13 @@ const showPagination = computed(() => props.totalPages > 1);
 
 function format(dt) {
     return dt ? new Date(dt).toLocaleString() : '—';
+}
+
+function stripHtml(html) {
+    if (!html) return ''
+    const div = document.createElement('div')
+    div.innerHTML = html
+    return div.textContent || div.innerText || ''
 }
 </script>
 

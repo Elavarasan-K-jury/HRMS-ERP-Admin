@@ -12,7 +12,7 @@
             <div class="flex flex-col gap-1.5">
                 <div class="flex items-center gap-1.5">
                     <label class="text-md text-white/80">Policy Name</label>
-                    <InfoTip tip="Unique name used to identify this policy in lists and reports." />
+                    <UiInfoTip tip="Unique name used to identify this policy in lists and reports." />
                 </div>
                 <FormInput color="#fff" v-model="name" placeholder="e.g. Standard Probation Policy" />
             </div>
@@ -28,7 +28,7 @@
             <div class="flex flex-col gap-1.5">
                 <div class="flex items-center gap-1.5">
                     <label class="text-md text-white/80">Policy Duration</label>
-                    <InfoTip tip="Length of the employment period before confirmation. Minimum of 1." />
+                    <UiInfoTip tip="Length of the employment period before confirmation. Minimum of 1." />
                 </div>
                 <FormInput color="#fff" v-model="duration_value" type="number" min="1" placeholder="e.g. 3" />
             </div>
@@ -39,7 +39,7 @@
             <div class="flex flex-col gap-1.5">
                 <div class="flex items-center gap-1.5">
                     <label class="text-md text-white/80">Max Extension Duration</label>
-                    <InfoTip tip="Maximum extension allowed if the probation needs more time. Set to 0 for no extension." />
+                    <UiInfoTip tip="Maximum extension allowed if the probation needs more time. Set to 0 for no extension." />
                 </div>
                 <FormInput color="#fff" v-model="max_duration_value" type="number" min="0" placeholder="e.g. 3 (0 = none)" />
             </div>
@@ -53,7 +53,7 @@
         <section class="flex flex-col gap-2">
                 <div class="flex items-center gap-1.5">
                     <label class="text-md text-white/80">Policy End Date</label>
-                    <InfoTip tip="End date is derived automatically from the joining date. Toggle: ends on the last day of the duration vs. the day after it completes." />
+                    <UiInfoTip tip="End date is derived automatically from the joining date. Toggle: ends on the last day of the duration vs. the day after it completes." />
                 </div>
             <div class="rounded-2xl border border-emerald-300/30 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-200">
                 <div class="flex items-center justify-between gap-3">
@@ -77,7 +77,7 @@
             <div>
                 <div class="flex items-center gap-1.5">
                     <label class="text-md text-white/80">Active Policy</label>
-                    <InfoTip tip="Only active policies can be assigned to employee probations." />
+                    <UiInfoTip tip="Only active policies can be assigned to employee probations." />
                 </div>
                 <p class="text-xs text-white/50">Policy can be assigned to probations</p>
             </div>
@@ -88,7 +88,7 @@
         <section class="flex flex-col gap-2">
             <div class="flex items-center gap-1.5">
                 <label class="text-md text-white/80">Applied to Employee Categories</label>
-                <InfoTip tip="Employees in the selected categories automatically follow this policy's probation rules." />
+                <UiInfoTip tip="Employees in the selected categories automatically follow this policy's probation rules." />
             </div>
             <p class="text-xs text-white/50">Employees in the selected categories follow this policy's probation rules.</p>
             <div v-if="categoryOptions.length" class="flex flex-wrap gap-2 mt-2">
@@ -109,11 +109,11 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, ref, watch, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useProbationPolicyStore } from '@/stores/probationPolicy.store'
-import { useEmpCategoryStore } from '@/stores/empCategory.store'
-import { useAuthStore } from '@/stores/auth.store'
+import { useProbationPolicyStore } from '@/stores/organization/probationPolicy.store'
+import { useEmpCategoryStore } from '@/stores/organization/empCategory.store'
+import { useAuthStore } from '@/stores/shared/auth.store'
 
 const store = useProbationPolicyStore()
 const empCategoryStore = useEmpCategoryStore()
@@ -150,15 +150,51 @@ const toggleCategory = (id) => {
     const idx = employee_category_ids.value.indexOf(str)
     if (idx >= 0) {
         employee_category_ids.value.splice(idx, 1)
+        if (autoSelectedCategoryId.value === str) {
+            autoSelectedCategoryId.value = null
+        }
     } else {
         employee_category_ids.value.push(str)
+        if (autoSelectedCategoryId.value === str) {
+            autoSelectedCategoryId.value = null
+        }
     }
 }
+
+const autoSelectedCategoryId = ref(null)
+
+function applyAutoCategory(newType) {
+    if (autoSelectedCategoryId.value) {
+        const idx = employee_category_ids.value.indexOf(autoSelectedCategoryId.value)
+        if (idx >= 0) {
+            employee_category_ids.value.splice(idx, 1)
+        }
+        autoSelectedCategoryId.value = null
+    }
+
+    if (newType) {
+        const matchingCat = categoryOptions.value.find(
+            cat => cat.employment_type === newType
+        )
+        if (matchingCat) {
+            const catId = String(matchingCat.value)
+            if (!employee_category_ids.value.includes(catId)) {
+                employee_category_ids.value.push(catId)
+                autoSelectedCategoryId.value = catId
+            }
+        }
+    }
+}
+
+watch(policy_type, (newType) => {
+    applyAutoCategory(newType)
+})
 
 onMounted(async () => {
     empCategoryStore.organization_id = authStore.organization
     if (!empCategoryStore.category_list?.length) {
         await empCategoryStore.fetchAllEmployeeCategories()
     }
+    applyAutoCategory(policy_type.value)
 })
 </script>

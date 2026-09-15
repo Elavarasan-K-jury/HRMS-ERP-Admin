@@ -69,7 +69,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { resolveMediaUrl, uploadMediaFile } from '~/utils/media'
-import { useAuthStore } from '~/stores/auth.store'
+import { useAuthStore } from '~/stores/shared/auth.store'
 
 const props = defineProps({
     employee: { type: Object, required: true },

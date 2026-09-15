@@ -41,11 +41,11 @@
 
 <script setup>
 import { onMounted, computed, ref } from "vue";
-import { useAttendanceReportsStore } from "../../stores/attendanceReport.store"
-import { useDepartmentStore } from "../../stores/department.store"
-import { useDesignationStore } from "../../stores/designation.store"
-import { useEmployeesStore } from "../../stores/employee.store"
-import { useAuthStore } from "../../stores/auth.store";
+import { useAttendanceReportsStore } from "../../stores/organization/attendanceReport.store"
+import { useDepartmentStore } from "../../stores/organization/department.store"
+import { useDesignationStore } from "../../stores/organization/designation.store"
+import { useEmployeesStore } from "../../stores/organization/employee.store"
+import { useAuthStore } from "../../stores/shared/auth.store";
 
 const store = useAttendanceReportsStore()
 const departmentStore = useDepartmentStore()

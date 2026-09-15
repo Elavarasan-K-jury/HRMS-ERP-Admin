@@ -122,7 +122,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
-import { useSubscriptionPlanStore } from '../stores/subscription-plan.store'
+import { useSubscriptionPlanStore } from '../stores/super-admin/subscription-plan.store'
 import { storeToRefs } from 'pinia'
 
 definePageMeta({ layout: 'auth' })

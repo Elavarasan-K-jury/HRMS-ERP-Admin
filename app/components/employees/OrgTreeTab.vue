@@ -39,10 +39,10 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useAuthStore } from '~/stores/auth.store'
-import { useHierarchyStore } from '~/stores/hierarchy.store'
-import { useDepartmentStore } from '~/stores/department.store'
-import { useBranchStore } from '~/stores/branch.store'
+import { useAuthStore } from '~/stores/shared/auth.store'
+import { useHierarchyStore } from '~/stores/organization/hierarchy.store'
+import { useDepartmentStore } from '~/stores/organization/department.store'
+import { useBranchStore } from '~/stores/organization/branch.store'
 import OrgChartTree from '~/components/hierarchy/OrgChartTree.vue'
 
 const authStore = useAuthStore()

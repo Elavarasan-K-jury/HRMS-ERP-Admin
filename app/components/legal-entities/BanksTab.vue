@@ -82,7 +82,7 @@
 
 <script setup>
 import { computed, ref } from 'vue'
-import { useLegalEntitiesStore } from '~/stores/legalEntities.store'
+import { useLegalEntitiesStore } from '~/stores/organization/legalEntities.store'
 
 const props = defineProps({
     entity: { type: Object, default: null },

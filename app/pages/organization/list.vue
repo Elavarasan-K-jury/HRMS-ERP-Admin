@@ -233,9 +233,9 @@
 import { onMounted, ref, watch, computed } from 'vue'
 import { industries } from '../../constants/industries'
 import { countries } from '../../constants/countries'
-import { useOrganizationStore } from '../../stores/organization.store'
-import { useSubscriptionPlanStore } from '../../stores/subscription-plan.store'
-import { useOrganizationSubscriptionStore } from '../../stores/organizationSubscription.store'
+import { useOrganizationStore } from '../../stores/organization/organization.store'
+import { useSubscriptionPlanStore } from '../../stores/super-admin/subscription-plan.store'
+import { useOrganizationSubscriptionStore } from '../../stores/shared/organizationSubscription.store'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 

@@ -58,7 +58,7 @@
 
 <script setup>
 import { ref, watch, computed } from 'vue'
-import { useEmployeeDocumentStore } from '~/stores/employeeDocument.store'
+import { useEmployeeDocumentStore } from '~/stores/organization/employeeDocument.store'
 
 const DEFAULT_ROLES = [
     'Employee - Self',

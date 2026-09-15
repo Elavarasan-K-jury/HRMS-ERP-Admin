@@ -28,7 +28,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { useAuthStore } from '../stores/auth.store'
+import { useAuthStore } from '../stores/shared/auth.store'
 
 const route = useRoute()
 const authStore = useAuthStore()
@@ -61,12 +61,14 @@ const resolvedOrgId = computed(
 )
 
 const homePath = computed(() => {
+    if (authStore.isEmployee) return '/employee'
     if (resolvedOrgId.value) return `/organization/${resolvedOrgId.value}/dashboard`
     if (authStore.isSuperAdmin) return '/'
     return '/login'
 })
 
 const homeLabel = computed(() => {
+    if (authStore.isEmployee) return 'Employee Dashboard'
     if (resolvedOrgId.value) return 'Org Admin Dashboard'
     if (authStore.isSuperAdmin) return 'Super Admin Dashboard'
     return 'Login'

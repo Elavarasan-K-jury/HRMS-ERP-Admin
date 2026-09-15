@@ -1,27 +1,42 @@
 // middleware/auth.global.js
+import { useAuthStore } from '~/stores/shared/auth.store'
+
 export default defineNuxtRouteMiddleware(async (to) => {
     const authStore = useAuthStore()
 
-    // ⛔ Skip middleware on server redirect loops
-    if (import.meta.server) return
-
-    // ✅ Define public pages
     const publicPaths = ['/login', '/forgot-password']
     const redirectCookie = useCookie('REDIRECT_PATH', { maxAge: 60 * 5 })
-    const accessTokenCookie = useCookie('ADMIN_ACCESS_KEY', { maxAge: 60 * 60 * 24 * 7 })
-
-    const hasToken = !!accessTokenCookie.value
     const isPublic = publicPaths.includes(to.path)
 
-    // 🧠 1️⃣ If no token & not public → redirect to login
+    const portalScope = useCookie('PORTAL_SCOPE').value
+    const adminToken = useCookie('ADMIN_ACCESS_KEY', { maxAge: 60 * 60 * 24 * 7 }).value
+    const employeeToken = useCookie('EMPLOYEE_ACCESS_KEY', { maxAge: 60 * 60 * 24 * 7 }).value
+
+    let activeToken = null
+    if (portalScope === 'admin' && adminToken) activeToken = adminToken
+    else if (portalScope === 'employee' && employeeToken) activeToken = employeeToken
+    else if (adminToken) activeToken = adminToken
+    else if (employeeToken) activeToken = employeeToken
+
+    const hasToken = !!activeToken
+
+    // No token & not public → redirect to login
     if (!hasToken && !isPublic) {
         redirectCookie.value = to.fullPath
         return navigateTo('/login', { replace: true })
     }
 
-    // 🧠 2️⃣ If has token but store not initialized, verify it once
-    if (hasToken && !authStore.isLoggedIn && !isPublic) {
+    // Has token but store not initialized → verify (client only — needs API)
+    if (import.meta.client && hasToken && !authStore.isLoggedIn && !isPublic) {
         try {
+            if (portalScope) {
+                authStore.scope = portalScope
+            }
+            authStore.accessToken = activeToken
+            const refreshToken = portalScope === 'employee'
+                ? useCookie('EMPLOYEE_REFRESH_KEY', { maxAge: 60 * 60 * 24 * 7 }).value
+                : useCookie('ADMIN_REFRESH_KEY', { maxAge: 60 * 60 * 24 * 7 }).value
+            if (refreshToken) authStore.refreshToken = refreshToken
             await authStore.getUserDetails()
         } catch (err) {
             console.warn('[auth.global] Token invalid, logging out:', err)
@@ -30,37 +45,55 @@ export default defineNuxtRouteMiddleware(async (to) => {
         }
     }
 
-    // 🧠 2️⃣b️⃣ Org admin (non-super) visiting the super-admin home → send to their org dashboard
-    if (authStore.isLoggedIn && !authStore.isSuperAdmin && authStore.admin?.organization_id) {
+    // Org admin (non-super) visiting super-admin home → redirect to org dashboard
+    if (authStore.isLoggedIn && authStore.isAdmin && !authStore.isSuperAdmin && authStore.admin?.organization_id) {
         const orgPath = `/organization/${authStore.admin.organization_id}/dashboard`
         if (to.path === '/' && to.path !== orgPath) {
             return navigateTo(orgPath, { replace: true })
         }
     }
 
-    // 🧠 3️⃣ If visiting login but already logged in → redirect to dashboard
-    if (isPublic && hasToken) {
-        // Try verifying before redirecting (avoid redirect loop)
+    // Employee visiting admin-only pages → redirect to employee dashboard
+    if (authStore.isLoggedIn && authStore.isEmployee) {
+        if (to.path === '/') {
+            return navigateTo(authStore.defaultRoute, { replace: true })
+        }
+        // Block employee from ALL /organization/* admin routes
+        if (to.path.startsWith('/organization/')) {
+            return navigateTo(authStore.defaultRoute, { replace: true })
+        }
+        const superAdminOnlyPaths = ['/modules', '/plans', '/settings/admins', '/settings/roles', '/settings/audit-logs', '/organization/list', '/reports/traffic', '/reports/usage']
+        if (superAdminOnlyPaths.some(p => to.path.startsWith(p))) {
+            return navigateTo(authStore.defaultRoute, { replace: true })
+        }
+    }
+
+    // Visiting login but already logged in → redirect to dashboard (client only — needs API)
+    if (import.meta.client && isPublic && hasToken) {
         try {
-            await authStore.getUserDetails()
-            // const target = redirectCookie.value || '/panel/super-admin/dashboard'
-            // redirectCookie.value = null
-            // if (to.path !== target) return navigateTo(target, { replace: true })
+            if (!authStore.isLoggedIn) {
+                if (portalScope) authStore.scope = portalScope
+                await authStore.getUserDetails()
+            }
+            if (authStore.isLoggedIn) {
+                return navigateTo(authStore.defaultRoute, { replace: true })
+            }
         } catch {
-            // Invalid token — stay on login, clear cookie
-            accessTokenCookie.value = null
+            const ac = useCookie('ADMIN_ACCESS_KEY', { maxAge: 60 * 60 * 24 * 7 })
+            ac.value = null
+            const ec = useCookie('EMPLOYEE_ACCESS_KEY', { maxAge: 60 * 60 * 24 * 7 })
+            ec.value = null
+            const ps = useCookie('PORTAL_SCOPE', { maxAge: 60 * 60 * 24 * 7 })
+            ps.value = null
             redirectCookie.value = null
             return
         }
     }
 
-    // 🧠 4️⃣ If login page & no token → clear stale cookies and continue
+    // Login page & no token → clear stale cookies
     if (isPublic && !hasToken) {
         redirectCookie.value = null
-        // ✅ Add this
         authStore.isLoggedIn = false
         return
     }
-
-    // ✅ 5️⃣ All good — continue navigation
 })

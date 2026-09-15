@@ -1,3 +1,5 @@
+import { useAuthStore } from '~/stores/shared/auth.store'
+
 const getAuthToken = () => {
     if (process.client) {
         const match = document.cookie.split('; ').find((r) => r.startsWith('ADMIN_ACCESS_KEY='))

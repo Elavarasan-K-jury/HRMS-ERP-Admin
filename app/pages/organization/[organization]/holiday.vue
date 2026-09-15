@@ -80,8 +80,8 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 
-import { useAuthStore } from '../../../stores/auth.store'
-import { useHolidayStore } from '../../../stores/holiday.store'
+import { useAuthStore } from '../../../stores/shared/auth.store'
+import { useHolidayStore } from '../../../stores/organization/holiday.store'
 
 import HolidayTable from '../../../components/holiday/dataTable.vue'
 import HolidayDetailedView from '../../../components/holiday/DetailedView.vue'

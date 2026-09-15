@@ -202,7 +202,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useSalaryTemplateStore } from '../../stores/salaryTemplate.store'
+import { useSalaryTemplateStore } from '../../stores/organization/salaryTemplate.store'
 
 const templateStore = useSalaryTemplateStore()
 

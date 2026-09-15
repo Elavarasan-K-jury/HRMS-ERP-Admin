@@ -1,5 +1,4 @@
 <template>
-    <!-- Main background controlled by themeStore.bgColor -->
     <div class="relative min-h-screen overflow-hidden" :style="{ backgroundColor: themeStore.bgColor }">
 
         <div v-if="!preloader" class="pointer-events-none absolute bottom-2 right-2 z-[100]">
@@ -10,7 +9,7 @@
                hover:bg-black/60 hover:text-white
                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
                 aria-label="Powered by Jurysoft (opens in a new tab)">
-                <span aria-hidden="true">✨</span>
+                <span aria-hidden="true"></span>
                 <span class="hidden sm:inline opacity-80">Powered by</span>
                 <span class="sm:ml-1 underline underline-offset-2 decoration-white/40 group-hover:decoration-white">
                     Jurysoft
@@ -19,15 +18,20 @@
         </div>
 
         <!-- Sidebar -->
-        <UiSidebar v-if="!preloader" :menu-items="menu" :title="title" />
+        <UiSidebar v-if="!preloader" :menu-items="activeMenu" :title="title" :titleShort="titleShort" :show-payment="showPaymentGate" :payment-url="paymentUrl" />
 
-        <!-- 🎨 Color Picker Sidebar -->
         <UiColorSidebar />
 
-        <!-- Main wrapper (shifts right when sidebar expands) -->
+        <!-- Main wrapper -->
         <div v-if="!preloader" :class="sidebar ? 'ml-[250px]' : 'ml-[85px]'" class="transition-all duration-300">
             <UiHeader :breadcrumbs="breadcrumbs" @toggleSidebar="toggleSidebar" />
-            <main class="mt-[60px] text-white">
+
+            <!-- Employee payment gate (only for employee portal, not super admin) -->
+            <div v-if="showPaymentGate && !paymentRoute"
+                class="p-2 w-full mt-[60px] h-[calc(100vh-4rem)] flex items-center justify-center">
+                <UiPaymentDue :payment-url="paymentUrl" :title="title" :employee="!user?.admin_of_organization" />
+            </div>
+            <main v-else class="mt-[60px] text-white">
                 <slot />
             </main>
         </div>
@@ -41,8 +45,9 @@
 
 <script setup>
 import { menu } from '../data/menu'
-import { useThemeStore } from '../stores/theme.store'
-import { useAuthStore } from '../stores/auth.store'
+import { useThemeStore } from '../stores/shared/theme.store'
+import { useAuthStore } from '../stores/shared/auth.store'
+import { useOrganizationSubscriptionStore } from '../stores/shared/organizationSubscription.store'
 import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -50,12 +55,52 @@ const route = useRoute()
 const authStore = useAuthStore()
 const themeStore = useThemeStore()
 
-const title = 'JURY-HRMS'
+const isEmployee = computed(() => authStore.scope === 'employee')
+const user = computed(() => authStore.user)
+
+const title = computed(() => {
+    if (isEmployee.value) return authStore.user?.organization?.name || 'JURY-HRMS'
+    return 'JURY-HRMS'
+})
+
+const titleShort = computed(() => {
+    const name = authStore.user?.organization?.name
+    if (!name) return 'JH'
+    const nameSplitted = name.split(' ')
+    if (nameSplitted.length > 2) {
+        return `${nameSplitted[0][0]}${nameSplitted[1][0]}`
+    } else {
+        return nameSplitted.map(e => e[0]).join('')
+    }
+})
+
+const paymentRoute = computed(() => {
+    return route.fullPath === `/organization/${authStore.organization}/expenses/subscription`
+})
+
+const paid = computed(() => {
+    const orgSubStore = useOrganizationSubscriptionStore()
+    return !orgSubStore.pendingPayment || !orgSubStore.trialEnded
+})
+
+const showPaymentGate = computed(() => {
+    if (!isEmployee.value) return false
+    return !paid.value
+})
+
+const paymentUrl = computed(() => {
+    return `/organization/${authStore.organization}/expenses/subscription`
+})
+
+const activeMenu = computed(() => {
+    if (isEmployee.value) return authStore.menu
+    return menu
+})
+
 const sidebar = computed(() => themeStore.sidebar)
 const preloader = computed(() => themeStore.preloader)
 const toggleSidebar = () => themeStore.toggleSidebar()
 
-/* 🧭 Recursive breadcrumb resolver */
 function findBreadcrumb(menuGroups, path, parents = []) {
     for (const group of menuGroups) {
         for (const item of group.items) {
@@ -74,9 +119,8 @@ function findBreadcrumb(menuGroups, path, parents = []) {
     return []
 }
 
-/* 🧠 Auto-generate breadcrumbs */
 const breadcrumbs = computed(() => {
-    const found = findBreadcrumb(menu, route.path)
+    const found = findBreadcrumb(activeMenu.value, route.path)
     return found.length ? found : ['Dashboard']
 })
 
@@ -86,11 +130,11 @@ onMounted(async () => {
         themeStore.loadColor()
     } catch (err) {
         console.error('[Layout] loadLocalData failed:', err)
-        await authStore.logout('/login')
+        if (authStore.accessToken) {
+            await authStore.logout('/login')
+        }
     } finally {
-        setTimeout(() => {
-            themeStore.preloader = false
-        }, 1000)
+        themeStore.preloader = false
     }
 });
 </script>

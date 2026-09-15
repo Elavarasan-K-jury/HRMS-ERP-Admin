@@ -107,8 +107,8 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useThemeStore } from '@/stores/theme.store'
-import { useTrafficReportsStore } from '@/stores/trafficReports.store'
+import { useThemeStore } from '@/stores/shared/theme.store'
+import { useTrafficReportsStore } from '@/stores/super-admin/trafficReports.store'
 
 definePageMeta({ layout: 'auth' })
 

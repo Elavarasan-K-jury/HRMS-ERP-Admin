@@ -97,13 +97,13 @@
 
 <script setup>
 import { ref, onMounted, computed, nextTick } from 'vue'
-import { useAuthStore } from '../stores/auth.store'
-import { useThemeStore } from '../stores/theme.store'
+import { useAuthStore } from '../stores/shared/auth.store'
+import { useThemeStore } from '../stores/shared/theme.store'
 import { storeToRefs } from 'pinia'
 
 definePageMeta({
-    public: true,           // ✅ middleware will skip auth checks
-    layout: 'default',      // (optional) keep using your default layout
+    public: true,
+    layout: 'default',
     key: route => route.fullPath
 })
 
@@ -118,9 +118,9 @@ const done = (data) => {
 }
 
 const promos = ref([
-    { img: '/images/promo1.png', title: 'Introducing Dark Mode 🌙', desc: 'Experience the new sleek dark theme for better focus.' },
-    { img: '/images/promo2.png', title: 'Earn Rewards 🎁', desc: 'Get cashback and bonuses when you complete milestones.' },
-    { img: '/images/promo3.png', title: 'Upgrade your Plan 🚀', desc: 'Unlock premium analytics and tools for faster growth.' },
+    { img: '/images/promo1.png', title: 'Introducing Dark Mode', desc: 'Experience the new sleek dark theme for better focus.' },
+    { img: '/images/promo2.png', title: 'Earn Rewards', desc: 'Get cashback and bonuses when you complete milestones.' },
+    { img: '/images/promo3.png', title: 'Upgrade your Plan', desc: 'Unlock premium analytics and tools for faster growth.' },
 ])
 
 const currentPromo = ref(0)
@@ -128,7 +128,7 @@ onMounted(() => {
     themeStore.preloader = false
     const auth = useAuthStore()
     if (!auth.accessToken) {
-        auth.clearToken() // ensure clean state
+        auth.clearToken()
     } else {
         auth.loadLocalData()
     }

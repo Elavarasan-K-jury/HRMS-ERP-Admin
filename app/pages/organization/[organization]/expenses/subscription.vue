@@ -289,7 +289,7 @@
 
 <script setup>
 import { computed } from 'vue';
-import { useOrganizationSubscriptionStore } from '../../../../stores/organizationSubscription.store'
+import { useOrganizationSubscriptionStore } from '../../../../stores/shared/organizationSubscription.store'
 
 definePageMeta({
     layout: 'organization',

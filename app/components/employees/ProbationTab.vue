@@ -277,7 +277,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
-import { useProbationPolicyStore } from '../../stores/probationPolicy.store'
+import { useProbationPolicyStore } from '../../stores/organization/probationPolicy.store'
 import ProbationPolicyList from '../probation-policy/ProbationPolicyList.vue'
 import ProbationPolicyForm from '../probation-policy/ProbationPolicyForm.vue'
 import ProbationPolicyView from '../probation-policy/ProbationPolicyView.vue'

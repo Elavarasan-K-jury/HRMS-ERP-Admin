@@ -258,8 +258,8 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useDesignationStore } from '../../stores/designation.store'
-import { useEmpCategoryStore } from '../../stores/empCategory.store'
+import { useDesignationStore } from '../../stores/organization/designation.store'
+import { useEmpCategoryStore } from '../../stores/organization/empCategory.store'
 import { storeToRefs } from 'pinia'
 
 const activeTab = ref(0)

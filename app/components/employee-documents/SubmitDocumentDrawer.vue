@@ -50,7 +50,7 @@
                                     <textarea v-model="fieldValues[f.key]" rows="2" placeholder="Enter details" class="w-full bg-white/[0.06] border border-white/15 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:border-emerald-300/50 resize-none"></textarea>
                                 </template>
                                 <template v-else-if="f.field_type === 'FILE'">
-                                    <input type="file" class="w-full text-sm text-white/70 file:mr-3 file:rounded-lg file:border file:border-emerald-400/30 file:bg-emerald-500/10 file:px-3 file:py-1.5 file:text-emerald-300" @change="onFieldFileChange(f, $event)" />
+                                    <input type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" class="w-full text-sm text-white/70 file:mr-3 file:rounded-lg file:border file:border-emerald-400/30 file:bg-emerald-500/10 file:px-3 file:py-1.5 file:text-emerald-300" @change="onFieldFileChange(f, $event)" />
                                 </template>
                                 <template v-else>
                                     <input v-model="fieldValues[f.key]" type="text" :placeholder="f.label" class="w-full bg-white/[0.06] border border-white/15 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:border-emerald-300/50" />
@@ -65,7 +65,8 @@
                 <div v-if="!form.is_na && docConfig?.is_file_upload_enabled" class="rounded-xl border border-white/10 bg-white/5 p-4">
                     <label class="block">
                         <span class="text-sm text-white/85 block mb-2">Upload Document <span v-if="docConfig.is_file_upload_enabled" class="text-white/40">({{ file ? 'selected' : 'optional' }})</span></span>
-                        <input type="file" class="w-full text-sm text-white/70 file:mr-3 file:rounded-lg file:border file:border-emerald-400/30 file:bg-emerald-500/10 file:px-3 file:py-1.5 file:text-emerald-300" @change="onFileChange" />
+                        <input type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" class="w-full text-sm text-white/70 file:mr-3 file:rounded-lg file:border file:border-emerald-400/30 file:bg-emerald-500/10 file:px-3 file:py-1.5 file:text-emerald-300" @change="onFileChange" />
+                        <p class="text-[11px] text-white/35 mt-1">Accepted formats: JPG, PNG, WebP, PDF (max 10MB)</p>
                         <div v-if="file" class="mt-2 flex items-center gap-2 rounded-lg bg-emerald-500/10 border border-emerald-400/20 px-3 py-2">
                             <Icon name="ion:document-attach-outline" class="w-4 h-4 text-emerald-300" />
                             <span class="text-xs text-white/80 truncate flex-1">{{ file.name }}</span>
@@ -93,11 +94,12 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { useEmployeeDocumentStore } from '~/stores/employeeDocument.store'
+import { useEmployeeDocumentStore } from '~/stores/organization/employeeDocument.store'
 
 const props = defineProps({
     modelValue: { type: Boolean, default: false },
     pending: { type: Object, default: null },
+    organizationId: { type: String, default: '' },
 })
 const emit = defineEmits(['update:modelValue', 'submitted'])
 
@@ -177,6 +179,7 @@ async function submit() {
     saving.value = true
     try {
         const payload = {
+            organization_id: props.organizationId,
             assignment_id: props.pending.assignment_id,
             employee_id: props.pending.employee_id,
             document_type_id: props.pending.document_type_id,

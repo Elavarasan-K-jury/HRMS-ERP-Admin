@@ -108,8 +108,8 @@
 <script setup>
 import { computed, reactive, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from '#imports'
-import { useThemeStore } from '~/stores/theme.store'
-import { useAuthStore } from '~/stores/auth.store'
+import { useThemeStore } from '~/stores/shared/theme.store'
+import { useAuthStore } from '~/stores/shared/auth.store'
 
 const themeStore = useThemeStore()
 const auth = useAuthStore()

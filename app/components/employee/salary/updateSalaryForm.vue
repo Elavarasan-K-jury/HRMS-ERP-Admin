@@ -55,7 +55,7 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue';
-import { useSalaryTemplateStore } from '../../../stores/salaryTemplate.store';
+import { useSalaryTemplateStore } from '../../../stores/organization/salaryTemplate.store';
 import { useSalaryStore } from '../../../stores/employee/salary.store';
 import SalaryPreview from './SalaryPreview.vue';
 import { storeToRefs } from 'pinia';

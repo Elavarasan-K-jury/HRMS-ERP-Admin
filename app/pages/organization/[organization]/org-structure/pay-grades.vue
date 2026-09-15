@@ -63,8 +63,8 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { usePayGradeStore } from '~/stores/payGrade.store'
-import { useAuthStore } from '~/stores/auth.store'
+import { usePayGradeStore } from '~/stores/organization/payGrade.store'
+import { useAuthStore } from '~/stores/shared/auth.store'
 import { storeToRefs } from 'pinia'
 
 definePageMeta({

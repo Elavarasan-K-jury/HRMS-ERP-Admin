@@ -38,7 +38,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useThemeStore } from '@/stores/theme.store'
+import { useThemeStore } from '@/stores/shared/theme.store'
 
 const open = ref(false)
 const theme = useThemeStore()

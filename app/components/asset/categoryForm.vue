@@ -38,8 +38,8 @@
 <script setup>
 import { ref, watch, onMounted } from "vue";
 import { storeToRefs } from "pinia";
-import { useAssetsCategoryStore } from "../../stores/assetsCategory.store"; // <-- your new store
-import { useAuthStore } from "../../stores/auth.store";
+import { useAssetsCategoryStore } from "../../stores/organization/assetsCategory.store"; // <-- your new store
+import { useAuthStore } from "../../stores/shared/auth.store";
 
 const assetCategoryStore = useAssetsCategoryStore();
 const authStore = useAuthStore();
@@ -52,8 +52,12 @@ const loading = ref(false);
 watch(name, () => {
     if (name.value) {
         code.value = name.value
-            .replace(/[^a-zA-Z0-9]/g, "_")
-            .toLowerCase();
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9\s-]/g, '')
+            .replace(/[\s-]+/g, '-')
+            .replace(/^-+|-+$/g, '')
+            .replace(/-{2,}/g, '-');
     } else {
         code.value = "";
     }

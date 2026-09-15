@@ -41,8 +41,8 @@
 
 <script setup>
 import { employee_menu } from '../data/menu'
-import { useThemeStore } from '../stores/theme.store'
-import { useAuthStore } from '../stores/auth.store'
+import { useThemeStore } from '../stores/shared/theme.store'
+import { useAuthStore } from '../stores/shared/auth.store'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -104,11 +104,11 @@ onMounted(async () => {
         themeStore.loadColor() // load HEX color on mount
     } catch (err) {
         console.error('[Layout] loadLocalData failed:', err)
-        await authStore.logout('/login')
+        if (authStore.accessToken) {
+            await authStore.logout('/login')
+        }
     } finally {
-        setTimeout(() => {
-            themeStore.preloader = false
-        }, 1000)
+        themeStore.preloader = false
     }
 });
 </script>

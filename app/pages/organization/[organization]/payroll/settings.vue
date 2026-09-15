@@ -262,7 +262,7 @@
 
 <script setup>
 import { onMounted } from 'vue'
-import { useFinanceStore } from '@/stores/finance.store'
+import { useFinanceStore } from '@/stores/super-admin/finance.store'
 import { storeToRefs } from 'pinia';
 
 const finance = useFinanceStore()

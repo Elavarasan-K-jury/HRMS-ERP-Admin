@@ -117,14 +117,14 @@
 import { ref, watch, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 
-import { useSalaryTemplateStore } from "../../../../stores/salaryTemplate.store";
+import { useSalaryTemplateStore } from "../../../../stores/organization/salaryTemplate.store";
 
 import SalaryTemplateForm from "../../../../components/salary-templates/form.vue";
 import SalaryComponentForm from "../../../../components/salary-templates/componentForm.vue";
 import SalaryTemplateTable from "../../../../components/salary-templates/dataTable.vue";
 import DetailedView from "../../../../components/salary-templates/detailedView.vue";
-import { useFinanceStore } from '../../../../stores/finance.store';
-import { useAuthStore } from '../../../../stores/auth.store';
+import { useFinanceStore } from '../../../../stores/super-admin/finance.store';
+import { useAuthStore } from '../../../../stores/shared/auth.store';
 definePageMeta({
     layout: "organization",
 });

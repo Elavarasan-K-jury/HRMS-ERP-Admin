@@ -41,10 +41,10 @@
 
 <script setup>
 import { organization_menu } from '../data/menu'
-import { useThemeStore } from '../stores/theme.store'
-import { useAuthStore } from '../stores/auth.store'
-import { useFinanceStore } from '../stores/finance.store'
-import { useOrganizationStore } from '../stores/organization.store'
+import { useThemeStore } from '../stores/shared/theme.store'
+import { useAuthStore } from '../stores/shared/auth.store'
+import { useFinanceStore } from '../stores/super-admin/finance.store'
+import { useOrganizationStore } from '../stores/organization/organization.store'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 

@@ -649,9 +649,9 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
-import { useExpensePolicyStore } from '~/stores/expensePolicy.store'
-import { useExpenseCategoryStore } from '~/stores/expenseCategory.store'
-import { useAuthStore } from '~/stores/auth.store'
+import { useExpensePolicyStore } from '~/stores/organization/expensePolicy.store'
+import { useExpenseCategoryStore } from '~/stores/organization/expenseCategory.store'
+import { useAuthStore } from '~/stores/shared/auth.store'
 
 const props = defineProps({ organizationId: { type: String, required: true } })
 const store = useExpensePolicyStore()

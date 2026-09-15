@@ -85,10 +85,10 @@
 import { computed, ref, watch } from 'vue';
 import SalaryComponentForm from '../../../../components/component-definition/form.vue'
 import SalaryComponentTable from '../../../../components/component-definition/dataTable.vue'
-import { useComponentDefinitionStore } from '../../../../stores/componentDefinition.store';
-import { useFinanceStore } from '../../../../stores/finance.store';
+import { useComponentDefinitionStore } from '../../../../stores/organization/componentDefinition.store';
+import { useFinanceStore } from '../../../../stores/super-admin/finance.store';
 import { storeToRefs } from 'pinia';
-import { useAuthStore } from '../../../../stores/auth.store';
+import { useAuthStore } from '../../../../stores/shared/auth.store';
 
 const authStore = useAuthStore()
 const componentDefinitionStore = useComponentDefinitionStore()

@@ -64,7 +64,8 @@
                 <div v-if="!form.is_na && docConfig?.is_file_upload_enabled" class="rounded-xl border border-white/10 bg-white/5 p-4">
                     <label class="block">
                         <span class="text-sm text-white/85 block mb-2">Upload New Document</span>
-                        <input type="file" class="w-full text-sm text-white/70 file:mr-3 file:rounded-lg file:border file:border-emerald-400/30 file:bg-emerald-500/10 file:px-3 file:py-1.5 file:text-emerald-300" @change="onFileChange" />
+                        <input type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" class="w-full text-sm text-white/70 file:mr-3 file:rounded-lg file:border file:border-emerald-400/30 file:bg-emerald-500/10 file:px-3 file:py-1.5 file:text-emerald-300" @change="onFileChange" />
+                        <p class="text-[11px] text-white/35 mt-1">Accepted formats: JPG, PNG, WebP, PDF (max 10MB)</p>
                         <div v-if="file" class="mt-2 flex items-center gap-2 rounded-lg bg-emerald-500/10 border border-emerald-400/20 px-3 py-2">
                             <Icon name="ion:document-attach-outline" class="w-4 h-4 text-emerald-300" />
                             <span class="text-xs text-white/80 truncate flex-1">{{ file.name }}</span>
@@ -93,11 +94,12 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { useEmployeeDocumentStore } from '~/stores/employeeDocument.store'
+import { useEmployeeDocumentStore } from '~/stores/organization/employeeDocument.store'
 
 const props = defineProps({
     modelValue: { type: Boolean, default: false },
     pending: { type: Object, default: null },
+    organizationId: { type: String, default: '' },
 })
 const emit = defineEmits(['update:modelValue', 'renewed'])
 
@@ -124,7 +126,7 @@ async function loadConfig() {
     loading.value = true
     try {
         // getSubmission returns the verified submission with fields + fieldValues for prefill
-        const sub = await store.getSubmission(props.pending.submission_id)
+        const sub = await store.getSubmission(props.pending.submission_id, { organization_id: props.organizationId })
         const t = await store.getDocumentType(props.pending.folder_id, props.pending.document_type_id)
         docConfig.value = { is_appliable_na: t.is_appliable_na, is_file_upload_enabled: t.is_file_upload_enabled, ask_expiry_date: t.ask_expiry_date, fields: t.fields || [] }
         fieldValues.value = { ...(sub?.field_values || {}) }
@@ -158,6 +160,7 @@ async function submit() {
     saving.value = true
     try {
         await store.renewDocument(props.pending.submission_id, {
+            organization_id: props.organizationId,
             submitted_by_id: props.pending?.submitted_by_id || undefined,
             is_na: form.value.is_na,
             expiry_date: form.value.expiry_date || null,

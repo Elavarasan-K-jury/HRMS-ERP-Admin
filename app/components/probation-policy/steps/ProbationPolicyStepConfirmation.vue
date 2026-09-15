@@ -11,7 +11,7 @@
                 <div>
                     <div class="flex items-center gap-1.5">
                         <span class="text-sm font-medium text-white/85">Confirm employee probation automatically</span>
-                        <InfoTip tip="Auto-confirms the employee when the probation period completes. The automation itself is implemented in a later phase — only the configuration is saved now." />
+                        <UiInfoTip tip="Auto-confirms the employee when the probation period completes. The automation itself is implemented in a later phase — only the configuration is saved now." />
                     </div>
                     <p class="text-xs text-white/45">The employee's probation can end automatically at the completion of the probation period.</p>
                 </div>
@@ -31,7 +31,7 @@
                 <div>
                     <div class="flex items-center gap-1.5">
                         <span class="text-sm font-medium text-white/85">Auto-generate and issue letter to the employee</span>
-                        <InfoTip tip="Generates and issues a confirmation letter at the end of probation. Letter generation is a separate feature to be implemented later — only the configuration is saved now." />
+                        <UiInfoTip tip="Generates and issues a confirmation letter at the end of probation. Letter generation is a separate feature to be implemented later — only the configuration is saved now." />
                     </div>
                     <p class="text-xs text-white/45">Generate a confirmation letter automatically and share it with the employee.</p>
                 </div>
@@ -54,7 +54,7 @@
 
 <script setup>
 import { storeToRefs } from 'pinia'
-import { useProbationPolicyStore } from '@/stores/probationPolicy.store'
+import { useProbationPolicyStore } from '@/stores/organization/probationPolicy.store'
 
 const store = useProbationPolicyStore()
 const { auto_confirm_probation, auto_generate_confirmation_letter } = storeToRefs(store)

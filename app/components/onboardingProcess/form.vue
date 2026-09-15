@@ -118,7 +118,7 @@
 <script setup>
 import { storeToRefs } from 'pinia';
 import InputTypes from '../../constants/inputTypes';
-import { useOnboardingStore } from '../../stores/onBoarding.store';
+import { useOnboardingStore } from '../../stores/organization/onBoarding.store';
 
 const onboardingStore = useOnboardingStore();
 const config = useRuntimeConfig()

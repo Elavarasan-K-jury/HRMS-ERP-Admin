@@ -23,7 +23,7 @@
                 <!-- Year Select -->
                 <div class="w-[200px] flex flex-col items-start">
                     <label class="text-xs text-white/60 uppercase tracking-widest block mb-1">Year</label>
-                    <FormSelect @select="onYearChange" id="departent_head" class="w-full" color="#fff"
+                    <FormSelect @select="on7YearChange" id="departent_head" class="w-full" color="#fff"
                         prepend-icon="lucide:calendar" v-model="year" :options="years" searchable size="lg" rounded="lg"
                         placeholder="Year" />
                 </div>
@@ -234,7 +234,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import { useAttendanceStore } from '../../../../../stores/employee/attendance.store'
+import { useEmployeeAttendanceStore as useAttendanceStore } from '../../../../../stores/employee/attendance.store'
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { storeToRefs } from 'pinia';

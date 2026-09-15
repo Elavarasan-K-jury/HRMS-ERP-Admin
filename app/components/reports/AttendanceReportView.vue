@@ -188,7 +188,7 @@
 
 <script setup>
 import { computed, reactive, watch } from "vue"
-import { useAttendanceReportsStore } from "../../stores/attendanceReport.store"
+import { useAttendanceReportsStore } from "../../stores/organization/attendanceReport.store"
 import { useRouter, useRoute } from "vue-router"
 
 const model = defineModel()

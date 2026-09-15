@@ -71,7 +71,7 @@
 <script setup>
 import { storeToRefs } from "pinia";
 import { ref, watch, onMounted } from "vue";
-import { useComponentDefinitionStore } from "../../stores/componentDefinition.store";
+import { useComponentDefinitionStore } from "../../stores/organization/componentDefinition.store";
 
 const componentDefinitionStore = useComponentDefinitionStore()
 const loading = ref(true)

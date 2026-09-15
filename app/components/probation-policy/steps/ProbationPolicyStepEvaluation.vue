@@ -4,7 +4,7 @@
         <section class="flex flex-col gap-2">
             <div class="flex items-center gap-1.5">
                 <label class="text-md text-white/80 font-medium">Evaluation Criteria</label>
-                <InfoTip tip="Choose whether evaluation milestones are required before the probation is confirmed." />
+                <UiInfoTip tip="Choose whether evaluation milestones are required before the probation is confirmed." />
             </div>
             <div class="grid grid-cols-2 gap-3">
                 <button type="button" class="rounded-2xl border p-4 text-left transition-all"
@@ -71,14 +71,14 @@
                             <div class="flex flex-col gap-1.5">
                                 <div class="flex items-center gap-1.5">
                                     <label class="text-xs text-white/60">Milestone Name</label>
-                                    <InfoTip tip="A checkpoint in the evaluation. The Final milestone determines the outcome (Confirm / Terminate / Extend)." />
+                                    <UiInfoTip tip="A checkpoint in the evaluation. The Final milestone determines the outcome (Confirm / Terminate / Extend)." />
                                 </div>
                                 <FormInput color="#fff" v-model="milestone.name" size="sm" placeholder="e.g. 30-day progress check" />
                             </div>
                             <div class="flex flex-col gap-1.5">
                                 <div class="flex items-center gap-1.5">
                                     <label class="text-xs text-white/60">Order</label>
-                                    <InfoTip tip="Sets the sequence in which milestones run. Lower order runs first." />
+                                    <UiInfoTip tip="Sets the sequence in which milestones run. Lower order runs first." />
                                 </div>
                                 <FormInput color="#fff" v-model.number="milestone.order" type="number" size="sm" min="1" placeholder="1" />
                             </div>
@@ -89,7 +89,7 @@
                             <div class="flex items-center justify-between gap-2">
                                 <div>
                                     <span class="text-xs font-medium text-white/80">Automatically trigger evaluation</span>
-                                    <InfoTip tip="Schedule this milestone to auto-start N days after the probation begins. Off = manual trigger." />
+                                    <UiInfoTip tip="Schedule this milestone to auto-start N days after the probation begins. Off = manual trigger." />
                                     <p class="text-[10px] text-white/40">Schedule this milestone to trigger automatically.</p>
                                 </div>
                                 <UiSwitch v-model="milestone.automatic_trigger_enabled" color="#4aff7a" size="sm" />
@@ -109,7 +109,7 @@
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-1.5">
                                     <span class="text-xs font-semibold text-white/80 uppercase tracking-wider">Evaluation Levels</span>
-                                    <InfoTip tip="Each milestone contains one or more levels. All levels must be passed as the evaluation for a milestone moves forward." />
+                                    <UiInfoTip tip="Each milestone contains one or more levels. All levels must be passed as the evaluation for a milestone moves forward." />
                                 </div>
                                 <UiButton size="xs" color="#4aff7a" text="Add new level" prepend-icon="lucide:plus"
                                     @click="store.addLevel(milestone)" />
@@ -130,7 +130,7 @@
                                 <div class="flex items-center justify-between gap-2">
                                     <div class="flex items-center gap-1.5">
                                         <span class="text-xs text-white/60">Completion rule</span>
-                                        <InfoTip tip="All evaluators: the level is complete only when every assigned evaluator submits feedback. Any evaluator: completes as soon as one assigned evaluator submits." />
+                                        <UiInfoTip tip="All evaluators: the level is complete only when every assigned evaluator submits feedback. Any evaluator: completes as soon as one assigned evaluator submits." />
                                     </div>
                                     <div class="flex items-center gap-2">
                                         <button type="button" class="rounded-lg px-2.5 py-1 text-xs border transition"
@@ -155,7 +155,7 @@
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center gap-1.5">
                                             <span class="text-xs text-white/60">Evaluators (Role / Employee)</span>
-                                            <InfoTip tip="Only these assigned roles or employees can give feedback for this level." />
+                                            <UiInfoTip tip="Only these assigned roles or employees can give feedback for this level." />
                                         </div>
                                         <UiButton size="xs" color="#fff" text="Add evaluator" prepend-icon="lucide:user-plus"
                                             @click="store.addEvaluator(level)" />
@@ -190,7 +190,7 @@
                                     <div class="flex items-center justify-between gap-2">
                                         <div class="flex items-center gap-1.5">
                                             <span class="text-xs text-white/70">Send reminder to evaluators</span>
-                                            <InfoTip tip="Notifies assigned evaluators N days after the evaluation starts if they haven't submitted feedback yet." />
+                                            <UiInfoTip tip="Notifies assigned evaluators N days after the evaluation starts if they haven't submitted feedback yet." />
                                         </div>
                                         <UiSwitch v-model="level.reminder_enabled" color="#4aff7a" size="sm" />
                                     </div>
@@ -210,7 +210,7 @@
                         <div class="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 mt-3 flex items-center justify-between gap-2">
                             <div class="flex items-center gap-1.5">
                                 <span class="text-xs font-medium text-white/80">Attach a feedback form to this milestone</span>
-                                <InfoTip tip="Links a feedback form to this milestone. The feedback forms module is a separate feature — only the configuration is stored." />
+                                <UiInfoTip tip="Links a feedback form to this milestone. The feedback forms module is a separate feature — only the configuration is stored." />
                             </div>
                             <UiSwitch v-model="milestone.feedback_form_enabled" color="#4aff7a" size="sm" />
                         </div>
@@ -226,7 +226,7 @@
             <section>
                 <div class="flex items-center gap-1.5 border-b border-white/10 pb-2 mb-3">
                     <h3 class="text-white/90 font-semibold">Other Form Settings</h3>
-                    <InfoTip tip="Controls how the evaluation feedback form behaves across the review process and what the employee or reviewers can see and do." />
+                    <UiInfoTip tip="Controls how the evaluation feedback form behaves across the review process and what the employee or reviewers can see and do." />
                 </div>
                 <div class="flex flex-col gap-3">
                     <div class="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 flex items-center justify-between gap-2">
@@ -263,8 +263,8 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useProbationPolicyStore } from '@/stores/probationPolicy.store'
-import { useAuthStore } from '@/stores/auth.store'
+import { useProbationPolicyStore } from '@/stores/organization/probationPolicy.store'
+import { useAuthStore } from '@/stores/shared/auth.store'
 
 const store = useProbationPolicyStore()
 const authStore = useAuthStore()

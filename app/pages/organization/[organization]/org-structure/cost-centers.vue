@@ -79,7 +79,7 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { useCostCenterStore } from '~/stores/costCenter.store'
+import { useCostCenterStore } from '~/stores/organization/costCenter.store'
 
 definePageMeta({
     layout: 'organization',

@@ -1,6 +1,6 @@
 // stores/holidayPublic.store.js
 import { defineStore } from 'pinia'
-import { useAuthStore } from '../auth.store'
+import { useAuthStore } from '../shared/auth.store'
 
 export const useSalaryStore = defineStore('salary', {
     state: () => ({

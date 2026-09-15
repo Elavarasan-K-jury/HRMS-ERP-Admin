@@ -52,7 +52,7 @@
 </template>
 
 <script setup>
-import { useThemeStore } from '../../../stores/theme.store';
+import { useThemeStore } from '../../../stores/shared/theme.store';
 
 definePageMeta({
     layout: 'organization',

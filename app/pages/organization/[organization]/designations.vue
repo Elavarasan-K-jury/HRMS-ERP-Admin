@@ -41,13 +41,13 @@
 
 <script setup>
 import { onMounted, watch } from 'vue';
-import { useDesignationStore } from '../../../stores/designation.store';
-import { useAuthStore } from '../../../stores/auth.store';
+import { useDesignationStore } from '../../../stores/organization/designation.store';
+import { useAuthStore } from '../../../stores/shared/auth.store';
 import DataTable from '../../../components/designation/dataTable.vue';
 import DetailedView from '../../../components/designation/detailedView.vue';
 import DesignationForm from '../../../components/designation/form.vue';
 import designationsList from '../../../constants/designations';
-import { useDepartmentStore } from '../../../stores/department.store'
+import { useDepartmentStore } from '../../../stores/organization/department.store'
 import { storeToRefs } from 'pinia';
 definePageMeta({
     layout: 'organization',

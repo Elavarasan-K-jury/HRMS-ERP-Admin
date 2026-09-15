@@ -38,8 +38,8 @@
 
 <script setup>
 import { onMounted, computed } from 'vue';
-import { useEmpCategoryStore } from '../../../../stores/empCategory.store';
-import { useAuthStore } from '../../../../stores/auth.store';
+import { useEmpCategoryStore } from '../../../../stores/organization/empCategory.store';
+import { useAuthStore } from '../../../../stores/shared/auth.store';
 import DataTable from '../../../../components/employee-category/dataTable.vue';
 import CategoryForm from '../../../../components/employee-category/form.vue';
 import { storeToRefs } from 'pinia';

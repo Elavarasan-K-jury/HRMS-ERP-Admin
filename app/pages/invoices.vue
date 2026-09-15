@@ -24,11 +24,11 @@
 
 <script setup>
 import { onMounted } from 'vue';
-import { useOrganizationSubscriptionStore } from '../stores/organizationSubscription.store';
-import { useOrganizationStore } from '../stores/organization.store';
+import { useOrganizationSubscriptionStore } from '../stores/shared/organizationSubscription.store';
+import { useOrganizationStore } from '../stores/organization/organization.store';
 import InvoiceTable from "../components/invoices/DataTable.vue"
 import { storeToRefs } from 'pinia';
-import { useAuthStore } from '../stores/auth.store';
+import { useAuthStore } from '../stores/shared/auth.store';
 const organizationSubscriptionStore = useOrganizationSubscriptionStore()
 const organizationStore = useOrganizationStore()
 const authStore = useAuthStore()

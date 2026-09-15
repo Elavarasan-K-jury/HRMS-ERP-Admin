@@ -76,7 +76,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { useLegalEntitiesStore } from '~/stores/legalEntities.store'
+import { useLegalEntitiesStore } from '~/stores/organization/legalEntities.store'
 import LegalEntitySidebar from '~/components/legal-entities/LegalEntitySidebar.vue'
 import LegalEntityHeader from '~/components/legal-entities/LegalEntityHeader.vue'
 import RegistrationTab from '~/components/legal-entities/RegistrationTab.vue'

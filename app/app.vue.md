@@ -17,7 +17,7 @@ The root component of the application that wraps all pages with a layout and set
 ## Script Logic
 
 ```js
-import { useHeadStore } from './stores/head.store'
+import { useHeadStore } from './stores/shared/head.store'
 import { useHead } from 'nuxt/app'
 import { useRoute } from 'vue-router'
 

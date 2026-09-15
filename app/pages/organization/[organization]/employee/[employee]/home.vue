@@ -116,8 +116,8 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { useEmployeesStore } from '../../../../../stores/employee.store'
-import { useThemeStore } from '../../../../../stores/theme.store'
+import { useEmployeesStore } from '../../../../../stores/organization/employee.store'
+import { useThemeStore } from '../../../../../stores/shared/theme.store'
 
 import feedHero from '../../../../../components/employee/feed/feedHero.vue'
 import feedCard from '../../../../../components/employee/feed/feedCard.vue'

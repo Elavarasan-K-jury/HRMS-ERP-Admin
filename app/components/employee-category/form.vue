@@ -31,8 +31,8 @@
 
 <script setup>
 import { onMounted, ref } from 'vue';
-import { useEmpCategoryStore } from '../../stores/empCategory.store';
-import { useAuthStore } from '../../stores/auth.store';
+import { useEmpCategoryStore } from '../../stores/organization/empCategory.store';
+import { useAuthStore } from '../../stores/shared/auth.store';
 import { storeToRefs } from 'pinia';
 
 const props = defineProps({

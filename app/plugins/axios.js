@@ -9,7 +9,6 @@ export default defineNuxtPlugin(() => {
         timeout: 15000,
     })
 
-    // Set or remove the custom header
     const setOrganizationId = (id) => {
         if (id) {
             api.defaults.headers.common['x-org-id'] = id
@@ -25,14 +24,30 @@ export default defineNuxtPlugin(() => {
         }
     }
 
-    // Attach the admin access token from the cookie to every request
     api.interceptors.request.use((config) => {
         if (process.client && !config.headers.Authorization) {
-            const match = document.cookie.split('; ').find(r => r.startsWith('ADMIN_ACCESS_KEY='))
-            if (match) {
-                const token = decodeURIComponent(match.slice('ADMIN_ACCESS_KEY='.length))
-                if (token) config.headers.Authorization = `Bearer ${token}`
+            const cookies = document.cookie.split('; ')
+            const portalScopeMatch = cookies.find(r => r.startsWith('PORTAL_SCOPE='))
+            const scope = portalScopeMatch ? portalScopeMatch.split('=').slice(1).join('=') : null
+
+            let token = null
+            if (scope === 'admin') {
+                const match = cookies.find(r => r.startsWith('ADMIN_ACCESS_KEY='))
+                if (match) token = decodeURIComponent(match.slice('ADMIN_ACCESS_KEY='.length))
+            } else if (scope === 'employee') {
+                const match = cookies.find(r => r.startsWith('EMPLOYEE_ACCESS_KEY='))
+                if (match) token = decodeURIComponent(match.slice('EMPLOYEE_ACCESS_KEY='.length))
+            } else {
+                const adminMatch = cookies.find(r => r.startsWith('ADMIN_ACCESS_KEY='))
+                const empMatch = cookies.find(r => r.startsWith('EMPLOYEE_ACCESS_KEY='))
+                const match = adminMatch || empMatch
+                if (match) {
+                    const key = adminMatch ? 'ADMIN_ACCESS_KEY=' : 'EMPLOYEE_ACCESS_KEY='
+                    token = decodeURIComponent(match.slice(key.length))
+                }
             }
+
+            if (token) config.headers.Authorization = `Bearer ${token}`
         }
         return config
     })

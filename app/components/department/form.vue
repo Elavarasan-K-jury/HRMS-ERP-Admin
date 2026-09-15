@@ -51,9 +51,9 @@
 
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue';
-import { useEmployeesStore } from '../../stores/employee.store'
-import { useDepartmentStore } from '../../stores/department.store'
-import { useAuthStore } from '../../stores/auth.store'
+import { useEmployeesStore } from '../../stores/organization/employee.store'
+import { useDepartmentStore } from '../../stores/organization/department.store'
+import { useAuthStore } from '../../stores/shared/auth.store'
 import { storeToRefs } from 'pinia';
 const employeeStore = useEmployeesStore();
 const departmentStore = useDepartmentStore();

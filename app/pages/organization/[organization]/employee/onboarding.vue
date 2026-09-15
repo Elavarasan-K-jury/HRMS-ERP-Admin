@@ -54,8 +54,8 @@ import { computed, onMounted, ref } from 'vue'
 import OnboardingForm from '../../../../components/onboardingProcess/form.vue';
 import OnboardingProcessTable from '../../../../components/onboardingProcess/dataTable.vue';
 import DetailedView from '../../../../components/onboardingProcess/detailedView.vue';
-import { useOnboardingStore } from '../../../../stores/onBoarding.store';
-import { useAuthStore } from '../../../../stores/auth.store';
+import { useOnboardingStore } from '../../../../stores/organization/onBoarding.store';
+import { useAuthStore } from '../../../../stores/shared/auth.store';
 import InputTypes from '../../../../constants/inputTypes';
 import { storeToRefs } from 'pinia';
 

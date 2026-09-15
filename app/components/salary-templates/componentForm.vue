@@ -223,11 +223,11 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 
-import { useSalaryTemplateStore } from '../../stores/salaryTemplate.store'
-import { useComponentDefinitionStore } from '../../stores/componentDefinition.store'
-import { useDepartmentStore } from '../../stores/department.store'
-import { useDesignationStore } from '../../stores/designation.store'
-import { useSalaryRangeStore } from '../../stores/salaryRange.store'
+import { useSalaryTemplateStore } from '../../stores/organization/salaryTemplate.store'
+import { useComponentDefinitionStore } from '../../stores/organization/componentDefinition.store'
+import { useDepartmentStore } from '../../stores/organization/department.store'
+import { useDesignationStore } from '../../stores/organization/designation.store'
+import { useSalaryRangeStore } from '../../stores/organization/salaryRange.store'
 const toast = useToast()
 
 const props = defineProps({

@@ -503,6 +503,76 @@
                 </template>
             </div>
         </div>
+        <!-- 👥 Relationships -->
+        <span class="col-span-12 mt-3 flex items-center gap-2 pb-1 border-b border-white/10">
+            <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-400/10 border border-blue-400/25">
+                <Icon name="lucide:users" class="w-4 h-4 text-blue-400" />
+            </span>
+            <h3 class="text-lg font-semibold text-white/85">Relationships</h3>
+        </span>
+        <div class="col-span-12">
+            <div
+                class="grid rounded-xl border border-white/10 bg-gradient-to-br from-white/[0.07] via-white/[0.04] to-transparent p-3 grid-cols-12 gap-3 backdrop-blur-xl shadow-lg">
+                <template v-for="(rel, index) in relationships" :key="rel._key">
+                    <div class="col-span-6 w-full flex flex-col items-start">
+                        <label class="text-md text-white/80">Relationship: <span class="text-red-400">*</span></label>
+                        <FormSelect class="w-full" color="#fff" prepend-icon="lucide:users"
+                            v-model="rel.relationship" :options="relationshipTypeOptions" size="md" rounded="lg"
+                            placeholder="Select Relationship" />
+                    </div>
+                    <div class="col-span-6 w-full flex flex-col items-start">
+                        <label class="text-md text-white/80">Gender:</label>
+                        <FormSelect class="w-full" color="#fff" prepend-icon="bx:bx-user"
+                            v-model="rel.gender" :options="genderOptions" size="md" rounded="lg"
+                            placeholder="Select Gender" clearable />
+                    </div>
+                    <div class="col-span-6 w-full flex flex-col items-start">
+                        <label class="text-md text-white/80">First Name: <span class="text-red-400">*</span></label>
+                        <FormInput v-model="rel.first_name" class="w-full" prepend-icon="bx:bx-user" color="#fff" size="md"
+                            rounded="lg" placeholder="First Name" />
+                    </div>
+                    <div class="col-span-6 w-full flex flex-col items-start">
+                        <label class="text-md text-white/80">Last Name:</label>
+                        <FormInput v-model="rel.last_name" class="w-full" prepend-icon="bx:bx-user" color="#fff" size="md"
+                            rounded="lg" placeholder="Last Name" />
+                    </div>
+                    <div class="col-span-6 w-full flex flex-col items-start">
+                        <label class="text-md text-white/80">Email:</label>
+                        <FormInput v-model="rel.email" class="w-full" prepend-icon="heroicons:envelope" color="#fff"
+                            size="md" rounded="lg" placeholder="Email" />
+                    </div>
+                    <div class="col-span-6 w-full flex flex-col items-start">
+                        <label class="text-md text-white/80">Mobile:</label>
+                        <FormInput v-model="rel.phone" class="w-full" prepend-icon="heroicons:phone" color="#fff"
+                            size="md" rounded="lg" placeholder="Mobile" />
+                    </div>
+                    <div class="col-span-6 w-full flex flex-col items-start">
+                        <label class="text-md text-white/80">Profession:</label>
+                        <FormInput v-model="rel.profession" class="w-full" prepend-icon="lucide:briefcase" color="#fff"
+                            size="md" rounded="lg" placeholder="Profession" />
+                    </div>
+                    <div class="col-span-6 w-full flex flex-col items-start">
+                        <label class="text-md text-white/80">Date of Birth:</label>
+                        <FormInput v-model="rel.date_of_birth" type="date" class="w-full" prepend-icon="bx:bx-calendar"
+                            color="#fff" size="md" rounded="lg" placeholder="Date of Birth" />
+                    </div>
+                    <div class="col-span-12 flex flex-row justify-end items-center gap-2">
+                        <span @click="employeesStore.removeRelationship(index)"
+                            class="flex items-center gap-1 text-xs font-medium text-red-400 cursor-pointer rounded-lg border border-red-400/25 bg-red-400/10 px-3 py-1.5 hover:bg-red-400/20 transition-all">
+                            <Icon name="lucide:trash-2" class="w-3.5 h-3.5" /> Remove
+                        </span>
+                    </div>
+                    <div v-if="index !== relationships.length - 1 && relationships.length > 1"
+                        class="col-span-12 h-[1px] bg-white/10"></div>
+                </template>
+                <div class="col-span-12 flex justify-end">
+                    <span @click="employeesStore.addRelationship()"
+                        class="flex items-center gap-1 text-xs font-medium text-emerald-400 cursor-pointer rounded-lg border border-emerald-400/25 bg-emerald-400/10 px-3 py-1.5 hover:bg-emerald-400/20 transition-all">
+                        <Icon name="lucide:plus" class="w-3.5 h-3.5" /> Add Relationship
+                    </span>
+                </div>
+            </div>
+        </div>
         <div v-if="probationPreview || probation_start_date || probation_end_date" class="col-span-12">
             <div
                 class="grid rounded-xl border border-emerald-400/25 bg-gradient-to-br from-emerald-400/[0.08] via-white/[0.04] to-transparent p-4 grid-cols-12 gap-3 backdrop-blur-xl shadow-lg">
@@ -549,20 +619,20 @@
 
 <script setup>
 import { onMounted, ref, watch, computed } from 'vue';
-import { useEmpCategoryStore } from '../../stores/empCategory.store';
-import { useDesignationStore } from '../../stores/designation.store';
-import { useDepartmentStore } from '../../stores/department.store';
-import { useEmployeesStore } from '../../stores/employee.store';
-import { useBranchStore } from '../../stores/branch.store';
-import { useLocationStore } from '../../stores/location.store';
-import { useProbationPolicyStore } from '../../stores/probationPolicy.store';
-import { useCostCenterStore } from '../../stores/costCenter.store';
-import { usePayGradeStore } from '../../stores/payGrade.store';
-import { useBandStore } from '../../stores/band.store';
-import { useNoticePeriodStore } from '../../stores/noticePeriod.store';
+import { useEmpCategoryStore } from '../../stores/organization/empCategory.store';
+import { useDesignationStore } from '../../stores/organization/designation.store';
+import { useDepartmentStore } from '../../stores/organization/department.store';
+import { useEmployeesStore } from '../../stores/organization/employee.store';
+import { useBranchStore } from '../../stores/organization/branch.store';
+import { useLocationStore } from '../../stores/organization/location.store';
+import { useProbationPolicyStore } from '../../stores/organization/probationPolicy.store';
+import { useCostCenterStore } from '../../stores/organization/costCenter.store';
+import { usePayGradeStore } from '../../stores/organization/payGrade.store';
+import { useBandStore } from '../../stores/organization/band.store';
+import { useNoticePeriodStore } from '../../stores/organization/noticePeriod.store';
 import { calculateProbationEndDate } from '../../utils/probationDate.js'
 import { resolveMediaUrl, uploadMediaFile } from '../../utils/media'
-import { useAuthStore } from '../../stores/auth.store'
+import { useAuthStore } from '../../stores/shared/auth.store'
 import Loader from '../ui/loader.vue'
 import { storeToRefs } from 'pinia';
 const empCategoryStore = useEmpCategoryStore()
@@ -621,6 +691,7 @@ const {
     pay_grade_id,
     band_id,
     notice_period_policy_id,
+    relationships,
 } = storeToRefs(employeesStore)
 
 const photoUploading = ref(false)
@@ -683,6 +754,25 @@ const workerTypeOptions = [
     { value: 'CONTRACT', label: 'Contract' },
     { value: 'INTERN', label: 'Intern' },
     { value: 'PERMANENT', label: 'Permanent' },
+]
+
+const relationshipTypeOptions = [
+    { value: 'CHILD', label: 'Child' },
+    { value: 'FATHER', label: 'Father' },
+    { value: 'FATHER_IN_LAW', label: 'Father-in-law' },
+    { value: 'MOTHER', label: 'Mother' },
+    { value: 'MOTHER_IN_LAW', label: 'Mother-in-law' },
+    { value: 'OTHERS', label: 'Others' },
+    { value: 'PARTNER', label: 'Partner' },
+    { value: 'SPOUSE', label: 'Spouse' },
+    { value: 'SELF', label: 'Self' },
+    { value: 'SIBLING', label: 'Sibling' },
+]
+
+const genderOptions = [
+    { value: 'MALE', label: 'Male' },
+    { value: 'FEMALE', label: 'Female' },
+    { value: 'OTHER', label: 'Other' },
 ]
 
 const workerTypeSelection = computed({

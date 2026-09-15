@@ -111,8 +111,8 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import { useBranchStore } from '~/stores/branch.store'
-import { useLocationStore } from '~/stores/location.store'
+import { useBranchStore } from '~/stores/organization/branch.store'
+import { useLocationStore } from '~/stores/organization/location.store'
 
 definePageMeta({
     layout: 'organization',

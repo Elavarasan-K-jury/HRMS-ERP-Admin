@@ -261,7 +261,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
-import { useNoticePeriodStore } from '~/stores/noticePeriod.store'
+import { useNoticePeriodStore } from '~/stores/organization/noticePeriod.store'
 import PolicyItem from '../policies/item.vue'
 
 const props = defineProps({

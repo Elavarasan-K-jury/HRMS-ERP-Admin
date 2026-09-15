@@ -28,7 +28,7 @@
 <script setup>
 import { ref, watch } from "vue";
 import { storeToRefs } from "pinia";
-import { useAssetsModelStore } from "../../stores/assetModel.store";
+import { useAssetsModelStore } from "../../stores/organization/assetModel.store";
 
 const store = useAssetsModelStore();
 const { specs } = storeToRefs(store);

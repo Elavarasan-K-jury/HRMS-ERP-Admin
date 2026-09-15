@@ -104,9 +104,9 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
 
-import { useAuthStore } from '../../../stores/auth.store'
-import { useDepartmentStore } from '../../../stores/department.store'
-import { useHierarchyStore } from '../../../stores/hierarchy.store'
+import { useAuthStore } from '../../../stores/shared/auth.store'
+import { useDepartmentStore } from '../../../stores/organization/department.store'
+import { useHierarchyStore } from '../../../stores/organization/hierarchy.store'
 
 import OrgChartTree from '../../../components/hierarchy/OrgChartTree.vue'
 import OrganizationTree from '../../../components/hierarchy/OrganizationTree.vue'
