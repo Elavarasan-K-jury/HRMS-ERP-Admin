@@ -179,20 +179,6 @@
             </div>
         </section>
 
-        <section v-show="activeTab === 4" class="probation-panel">
-            <div class="panel-heading">
-                <div>
-                    <p class="eyebrow">Feedback</p>
-                    <h3>Feedback Forms</h3>
-                    <p>Manage feedback forms used during probation evaluation.</p>
-                </div>
-            </div>
-            <div class="py-12 text-center">
-                <Icon name="ion:chatbubbles-outline" class="mx-auto mb-3 text-4xl text-white/30" />
-                <p class="text-sm text-white/50">No feedback forms created yet.</p>
-            </div>
-        </section>
-
         <!-- Probation Policy modals -->
         <ProbationPolicyView v-model="ppViewModal" :policy="ppViewData" />
 
@@ -469,7 +455,6 @@ const tabs = [
     { label: 'Under Evaluation', icon: 'ion:time-outline' },
     { label: 'Completed Probations', icon: 'ion:checkmark-done-outline' },
     { label: 'Employment Policies', icon: 'ion:document-text-outline' },
-    { label: 'Feedback Forms', icon: 'ion:chatbubbles-outline' },
 ]
 
 const confirmProbation = (p, newStatus) => {
@@ -482,7 +467,7 @@ const viewDetails = (p) => {
 }
 
 const handleRefresh = (e) => {
-    if (e.detail.tab === 4) fetchProbations()
+    if (e.detail.tab === 3) fetchProbations()
 }
 
 onMounted(() => {

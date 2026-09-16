@@ -133,7 +133,6 @@ const props = defineProps({
                             { label: 'All Employees', path: '/employees', icon: 'lucide:user-circle-2' },
                             { label: 'Categories', path: '/employees/categories', icon: 'lucide:tags' },
                             { label: 'Trainees', path: '/employees/trainees', icon: 'lucide:graduation-cap' },
-                            { label: 'Onboarding', path: '/employees/onboarding', icon: 'lucide:badge-check' },
                         ],
                     },
                     { label: 'Departments', path: '/departments', icon: 'lucide:building-2' },

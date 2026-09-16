@@ -81,14 +81,6 @@
                             <div class="text-xs text-white/70">Level: {{ desig.level || '—' }}</div>
                         </td>
 
-                        <!-- Band -->
-                        <td class="td align-top">
-                            <span class="inline-flex items-center gap-1 text-white/90">
-                                <Icon name="ion:git-branch-outline" class="w-4 h-4 opacity-80" />
-                                {{ desig.band?.name || '—' }}
-                            </span>
-                        </td>
-
                         <!-- Organization -->
                         <td class="td align-top">
                             <div class="font-semibold text-white/90">

@@ -161,11 +161,6 @@
                                         {{ autoTriggerCount ? `${autoTriggerCount} milestone(s) auto-trigger` : 'Manual trigger' }}
                                     </span>
                                 </PolicyItem>
-                                <PolicyItem label="Share feedback with employee" icon="lucide:share-2">
-                                    <span :class="selected.share_feedback_with_employee ? 'text-emerald-300' : 'text-white/40'">
-                                        {{ selected.share_feedback_with_employee ? 'Enabled' : 'Disabled' }}
-                                    </span>
-                                </PolicyItem>
                             </div>
 
                             <div class="flex flex-col gap-3">
@@ -192,10 +187,6 @@
                                             <span class="text-white/40">
                                                 · {{ (level.evaluators || []).map(e => e.evaluator_name || e.evaluator_ref_id).join(', ') }}
                                             </span>
-                                        </div>
-                                        <div v-if="m.feedback_form_enabled" class="text-xs text-amber-300/90">
-                                            <Icon name="lucide:file-text" class="w-3 h-3 inline mr-1" />
-                                            Feedback form attached to this milestone
                                         </div>
                                     </div>
                                 </div>

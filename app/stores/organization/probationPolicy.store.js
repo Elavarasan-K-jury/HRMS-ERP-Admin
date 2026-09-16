@@ -22,7 +22,6 @@ const newMilestone = (order, isFinal = false) => ({
     is_final_milestone: isFinal,
     automatic_trigger_enabled: false,
     trigger_after_days: null,
-    feedback_form_enabled: false,
     levels: [newLevel(1)],
 })
 
@@ -55,13 +54,6 @@ export const useProbationPolicyStore = defineStore('probationPolicy', {
         // ---------- Step 2 — Evaluation ----------
         evaluation_required: false,
         evaluation_milestones: [newMilestone(1, true)],
-
-        // Feedback form settings
-        show_feedback_form_in_review: false,
-        share_feedback_with_employee: false,
-        employee_response_allowed: false,
-        reviewer_response_allowed: false,
-        reviewer_recommendations_allowed: false,
 
         // ---------- Step 3 — Confirmation ----------
         auto_confirm_probation: false,
@@ -173,7 +165,6 @@ export const useProbationPolicyStore = defineStore('probationPolicy', {
                 is_final_milestone: Boolean(m.is_final_milestone),
                 automatic_trigger_enabled: Boolean(m.automatic_trigger_enabled),
                 trigger_after_days: m.automatic_trigger_enabled ? Number(m.trigger_after_days) : null,
-                feedback_form_enabled: Boolean(m.feedback_form_enabled),
                 levels: (m.levels || []).map(l => ({
                     level_order: Number(l.level_order) || 0,
                     completion_rule: l.completion_rule || 'ALL',
@@ -191,11 +182,6 @@ export const useProbationPolicyStore = defineStore('probationPolicy', {
         buildEvaluationPayload() {
             return {
                 evaluation_required: this.evaluation_required,
-                show_feedback_form_in_review: this.show_feedback_form_in_review,
-                share_feedback_with_employee: this.share_feedback_with_employee,
-                employee_response_allowed: this.employee_response_allowed,
-                reviewer_response_allowed: this.reviewer_response_allowed,
-                reviewer_recommendations_allowed: this.reviewer_recommendations_allowed,
                 evaluation_milestones: this.evaluation_milestones.map(m => this.buildMilestonePayload(m)),
             }
         },
@@ -256,11 +242,6 @@ export const useProbationPolicyStore = defineStore('probationPolicy', {
                     policy_type: this.policy_type,
                     employee_category_ids: this.employee_category_ids,
                     evaluation_required: this.evaluation_required,
-                    show_feedback_form_in_review: this.show_feedback_form_in_review,
-                    share_feedback_with_employee: this.share_feedback_with_employee,
-                    employee_response_allowed: this.employee_response_allowed,
-                    reviewer_response_allowed: this.reviewer_response_allowed,
-                    reviewer_recommendations_allowed: this.reviewer_recommendations_allowed,
                     auto_confirm_probation: this.auto_confirm_probation,
                     auto_generate_confirmation_letter: this.auto_generate_confirmation_letter,
                     evaluation_milestones: this.evaluation_milestones.map(m => this.buildMilestonePayload(m)),
@@ -359,11 +340,6 @@ export const useProbationPolicyStore = defineStore('probationPolicy', {
                     policy_type: policy.policy_type || 'PROBATION',
                     employee_category_ids: policy.employee_category_ids || [],
                     evaluation_required: policy.evaluation_required ?? false,
-                    show_feedback_form_in_review: policy.show_feedback_form_in_review ?? false,
-                    share_feedback_with_employee: policy.share_feedback_with_employee ?? false,
-                    employee_response_allowed: policy.employee_response_allowed ?? false,
-                    reviewer_response_allowed: policy.reviewer_response_allowed ?? false,
-                    reviewer_recommendations_allowed: policy.reviewer_recommendations_allowed ?? false,
                     auto_confirm_probation: policy.auto_confirm_probation ?? false,
                     auto_generate_confirmation_letter: policy.auto_generate_confirmation_letter ?? false,
                     evaluation_milestones: (policy.evaluation_milestones || []).map(m => this.buildMilestonePayload(m)),
@@ -401,12 +377,6 @@ export const useProbationPolicyStore = defineStore('probationPolicy', {
             this.evaluation_required = false
             this.evaluation_milestones = [newMilestone(1, true)]
 
-            this.show_feedback_form_in_review = false
-            this.share_feedback_with_employee = false
-            this.employee_response_allowed = false
-            this.reviewer_response_allowed = false
-            this.reviewer_recommendations_allowed = false
-
             this.auto_confirm_probation = false
             this.auto_generate_confirmation_letter = false
         },
@@ -437,7 +407,6 @@ export const useProbationPolicyStore = defineStore('probationPolicy', {
                 is_final_milestone: Boolean(m.is_final_milestone),
                 automatic_trigger_enabled: Boolean(m.automatic_trigger_enabled),
                 trigger_after_days: m.trigger_after_days ?? null,
-                feedback_form_enabled: Boolean(m.feedback_form_enabled),
                 levels: (m.levels || []).map(l => ({
                     level_order: l.level_order || 0,
                     completion_rule: l.completion_rule || 'ALL',
@@ -453,12 +422,6 @@ export const useProbationPolicyStore = defineStore('probationPolicy', {
             if (!this.evaluation_milestones.length && this.evaluation_required) {
                 this.evaluation_milestones = [newMilestone(1, true)]
             }
-
-            this.show_feedback_form_in_review = policy.show_feedback_form_in_review ?? false
-            this.share_feedback_with_employee = policy.share_feedback_with_employee ?? false
-            this.employee_response_allowed = policy.employee_response_allowed ?? false
-            this.reviewer_response_allowed = policy.reviewer_response_allowed ?? false
-            this.reviewer_recommendations_allowed = policy.reviewer_recommendations_allowed ?? false
 
             this.auto_confirm_probation = policy.auto_confirm_probation ?? false
             this.auto_generate_confirmation_letter = policy.auto_generate_confirmation_letter ?? false

@@ -14,7 +14,6 @@ export const useDesignationStore = defineStore('designation', {
         organization_id: null,
         department_id: null,
         band_id: null,
-        band_list: [],
         loading: false,
         error: null,
         name: null,

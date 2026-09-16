@@ -72,7 +72,6 @@ const {
     description,
     department_id,
     designation_id,
-    band_id,
 } = storeToRefs(designationStore)
 
 const viewModal = ref(false)
@@ -105,7 +104,6 @@ const closeDepartmentModal = () => {
     department_id.value = null
     designation_level.value = null
     designation_id.value = null
-    band_id.value = null
     addUpdateModal.value = false
 }
 watch(page, () => {
@@ -132,9 +130,6 @@ const editDesignation = async (desig) => {
     designation_level.value = designationsList.find(d => d.value == desig.level)
     description.value = desig.description
     department_id.value = departments.value.find(d => d.value == desig.department_id)
-    band_id.value = desig.band?.id || desig.band_id
-        ? { value: desig.band?.id || desig.band_id, label: desig.band?.name || 'Band' }
-        : null
     designation_id.value = desig.id
     addUpdateModal.value = true
 }

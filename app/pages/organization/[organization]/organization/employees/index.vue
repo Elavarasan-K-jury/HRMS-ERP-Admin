@@ -19,12 +19,9 @@
                 <EmployeesProfileChangesTab />
             </div>
             <div v-show="activeTab === 3" class="mt-2">
-                <EmployeesPrivateProfilesTab />
-            </div>
-            <div v-show="activeTab === 4" class="mt-2">
                 <EmployeesProbationTab />
             </div>
-            <div v-show="activeTab === 5" class="mt-2">
+            <div v-show="activeTab === 4" class="mt-2">
                 <EmployeesSettingsTab />
             </div>
         </UiTabs>
@@ -32,20 +29,16 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref } from 'vue'
 
 definePageMeta({
     layout: 'organization',
 })
 
-const route = useRoute()
-
 const tabConfig = [
     { label: 'Employee Directory', icon: 'ion:person-outline' },
     { label: 'Organization Tree', icon: 'ion:git-network-outline' },
     { label: 'Profile Changes', icon: 'ion:swap-horizontal-outline' },
-    { label: 'Private Profiles', icon: 'ion:lock-closed-outline' },
     { label: 'Probation', icon: 'ion:time-outline' },
     { label: 'Settings', icon: 'ion:settings-outline' },
 ]

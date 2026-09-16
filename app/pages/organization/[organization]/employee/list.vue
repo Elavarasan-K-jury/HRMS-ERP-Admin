@@ -46,7 +46,6 @@ import { useDepartmentStore } from '../../../../stores/organization/department.s
 import { useBranchStore } from '../../../../stores/organization/branch.store';
 import { useLocationStore } from '../../../../stores/organization/location.store';
 import { useProbationPolicyStore } from '../../../../stores/organization/probationPolicy.store';
-import { useBandStore } from '../../../../stores/organization/band.store';
 import { useAuthStore } from '../../../../stores/shared/auth.store';
 import DataTable from '../../../../components/employee/dataTable.vue';
 import DetailedView from '../../../../components/employee/detailedView.vue';
@@ -72,7 +71,6 @@ const employeesStore = useEmployeesStore()
 const branchStore = useBranchStore()
 const locationStore = useLocationStore()
 const probationPolicyStore = useProbationPolicyStore()
-const bandStore = useBandStore()
 const deleteModal = ref(false)
 const deleteData = ref(null)
 
@@ -135,7 +133,6 @@ const {
     profile_image_file_id,
     cost_center_id,
     pay_grade_id,
-    band_id,
     notice_period_policy_id,
     relationships,
 } = storeToRefs(employeesStore)
@@ -174,7 +171,6 @@ const openAddModal = () => {
     profile_image_file_id.value = null
     cost_center_id.value = null
     pay_grade_id.value = null
-    band_id.value = null
     relationships.value = []
     formTitle.value = 'Add New Employee'
     addUpdateModal.value = true
@@ -197,7 +193,6 @@ const editEmployee = async (emp) => {
     await employeesStore.fetchAllEmployees()
     await employeesStore.fetchNumberSeries()
     await probationPolicyStore.fetchPolicies()
-    await bandStore.fetchBandList(organization_id.value).catch(() => {})
     branchStore.organization_id = organization_id.value
     await branchStore.fetchAllBranches()
     formTitle.value = 'Update Employee'
@@ -237,7 +232,6 @@ const editEmployee = async (emp) => {
     profile_image_file_id.value = emp.profile_image_file_id || null
     cost_center_id.value = emp.cost_center_id ? { value: emp.cost_center_id, label: emp.cost_center_name || 'Cost Center' } : null
     pay_grade_id.value = emp.pay_grade_id ? { value: emp.pay_grade_id, label: emp.pay_grade_name || 'Pay Grade' } : null
-    band_id.value = emp.band_id ? { value: emp.band_id, label: emp.band_name || 'Band' } : null
     notice_period_policy_id.value = emp.notice_period_policy_id ? { value: emp.notice_period_policy_id, label: emp.notice_period_policy_name || 'Notice Period Policy' } : null
     current_address.value = apiAddressToStore(emp.current_address)
     permanent_address.value = apiAddressToStore(emp.permanent_address)
@@ -328,7 +322,6 @@ const closeModal = () => {
     profile_image_file_id.value = null
     cost_center_id.value = null
     pay_grade_id.value = null
-    band_id.value = null
     relationships.value = []
     addUpdateModal.value = false
 }

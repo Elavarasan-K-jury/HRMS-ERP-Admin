@@ -21,7 +21,7 @@
         <template #footer>
             <UiButton :disabled="loading" @click="closeAddUpdateModal" color="#fff" text="Cancel"
                 prepend-icon="ion:close-circle" />
-            <UiButton :disabled="loading" @click="saveOnboarding" color="#4aff7a"
+            <UiButton :disabled="loading" @click="saveCategory" color="#4aff7a"
                 :text="!loading ? 'Save Employee Category' : 'Saving please wait...'" prepend-icon="ion:save-outline" />
         </template>
     </UiSidebarModal>
@@ -89,7 +89,7 @@ const closeAddUpdateModal = () => {
     formTitle.value = null
     addUpdateModal.value = false
 }
-const saveOnboarding = async () => {
+const saveCategory = async () => {
     await empCategoryStore.saveEmpCategory()
     closeAddUpdateModal()
 }

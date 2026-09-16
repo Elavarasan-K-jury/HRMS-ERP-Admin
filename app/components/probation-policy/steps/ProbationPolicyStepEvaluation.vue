@@ -205,56 +205,12 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Feedback form attachment -->
-                        <div class="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 mt-3 flex items-center justify-between gap-2">
-                            <div class="flex items-center gap-1.5">
-                                <span class="text-xs font-medium text-white/80">Attach a feedback form to this milestone</span>
-                                <UiInfoTip tip="Links a feedback form to this milestone. The feedback forms module is a separate feature — only the configuration is stored." />
-                            </div>
-                            <UiSwitch v-model="milestone.feedback_form_enabled" color="#4aff7a" size="sm" />
-                        </div>
                     </div>
                 </div>
 
                 <!-- Add milestone -->
                 <UiButton size="sm" color="#fff" text="Add new milestone" prepend-icon="lucide:calendar-plus"
                     class="mt-4" @click="store.addMilestone()" />
-            </section>
-
-            <!-- Other form settings -->
-            <section>
-                <div class="flex items-center gap-1.5 border-b border-white/10 pb-2 mb-3">
-                    <h3 class="text-white/90 font-semibold">Other Form Settings</h3>
-                    <UiInfoTip tip="Controls how the evaluation feedback form behaves across the review process and what the employee or reviewers can see and do." />
-                </div>
-                <div class="flex flex-col gap-3">
-                    <div class="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 flex items-center justify-between gap-2">
-                        <span class="text-xs text-white/80">Show feedback form in the review process</span>
-                        <UiSwitch v-model="show_feedback_form_in_review" color="#4aff7a" size="sm" />
-                    </div>
-                    <div class="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 flex items-center justify-between gap-2">
-                        <div>
-                            <span class="text-xs text-white/80">Share probation feedback with employee</span>
-                            <p class="text-[10px] text-white/40">Expose the settings below to the employee experience.</p>
-                        </div>
-                        <UiSwitch v-model="share_feedback_with_employee" color="#4aff7a" size="sm" />
-                    </div>
-                    <div v-if="share_feedback_with_employee" class="rounded-xl border border-white/10 bg-black/20 p-3 flex flex-col gap-2">
-                        <div class="flex items-center justify-between gap-2">
-                            <span class="text-xs text-white/75">Feedback form response by employee</span>
-                            <UiSwitch v-model="employee_response_allowed" color="#4aff7a" size="sm" />
-                        </div>
-                        <div class="flex items-center justify-between gap-2">
-                            <span class="text-xs text-white/75">Feedback form response by reviewers</span>
-                            <UiSwitch v-model="reviewer_response_allowed" color="#4aff7a" size="sm" />
-                        </div>
-                        <div class="flex items-center justify-between gap-2">
-                            <span class="text-xs text-white/75">Recommendations by reviewers</span>
-                            <UiSwitch v-model="reviewer_recommendations_allowed" color="#4aff7a" size="sm" />
-                        </div>
-                    </div>
-                </div>
             </section>
         </template>
     </div>
@@ -274,11 +230,6 @@ const {
     evaluation_milestones,
     duration_value,
     duration_unit,
-    show_feedback_form_in_review,
-    share_feedback_with_employee,
-    employee_response_allowed,
-    reviewer_response_allowed,
-    reviewer_recommendations_allowed,
 } = storeToRefs(store)
 
 const milestones = evaluation_milestones

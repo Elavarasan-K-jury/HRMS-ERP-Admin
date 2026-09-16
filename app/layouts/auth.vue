@@ -18,7 +18,7 @@
         </div>
 
         <!-- Sidebar -->
-        <UiSidebar v-if="!preloader" :menu-items="activeMenu" :title="title" :titleShort="titleShort" :show-payment="showPaymentGate" :payment-url="paymentUrl" />
+        <UiSidebar v-if="!preloader" :menu-items="activeMenu" :title="title" :titleShort="titleShort" />
 
         <UiColorSidebar />
 
@@ -26,12 +26,7 @@
         <div v-if="!preloader" :class="sidebar ? 'ml-[250px]' : 'ml-[85px]'" class="transition-all duration-300">
             <UiHeader :breadcrumbs="breadcrumbs" @toggleSidebar="toggleSidebar" />
 
-            <!-- Employee payment gate (only for employee portal, not super admin) -->
-            <div v-if="showPaymentGate && !paymentRoute"
-                class="p-2 w-full mt-[60px] h-[calc(100vh-4rem)] flex items-center justify-center">
-                <UiPaymentDue :payment-url="paymentUrl" :title="title" :employee="!user?.admin_of_organization" />
-            </div>
-            <main v-else class="mt-[60px] text-white">
+            <main class="mt-[60px] text-white">
                 <slot />
             </main>
         </div>
@@ -47,7 +42,6 @@
 import { menu } from '../data/menu'
 import { useThemeStore } from '../stores/shared/theme.store'
 import { useAuthStore } from '../stores/shared/auth.store'
-import { useOrganizationSubscriptionStore } from '../stores/shared/organizationSubscription.store'
 import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -72,24 +66,6 @@ const titleShort = computed(() => {
     } else {
         return nameSplitted.map(e => e[0]).join('')
     }
-})
-
-const paymentRoute = computed(() => {
-    return route.fullPath === `/organization/${authStore.organization}/expenses/subscription`
-})
-
-const paid = computed(() => {
-    const orgSubStore = useOrganizationSubscriptionStore()
-    return !orgSubStore.pendingPayment || !orgSubStore.trialEnded
-})
-
-const showPaymentGate = computed(() => {
-    if (!isEmployee.value) return false
-    return !paid.value
-})
-
-const paymentUrl = computed(() => {
-    return `/organization/${authStore.organization}/expenses/subscription`
 })
 
 const activeMenu = computed(() => {

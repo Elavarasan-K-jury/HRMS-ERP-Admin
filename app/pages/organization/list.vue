@@ -143,21 +143,7 @@
                 </div>
 
                 <!-- Limits -->
-                <span class="col-span-12 text-xl font-semibold text-white/80 mt-4">Plan & Limits</span>
-
-                <div class="col-span-6 w-full flex flex-col gap-1 items-start">
-                    <label class="text-sm text-white/80" for="maxEmployees">Subscription Plan:</label>
-                    <FormSelect id="plan" class="w-full" color="#fff" v-model="plan" :options="plans"
-                        placeholder="Select Plan" size="lg" rounded="lg" prepend-icon="heroicons:currency-rupee"
-                        searchable />
-                </div>
-
-                <div class="col-span-6 w-full flex flex-col gap-1 items-start">
-                    <label class="text-sm text-white/80" for="maxEmployees">Payment Duration:</label>
-                    <FormSelect id="plan" class="w-full" color="#fff" v-model="planDuration"
-                        :options="['Monthly', 'Yearly']" placeholder="Select Plan" size="lg" rounded="lg"
-                        prepend-icon="heroicons:clock" searchable />
-                </div>
+                <span class="col-span-12 text-xl font-semibold text-white/80 mt-4">Limits</span>
 
                 <div class="col-span-6 w-full flex flex-col gap-1 items-start">
                     <label class="text-sm text-white/80" for="maxEmployees">Max Employees:</label>
@@ -234,8 +220,6 @@ import { onMounted, ref, watch, computed } from 'vue'
 import { industries } from '../../constants/industries'
 import { countries } from '../../constants/countries'
 import { useOrganizationStore } from '../../stores/organization/organization.store'
-import { useSubscriptionPlanStore } from '../../stores/super-admin/subscription-plan.store'
-import { useOrganizationSubscriptionStore } from '../../stores/shared/organizationSubscription.store'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 
@@ -245,8 +229,6 @@ definePageMeta({
 })
 
 const organizationStore = useOrganizationStore()
-const subscriptionPlanStore = useSubscriptionPlanStore()
-const organizationSubscriptionStore = useOrganizationSubscriptionStore()
 const toast = useToast()
 
 // ─── UI State ────────────────────────────────
@@ -255,8 +237,6 @@ const deleteOpen = ref(false)
 const title = ref('Add New Organization')
 const industry = ref(null)
 const country = ref(null)
-const plan = ref(null)
-const planDuration = ref(null)
 const search = ref('')
 const timer = ref(null)
 
@@ -264,40 +244,6 @@ const timer = ref(null)
 const { create, editId, editData, deleteId, deleteData, meta, loading } = storeToRefs(organizationStore)
 const organizations = computed(() => organizationStore.organizations)
 const totalOrganizations = computed(() => organizationStore.meta.total)
-const plans = computed(() => subscriptionPlanStore.plan_list.map(e => ({
-    value: e.id,
-    label: e.name
-})))
-
-watch(plan, (val) => {
-    if (val) {
-        const planDetails = subscriptionPlanStore.plan_list.find(e => e.id == val.value)
-        const planFeatures = planDetails.features
-        create.value = {
-            ...create.value,
-            limits: {
-                maxEmployees: planFeatures.find(e => e.key == 'max_employees').value,
-                storageGb: planFeatures.find(e => e.key == 'storage_gb').value,
-                apiRatePerMinute: planFeatures.find(e => e.key == 'api_rate_per_minute').value,
-                payrollRunsPerMonth: planFeatures.find(e => e.key == 'payroll_runs_per_month').value,
-                maxLeavePolicies: planFeatures.find(e => e.key == 'max_leave_policies').value,
-                maxAdmins: planFeatures.find(e => e.key == 'max_admin_accounts').value,
-            }
-        }
-    } else {
-        create.value = {
-            ...create.value,
-            limits: {
-                maxEmployees: null,
-                storageGb: null,
-                apiRatePerMinute: null,
-                payrollRunsPerMonth: null,
-                maxLeavePolicies: null,
-                maxAdmins: null,
-            }
-        }
-    }
-})
 
 // ─── Watchers ────────────────────────────────
 watch(search, (val) => {
@@ -320,8 +266,6 @@ function resetCreate() {
         contact_person_number: null,
         industry: null,
         size: null,
-        plan: null,
-        planDuration: null,
         admin_email: null,
         admin_phone: null,
         address: {
@@ -350,7 +294,6 @@ function resetCreate() {
 
 async function openOrganizationModal() {
     await resetCreate()
-    await subscriptionPlanStore.fetchPlansForSelect()
     title.value = 'Add New Organization'
     open.value = true
 }
@@ -372,10 +315,8 @@ async function saveOrganization() {
     }
 
     create.value.industry = industry.value.label
-    create.value.plan = plan.value?.value ?? null
     create.value.address.country = country.value.label
     create.value.size = Number(create.value.size || 0)
-    create.value.plan_duration = planDuration.value
 
     let resp
     if (editId.value) {
@@ -390,7 +331,6 @@ async function saveOrganization() {
 const structuredClone = (obj) => JSON.parse(JSON.stringify(obj))
 
 async function edit(org) {
-    await subscriptionPlanStore.fetchPlansForSelect()
     console.log('list.vue @ Line 220:', org);
     editId.value = org.id
     editData.value = structuredClone(org)
@@ -400,13 +340,6 @@ async function edit(org) {
     create.value.admin_phone = org.admin_phone ?? null
     industry.value = industries.find(i => i.label.toUpperCase() === org.industry?.toUpperCase())
     country.value = countries.find(c => c.label.toUpperCase() === org.address?.country?.toUpperCase())
-    const subscription = await organizationSubscriptionStore.fetchOrganizationSubscription(org.id)
-
-    plan.value = subscription ? {
-        value: subscription.plan_id,
-        label: subscription.plan_name
-    } : null
-    planDuration.value = subscription ? ['Monthly', 'Yearly'].find(e => e.toUpperCase() == subscription.billing_interval) : null
     create.value.limits = {
         maxEmployees: org.max_employees,
         storageGb: org.max_storage_in_gb,

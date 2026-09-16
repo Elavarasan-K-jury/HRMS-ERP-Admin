@@ -62,7 +62,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
         if (to.path.startsWith('/organization/')) {
             return navigateTo(authStore.defaultRoute, { replace: true })
         }
-        const superAdminOnlyPaths = ['/modules', '/plans', '/settings/admins', '/settings/roles', '/settings/audit-logs', '/organization/list', '/reports/traffic', '/reports/usage']
+        const superAdminOnlyPaths = ['/modules', '/settings/admins', '/settings/roles', '/settings/audit-logs', '/organization/list', '/reports/traffic', '/reports/usage']
         if (superAdminOnlyPaths.some(p => to.path.startsWith(p))) {
             return navigateTo(authStore.defaultRoute, { replace: true })
         }

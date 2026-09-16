@@ -14,7 +14,7 @@ export function encryptData(data, secretKey) {
 /**
  * Download encrypted data as a custom file
  */
-export function downloadEncrypted(data, secretKey, fileName = "onboarding-flow") {
+export function downloadEncrypted(data, secretKey, fileName = "data-export") {
     console.log('encrypt-download.js @ Line 18:', data, secretKey, fileName);
     const encrypted = encryptData(data, secretKey);
 

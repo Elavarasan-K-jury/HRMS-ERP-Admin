@@ -40,6 +40,21 @@ export const employee_menu = (org_id, employee_id) => {
             ],
         },
 
+                {
+            group: 'Time Attend',
+            items: [
+                {
+                    label: 'Time Attend',
+                    path: `/organization/${org_id}/employee/${employee_id}/attendance`,
+                    icon: 'ion:clock',
+                    children: [
+                        { label: 'Attendance Tracking', path: `/organization/${org_id}/employee/${employee_id}/attendance`, icon: 'ion:clock' },
+                        { label: 'Leaves', path: `/organization/${org_id}/employee/${employee_id}/leaves`, icon: 'ion:calendar' },
+                    ],
+                },
+            ],
+        },
+
         {
             group: 'Org Structure',
             items: [
@@ -54,17 +69,6 @@ export const employee_menu = (org_id, employee_id) => {
                         { label: 'Designations', path: `/organization/${org_id}/employee/${employee_id}/org-structure/designations`, icon: 'ion:briefcase-outline' },
                         { label: 'Hierarchy', path: `/organization/${org_id}/employee/${employee_id}/org-structure/hierarchy`, icon: 'ion:people-outline' },
                     ],
-                },
-            ],
-        },
-
-        {
-            group: 'Onboarding',
-            items: [
-                {
-                    label: 'Onboarding',
-                    path: `/organization/${org_id}/employee/${employee_id}/onboarding`,
-                    icon: 'ion:person-add-outline',
                 },
             ],
         },
@@ -118,21 +122,6 @@ export const employee_menu = (org_id, employee_id) => {
         },
 
         {
-            group: 'Assets',
-            items: [
-                {
-                    label: 'Assets',
-                    path: `/organization/${org_id}/employee/${employee_id}/assets`,
-                    icon: 'ion:laptop-outline',
-                    children: [
-                        { label: 'Assigned Assets', path: `/organization/${org_id}/employee/${employee_id}/assets/assigned`, icon: 'ion:desktop-outline' },
-                        { label: 'Asset Requests', path: `/organization/${org_id}/employee/${employee_id}/assets/requests`, icon: 'ion:document-text-outline' },
-                    ],
-                },
-            ],
-        },
-
-        {
             group: 'My Finance',
             items: [
                 {
@@ -143,37 +132,6 @@ export const employee_menu = (org_id, employee_id) => {
                         { label: 'Summary', path: `/organization/${org_id}/employee/${employee_id}/my-finance/summary`, icon: 'ion:stats-chart-outline' },
                         { label: 'My Pay', path: `/organization/${org_id}/employee/${employee_id}/my-finance/my-pay`, icon: 'ion:cash-outline' },
                         { label: 'Manage Tax', path: `/organization/${org_id}/employee/${employee_id}/my-finance/manage-tax`, icon: 'heroicons:percent-badge' },
-                    ]
-                }
-            ]
-        },
-
-        {
-            group: 'Time Attend',
-            items: [
-                {
-                    label: 'Time Attend',
-                    path: `/organization/${org_id}/employee/${employee_id}/attendance`,
-                    icon: 'ion:clock',
-                    children: [
-                        { label: 'Attendance Tracking', path: `/organization/${org_id}/employee/${employee_id}/attendance`, icon: 'ion:clock' },
-                        { label: 'Leaves', path: `/organization/${org_id}/employee/${employee_id}/leaves`, icon: 'ion:calendar' },
-                    ],
-                },
-            ],
-        },
-
-        {
-            group: 'Engage',
-            items: [
-                {
-                    label: 'Engage',
-                    path: `/organization/${org_id}/employee/${employee_id}/engage`,
-                    icon: 'ion:chatbubble-ellipses-outline',
-                    children: [
-                        { label: 'Announcements', path: `/organization/${org_id}/employee/${employee_id}/engage/announcements`, icon: 'ion:megaphone-outline' },
-                        { label: 'Polls', path: `/organization/${org_id}/employee/${employee_id}/engage/polls`, icon: 'ion:bar-chart-outline' },
-                        { label: 'Articles', path: `/organization/${org_id}/employee/${employee_id}/engage/articles`, icon: 'ion:newspaper-outline' },
                     ]
                 }
             ]
@@ -237,32 +195,37 @@ export const organization_menu = (org_id) => {
                         { label: 'Designations', path: `/organization/${org_id}/designations`, icon: 'ion:briefcase-outline', permission: 'orgnaization.designations.view' },
                         { label: 'Hierarchy', path: `/organization/${org_id}/hierarchy`, icon: 'ion:people-outline', permission: 'orgnaization.hierarchy.view' },
                         { label: 'Pay Grades', path: `/organization/${org_id}/org-structure/pay-grades`, icon: 'heroicons:currency-dollar' },
-                        { label: 'Bands', path: `/organization/${org_id}/org-structure/bands`, icon: 'ion:git-branch-outline' },
                         { label: 'Legal Entities', path: `/organization/${org_id}/org-structure/legal-entities`, icon: 'heroicons:building-office' },
                         { label: 'Location', path: `/organization/${org_id}/org-structure/locations`, icon: 'heroicons:map-pin' },
-                        { label: 'Cost Center', path: `/organization/${org_id}/org-structure/cost-centers`, icon: 'lucide:coins' },
                     ],
                 },
             ],
         },
 
-        // 4. Onboarding
+                // 11. Attendance as Time Attend
         {
-            group: 'Onboarding',
+            group: 'Time Attend',
             items: [
                 {
-                    label: 'Onboarding',
-                    path: `/organization/${org_id}/employee/onboarding`,
-                    icon: 'ion:person-add-outline',
+                    label: 'Time Attend',
+                    path: `/organization/${org_id}/attendance`,
+                    icon: 'ion:clock',
                     children: [
-                        { label: 'Onboarding Tasks', path: `/organization/${org_id}/employee/onboarding`, icon: 'ion:person-add-outline', permission: 'employees.view' },
-                        { label: 'Task Templates', path: `/organization/${org_id}/onboarding/task-templates`, icon: 'ion:document-outline' },
+                        { label: 'Attendance Tracking', path: `/organization/${org_id}/attendance`, icon: 'ion:clock', permission: 'attendance.view' },
+                        { label: 'Attendance Policy', path: `/organization/${org_id}/attendance/policy`, icon: 'ion:document-text-outline', permission: 'attendance.view' },
+                        { label: 'Attendance Report', path: `/organization/${org_id}/attendance/report`, icon: 'ion:document-text-outline', permission: 'attendance.view' },
+                        { label: 'Approvals', path: `/organization/${org_id}/attendance/approvals`, icon: 'heroicons:check-circle' },
+                        { label: 'Shifts/Weekly Offs', path: `/organization/${org_id}/attendance/shifts`, icon: 'ion:calendar-outline' },
+                        { label: 'Overtime', path: `/organization/${org_id}/attendance/overtime`, icon: 'ion:time-outline' },
+                        { label: 'Leaves', path: `/organization/${org_id}/leave`, icon: 'ion:calendar', permission: 'leave.view' },
+                        { label: 'Reports', path: `/organization/${org_id}/attendance/reports`, icon: 'ion:stats-chart-outline' },
+                        { label: 'Settings', path: `/organization/${org_id}/attendance/settings`, icon: 'ion:cog-outline' },
                     ],
                 },
             ],
         },
 
-        // 5. Exits (New)
+        // 4. Exits (New)
         {
             group: 'Exits',
             items: [
@@ -295,7 +258,6 @@ export const organization_menu = (org_id) => {
                     children: [
                         { label: 'Summary', path: `/organization/${org_id}/expense-travels/summary`, icon: 'ion:stats-chart-outline' },
                         { label: 'Expenses', path: `/organization/${org_id}/expense-travels/expenses`, icon: 'ion:card-outline' },
-                        { label: 'Subscriptions', path: `/organization/${org_id}/expenses/subscription`, icon: 'heroicons:currency-rupee' },
                         { label: 'Advances', path: `/organization/${org_id}/expense-travels/advances`, icon: 'ion:cash-outline' },
                         { label: 'Policies and Settings', path: `/organization/${org_id}/expense-travels/policies`, icon: 'ion:document-text-outline' },
                         { label: 'Reports and Invoices', path: `/organization/${org_id}/expense-travels/reports-invoices`, icon: 'ion:document-text-outline' },
@@ -321,29 +283,7 @@ export const organization_menu = (org_id) => {
             ],
         },
 
-        // 8. Assets
-        {
-            group: 'Assets',
-            items: [
-                {
-                    label: 'Assets',
-                    path: '/assets',
-                    icon: 'ion:laptop-outline',
-                    children: [
-                        { label: 'Summary', path: `/organization/${org_id}/assets/summary`, icon: 'ion:stats-chart-outline' },
-                        { label: 'Assigned Assets', path: `/organization/${org_id}/assets/assigned`, icon: 'ion:desktop-outline' },
-                        { label: 'Asset Requests', path: `/organization/${org_id}/assets/requests`, icon: 'ion:document-text-outline' },
-                        { label: 'Asset Categories', path: `/organization/${org_id}/assets/categories`, icon: 'heroicons:squares-plus' },
-                        { label: 'Asset Models', path: `/organization/${org_id}/assets/models`, icon: 'heroicons:rectangle-group' },
-                        { label: 'Asset Acknowledgement', path: `/organization/${org_id}/assets/acknowledgement`, icon: 'ion:checkmark-circle-outline' },
-                        { label: 'Reports', path: `/organization/${org_id}/assets/reports`, icon: 'ion:document-text-outline' },
-                        { label: 'Settings', path: `/organization/${org_id}/assets/settings`, icon: 'ion:cog-outline' },
-                    ],
-                },
-            ],
-        },
-
-        // 10. Payroll as My Finance
+        // 8. Payroll as My Finance
         {
             group: 'My Finance',
             items: [
@@ -359,49 +299,6 @@ export const organization_menu = (org_id) => {
                         { label: 'Payslips', path: '/payroll/payslips', icon: 'ion:receipt-outline' },
                         { label: 'Bonuses', path: '/payroll/bonuses', icon: 'ion:gift-outline' },
                         { label: 'Settings', path: `/organization/${org_id}/payroll/settings`, icon: 'ion:cog' },
-                    ],
-                },
-            ],
-        },
-
-        // 11. Attendance as Time Attend
-        {
-            group: 'Time Attend',
-            items: [
-                {
-                    label: 'Time Attend',
-                    path: `/organization/${org_id}/attendance`,
-                    icon: 'ion:clock',
-                    children: [
-                        { label: 'Attendance Tracking', path: `/organization/${org_id}/attendance`, icon: 'ion:clock', permission: 'attendance.view' },
-                        { label: 'Attendance Policy', path: `/organization/${org_id}/attendance/policy`, icon: 'ion:document-text-outline', permission: 'attendance.view' },
-                        { label: 'Attendance Report', path: `/organization/${org_id}/attendance/report`, icon: 'ion:document-text-outline', permission: 'attendance.view' },
-                        { label: 'Approvals', path: `/organization/${org_id}/attendance/approvals`, icon: 'heroicons:check-circle' },
-                        { label: 'Shifts/Weekly Offs', path: `/organization/${org_id}/attendance/shifts`, icon: 'ion:calendar-outline' },
-                        { label: 'Overtime', path: `/organization/${org_id}/attendance/overtime`, icon: 'ion:time-outline' },
-                        { label: 'Leaves', path: `/organization/${org_id}/leave`, icon: 'ion:calendar', permission: 'leave.view' },
-                        { label: 'Reports', path: `/organization/${org_id}/attendance/reports`, icon: 'ion:stats-chart-outline' },
-                        { label: 'Settings', path: `/organization/${org_id}/attendance/settings`, icon: 'ion:cog-outline' },
-                    ],
-                },
-            ],
-        },
-
-        // 12. Performance as Engage
-        {
-            group: 'Engage',
-            items: [
-                {
-                    label: 'Engage',
-                    path: '/engage',
-                    icon: 'ion:chatbubble-ellipses-outline',
-                    children: [
-                        { label: 'Announcements', path: `/organization/${org_id}/engage/announcements`, icon: 'ion:megaphone-outline' },
-                        { label: 'Survey', path: `/organization/${org_id}/engage/survey`, icon: 'ion:document-text-outline' },
-                        { label: 'Pulse', path: `/organization/${org_id}/engage/pulse`, icon: 'ion:pulse-outline' },
-                        { label: 'Polls', path: `/organization/${org_id}/engage/polls`, icon: 'ion:bar-chart-outline' },
-                        { label: 'Wall Settings', path: `/organization/${org_id}/engage/wall-settings`, icon: 'ion:cog-outline' },
-                        { label: 'Articles', path: `/organization/${org_id}/engage/articles`, icon: 'ion:newspaper-outline' },
                     ],
                 },
             ],
@@ -467,7 +364,7 @@ export const menu = [
         items: [
             { label: 'Dashboard', path: '/', icon: 'ion:pie-chart' },
         ]
-    }, {
+    },     {
         group: 'Tenants',
         items: [
             {
@@ -476,25 +373,6 @@ export const menu = [
                 icon: 'ion:business',
                 permission: 'super.organization.manage',
             },
-            {
-                label: 'Plans',
-                path: '/Plans',
-                icon: 'heroicons:receipt-percent',
-                permission: 'super.organization.manage',
-            },
-        ],
-    },
-
-    {
-        group: 'Billing',
-        items: [
-            {
-                label: 'Invoices',
-                path: '/invoices',
-                icon: 'ion:document-text',
-                permission: 'super.organization.manage',
-            },
-            { label: 'Payments', path: '/payments', icon: 'ion:cash', permission: 'super.organization.manage' },
         ],
     },
 
@@ -514,7 +392,6 @@ export const menu = [
         group: 'Reports & Analytics',
         items: [
             { label: 'Traffic Reports', path: '/reports/traffic', icon: 'heroicons:chart-pie', permission: 'reports.view' },
-            { label: 'Payment Reports', path: '/reports/payments', icon: 'heroicons:currency-dollar', permission: 'reports.view' },
             { label: 'Usage Reports', path: '/reports/usage', icon: 'heroicons:chart-bar', permission: 'reports.view' },
         ],
     },
@@ -537,23 +414,9 @@ export const menu = [
     },
 ]
 
-export const getMenu = (admin = false, org_id, subscriptionPaid = false, moduleKeys = [], permissionKeys = []) => {
+export const getMenu = (admin = false, org_id, moduleKeys = [], permissionKeys = []) => {
     if (admin) {
-        return !subscriptionPaid ? [
-            {
-                group: 'Payroll & Finance',
-                items: [
-                    {
-                        label: 'Expenses',
-                        path: '/expenses',
-                        icon: 'ion:cash',
-                        children: [
-                            { label: 'Subscription', path: `/organization/${org_id}/expenses/subscription`, icon: 'heroicons:currency-rupee' },
-                        ],
-                    },
-                ],
-            },
-        ] : [
+        return [
             {
                 group: 'Core HR',
                 items: [
@@ -576,7 +439,6 @@ export const getMenu = (admin = false, org_id, subscriptionPaid = false, moduleK
                         children: [
                             { label: 'Employees', path: `/organization/${org_id}/employee/list`, icon: 'ion:person-outline' },
                             { label: 'Employee Categories', path: `/organization/${org_id}/employee/categories`, icon: 'ion:albums-outline' },
-                            { label: 'Onboarding', path: `/organization/${org_id}/employee/onboarding`, icon: 'ion:person-add-outline' },
                             { label: 'Permissions', path: `/organization/${org_id}/employee/permissions`, icon: 'heroicons:lock-closed' },
                         ],
                     },
@@ -614,8 +476,6 @@ export const getMenu = (admin = false, org_id, subscriptionPaid = false, moduleK
                         path: '/expenses',
                         icon: 'ion:cash',
                         children: [
-                            { label: 'Subscription', path: `/organization/${org_id}/expenses/subscription`, icon: 'heroicons:currency-rupee' },
-                            { label: 'Invoices', path: `/organization/${org_id}/expenses/invoices`, icon: 'heroicons:document-currency-rupee' },
                             { label: 'Office Expenses', path: `/organization/${org_id}/expenses/office`, icon: 'heroicons:currency-rupee' },
                             { label: 'Other Expenses', path: `/organization/${org_id}/expenses/other`, icon: 'heroicons:document-currency-rupee' },
                         ],
@@ -633,27 +493,8 @@ export const getMenu = (admin = false, org_id, subscriptionPaid = false, moduleK
                         children: [
                             { label: 'Appraisals', path: '/performance/appraisals', icon: 'ion:stats-chart-outline' },
                             { label: 'Goals & KPIs', path: '/performance/goals', icon: 'ion:flag-outline' },
-                            { label: 'Feedback', path: '/performance/feedback', icon: 'ion:chatbubble-ellipses-outline' },
                         ],
                     },
-                    { label: 'Onboarding', path: '/onboarding', icon: 'ion:person-add' },
-                ],
-            },
-            {
-                group: 'Operations',
-                items: [
-                    {
-                        label: 'Asset Management',
-                        path: '/assets',
-                        icon: 'ion:laptop-outline',
-                        children: [
-                            { label: 'Asset Categories', path: `/organization/${org_id}/assets/categories`, icon: 'heroicons:squares-plus' },
-                            { label: 'Asset Models', path: `/organization/${org_id}/assets/models`, icon: 'heroicons:rectangle-group' },
-                            { label: 'Assets', path: `/organization/${org_id}/assets`, icon: 'ion:desktop-outline' },
-                            { label: 'Asset Requests', path: `/organization/${org_id}/assets/requests`, icon: 'ion:document-text-outline' },
-                        ],
-                    },
-                    { label: 'Employee Self-Service', path: '/ess', icon: 'ion:person-circle' },
                 ],
             },
             {
@@ -715,7 +556,7 @@ export const getMenu = (admin = false, org_id, subscriptionPaid = false, moduleK
             },
         ]
     } else {
-        return !subscriptionPaid ? [] : [
+        return [
             {
                 group: 'Home',
                 items: [
@@ -771,16 +612,6 @@ export const getMenu = (admin = false, org_id, subscriptionPaid = false, moduleK
                 ],
             },
             {
-                group: 'Onboarding',
-                items: [
-                    {
-                        label: 'Onboarding',
-                        path: `/organization/${org_id}/employee/onboarding`,
-                        icon: 'ion:person-add-outline',
-                    },
-                ],
-            },
-            {
                 group: 'Exits',
                 items: [
                     {
@@ -826,20 +657,6 @@ export const getMenu = (admin = false, org_id, subscriptionPaid = false, moduleK
                 ],
             },
             {
-                group: 'Assets',
-                items: [
-                    {
-                        label: 'Assets',
-                        path: '/employee/assets',
-                        icon: 'ion:laptop-outline',
-                        children: [
-                        { label: 'Assigned Assets', path: `/organization/${org_id}/assets/assigned`, icon: 'ion:desktop-outline' },
-                            { label: 'Asset Requests', path: `/organization/${org_id}/assets/requests`, icon: 'ion:document-text-outline' },
-                        ],
-                    },
-                ],
-            },
-            {
                 group: 'My Finance',
                 items: [
                     {
@@ -867,21 +684,6 @@ export const getMenu = (admin = false, org_id, subscriptionPaid = false, moduleK
                         ],
                     },
                 ],
-            },
-            {
-                group: 'Engage',
-                items: [
-                    {
-                        label: 'Engage',
-                        path: '/employee/engage',
-                        icon: 'ion:chatbubble-ellipses-outline',
-                        children: [
-                            { label: 'Announcements', path: '/employee/engage/announcements', icon: 'ion:megaphone-outline' },
-                            { label: 'Polls', path: '/employee/engage/polls', icon: 'ion:bar-chart-outline' },
-                            { label: 'Articles', path: '/employee/engage/articles', icon: 'ion:newspaper-outline' },
-                        ]
-                    }
-                ]
             },
             {
                 group: 'Reports & Analytics',

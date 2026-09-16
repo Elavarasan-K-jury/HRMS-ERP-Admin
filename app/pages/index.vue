@@ -10,16 +10,10 @@
                     <SuperAdminChartsPlatformOrgGrowth class="h-full w-full" />
                 </div>
                 <div class="col-span-12 lg:col-span-6">
-                    <SuperAdminChartsPlatformRevenueTrends class="h-full w-full" />
-                </div>
-                <div class="col-span-12 lg:col-span-7">
                     <SuperAdminChartsPlatformUsageByModule class="h-full w-full" />
                 </div>
-                <div class="col-span-12 lg:col-span-5">
+                <div class="col-span-12 lg:col-span-6">
                     <SuperAdminChartsPlatformTopOrgs class="h-full w-full" />
-                </div>
-                <div class="col-span-12">
-                    <SuperAdminChartsPlatformSubscriptionRisk class="h-full w-full" />
                 </div>
             </div>
         </div>

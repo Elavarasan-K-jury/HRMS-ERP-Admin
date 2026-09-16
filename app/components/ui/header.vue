@@ -279,7 +279,7 @@ function markAllRead() { notifications.value.forEach(n => (n.unread = false)) }
 const balance = ref(12450)
 const transactions = ref([
     { id: 1, title: 'Deposit', time: 'Today 3:45 PM', amount: 2500, icon: 'ion:cash-outline' },
-    { id: 2, title: 'Subscription Renewal', time: 'Yesterday 9:10 AM', amount: -799, icon: 'ion:card-outline' },
+    { id: 2, title: 'Reimbursement', time: 'Yesterday 9:10 AM', amount: 799, icon: 'ion:card-outline' },
 ])
 function addFunds() {
     balance.value += 1000

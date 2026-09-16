@@ -26,7 +26,6 @@
                 <ProfileTab v-else-if="activeTab === 'profile'" :employee="employee" @updated="loadEmployee" />
                 <JobTab v-else-if="activeTab === 'job'" :employee="employee" />
                 <DocumentsTab v-else-if="activeTab === 'documents'" :employee="employee" />
-                <AssetsTab v-else-if="activeTab === 'assets'" :employee="employee" />
             </div>
         </div>
     </div>
@@ -46,7 +45,6 @@ import AboutTab from '../../components/employee/profile/AboutTab.vue'
 import ProfileTab from '../../components/employee/profile/ProfileTab.vue'
 import JobTab from '../../components/employee/profile/JobTab.vue'
 import DocumentsTab from '../../components/employee/profile/DocumentsTab.vue'
-import AssetsTab from '../../components/employee/profile/AssetsTab.vue'
 
 definePageMeta({ layout: 'auth' })
 
@@ -59,7 +57,7 @@ const employee = ref(null)
 const loading = ref(true)
 const error = ref(null)
 
-const VALID_TABS = ['about', 'profile', 'job', 'documents', 'assets']
+const VALID_TABS = ['about', 'profile', 'job', 'documents']
 const activeTab = ref(VALID_TABS.includes(route.query.tab) ? route.query.tab : 'about')
 
 const setTab = (tab) => {

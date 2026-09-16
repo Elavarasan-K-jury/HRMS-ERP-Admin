@@ -200,42 +200,6 @@
                 placeholder="Designation" />
         </div>
         <div class="col-span-6 w-full flex flex-col items-start">
-            <p class="text-md text-white/80" for="Band">
-                Band:
-            </p>
-            <FormSelect id="band" class="w-full" color="#fff" prepend-icon="ion:git-branch-outline"
-                v-model="band_id" :options="bandOptions" searchable size="md" rounded="lg"
-                placeholder="Select Band" clearable :disabled="bandLockedByDesignation" />
-            <div v-if="selectedBand"
-                class="mt-1.5 w-full rounded-lg border border-emerald-300/20 bg-emerald-400/10 px-3 py-2 text-xs text-emerald-200/90 leading-relaxed">
-                <div class="flex items-start gap-1.5">
-                    <Icon name="ion:git-branch-outline" class="w-3.5 h-3.5 mt-0.5 shrink-0" />
-                    <div class="min-w-0 flex-1">
-                        <div class="flex items-center gap-1.5 flex-wrap">
-                            <span class="font-semibold text-emerald-100">{{ selectedBand.name }}</span>
-                            <span v-if="bandLockedByDesignation"
-                                class="text-[10px] uppercase tracking-wider text-emerald-300/70">
-                                derived from designation
-                            </span>
-                        </div>
-                        <p v-if="selectedBand.description" class="mt-1" :class="bandDescExpanded ? '' : 'line-clamp-2'">
-                            {{ selectedBand.description }}
-                        </p>
-                        <button v-if="descriptionTruncates" type="button" @click="bandDescExpanded = !bandDescExpanded"
-                            class="mt-1 text-emerald-300 hover:text-emerald-100 underline underline-offset-2">
-                            {{ bandDescExpanded ? 'Show less' : 'Show more' }}
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <p v-else-if="bandLockedByDesignation" class="mt-1.5 w-full rounded-lg border border-emerald-300/20 bg-emerald-400/10 px-3 py-1.5 text-xs text-emerald-200/90 leading-relaxed">
-                <Icon name="lucide:info" class="w-3.5 h-3.5 inline-block -mt-0.5 mr-1" />
-                {{ designationHasBand
-                    ? 'Band is derived from the selected designation and cannot be changed here.'
-                    : 'This designation has no band mapped. The employee will be saved without a band.' }}
-            </p>
-        </div>
-        <div class="col-span-6 w-full flex flex-col items-start">
             <p class="text-md text-white/80" for="Department Name">
                 Reporting Manager:
             </p>
@@ -258,14 +222,6 @@
             <FormSelect id="location_id" class="w-full" color="#fff" prepend-icon="ion:location-outline"
                 v-model="location_id" :options="locationOptions" searchable size="md" rounded="lg"
                 placeholder="Select Location" />
-        </div>
-        <div class="col-span-6 w-full flex flex-col items-start">
-            <p class="text-md text-white/80" for="Cost Center">
-                Cost Center:
-            </p>
-            <FormSelect id="cost_center" class="w-full" color="#fff" prepend-icon="lucide:coins"
-                v-model="cost_center_id" :options="costCenterOptions" searchable size="md" rounded="lg"
-                placeholder="Select Cost Center" clearable />
         </div>
         <div class="col-span-6 w-full flex flex-col items-start">
             <p class="text-md text-white/80" for="Pay Grade">
@@ -626,9 +582,7 @@ import { useEmployeesStore } from '../../stores/organization/employee.store';
 import { useBranchStore } from '../../stores/organization/branch.store';
 import { useLocationStore } from '../../stores/organization/location.store';
 import { useProbationPolicyStore } from '../../stores/organization/probationPolicy.store';
-import { useCostCenterStore } from '../../stores/organization/costCenter.store';
 import { usePayGradeStore } from '../../stores/organization/payGrade.store';
-import { useBandStore } from '../../stores/organization/band.store';
 import { useNoticePeriodStore } from '../../stores/organization/noticePeriod.store';
 import { calculateProbationEndDate } from '../../utils/probationDate.js'
 import { resolveMediaUrl, uploadMediaFile } from '../../utils/media'
@@ -642,9 +596,7 @@ const departmentStore = useDepartmentStore()
 const branchStore = useBranchStore()
 const locationStore = useLocationStore()
 const probationPolicyStore = useProbationPolicyStore()
-const costCenterStore = useCostCenterStore()
 const payGradeStore = usePayGradeStore()
-const bandStore = useBandStore()
 const noticePeriodStore = useNoticePeriodStore()
 
 const loader = ref(false)
@@ -687,9 +639,7 @@ const {
     employee_code,
     profile_image,
     profile_image_file_id,
-    cost_center_id,
     pay_grade_id,
-    band_id,
     notice_period_policy_id,
     relationships,
 } = storeToRefs(employeesStore)
@@ -910,20 +860,6 @@ const locationOptions = computed(() => {
     })
 })
 
-const costCenterOptions = computed(() => {
-    return (costCenterStore.costCenters || [])
-        .filter(c => c.is_active !== false)
-        .map(c => ({ value: c.id, label: `${c.name} (${c.code})` }))
-})
-
-const loadCostCenters = async () => {
-    const orgId = employeesStore.organization_id
-    if (!orgId) return
-    if (!costCenterStore.costCenters.length) {
-        await costCenterStore.fetchCostCenters(orgId).catch(() => {})
-    }
-}
-
 const payGradeOptions = computed(() => {
     return (payGradeStore.payGrades || [])
         .filter(p => p.name)
@@ -945,35 +881,6 @@ const loadPayGrades = async () => {
     if (!payGradeStore.payGrades.length) {
         await payGradeStore.fetchPayGrades(orgId).catch(() => {})
     }
-}
-
-const bandOptions = computed(() => bandStore.bandListSelect)
-
-const selectedBand = computed(() => {
-    const id = band_id.value && typeof band_id.value === 'object'
-        ? band_id.value.value
-        : band_id.value
-    if (!id) return null
-    return (bandStore.band_list || []).find(b => String(b.id) === String(id)) || null
-})
-
-const bandDescExpanded = ref(false)
-const descriptionTruncates = computed(() => (selectedBand.value?.description?.length || 0) > 140)
-
-const bandLockedByDesignation = computed(() => {
-    const desig = employee_designation.value
-    return Boolean(desig && (typeof desig === 'object' ? desig.value : desig))
-})
-
-const designationHasBand = computed(() => {
-    const desig = employee_designation.value
-    return Boolean(desig && typeof desig === 'object' && desig.band_id)
-})
-
-const loadBands = async () => {
-    const orgId = employeesStore.organization_id
-    if (!orgId) return
-    await bandStore.fetchBandList(orgId).catch(() => {})
 }
 
 const noticePeriodPolicyLoading = ref(false)
@@ -1012,24 +919,6 @@ const autoSelectDefaultNoticePeriodPolicy = () => {
 
 watch(noticePeriodStore.policies, () => {
     autoSelectDefaultNoticePeriodPolicy()
-})
-
-const syncBandFromDesignation = () => {
-    const desig = employee_designation.value
-    const bandId = desig && typeof desig === 'object' ? desig.band_id : null
-    if (bandId) {
-        const found = (bandStore.band_list || []).find(b => String(b.id) === String(bandId))
-        band_id.value = found
-            ? { value: found.id, label: found.name, description: found.description }
-            : { value: bandId, label: desig.band_name || 'Band' }
-    } else {
-        band_id.value = null
-    }
-}
-
-watch(employee_designation, () => {
-    bandDescExpanded.value = false
-    syncBandFromDesignation()
 })
 
 // Auto-select the location from the selected branch (or the org HQ location by
@@ -1187,11 +1076,8 @@ onMounted(async () => {
     await branchStore.fetchAllBranches()
     locationStore.organization_id = organization_id.value
     await locationStore.fetchLocations()
-    await loadCostCenters()
     await loadPayGrades()
-    await loadBands()
     await loadNoticePeriodPolicies()
-    syncBandFromDesignation()
     if (!location_id.value) {
         syncLocationFromBranch()
     }

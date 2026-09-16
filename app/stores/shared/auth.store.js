@@ -2,7 +2,6 @@ import { defineStore } from 'pinia'
 import { nextTick } from 'vue'
 import { useThemeStore } from '../shared/theme.store'
 import { getMenu } from '../../data/menu'
-import { useOrganizationSubscriptionStore } from '../shared/organizationSubscription.store'
 
 export const useAuthStore = defineStore('Auth', {
     state: () => ({
@@ -316,13 +315,6 @@ export const useAuthStore = defineStore('Auth', {
                         this.organization = data.user.organization_id
                         this.employee = data.sub
 
-                        try {
-                            const organizationSubscriptionStore = useOrganizationSubscriptionStore()
-                            await organizationSubscriptionStore.fetchOrganizationSubscriptionByOrganization()
-                        } catch (e) {
-                            console.warn('[Auth] Failed to fetch subscription:', e)
-                        }
-
                         this.toggleView('EMPLOYEE', true)
                     } else {
                         this.admin = data.user
@@ -385,14 +377,12 @@ export const useAuthStore = defineStore('Auth', {
                     return toast.error({ title: 'Error!', message: 'You dont have permission.', timeout: 1500 })
                 }
                 this.view = view
-                const organizationSubscriptionStore = useOrganizationSubscriptionStore()
-                const paidOrNot = !organizationSubscriptionStore.pendingPayment || !organizationSubscriptionStore.trialEnded
                 if (this.view === 'EMPLOYEE') {
-                    this.menu = getMenu(false, this.organization, paidOrNot, this.moduleKeys, this.permissionKeys)
+                    this.menu = getMenu(false, this.organization, this.moduleKeys, this.permissionKeys)
                     if (!skipNavigation) navigateTo(this.defaultRoute, { replace: true })
                 }
                 if (this.view === 'ORGANIZATION') {
-                    this.menu = getMenu(this.user?.admin_of_organization, this.organization, paidOrNot, this.moduleKeys, this.permissionKeys)
+                    this.menu = getMenu(this.user?.admin_of_organization, this.organization, this.moduleKeys, this.permissionKeys)
                     if (!skipNavigation) navigateTo(`/organization/${this.organization}/dashboard`, { replace: true })
                     toast.success({ title: 'Success!', message: 'Viewing as an organization!', timeout: 1500 })
                 }

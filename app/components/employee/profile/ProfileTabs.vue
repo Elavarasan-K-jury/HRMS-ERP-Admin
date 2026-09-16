@@ -22,6 +22,5 @@ const tabs = [
     { label: 'Profile', value: 'profile' },
     { label: 'Job', value: 'job' },
     { label: 'Documents', value: 'documents' },
-    { label: 'Assets', value: 'assets' },
 ]
 </script>

@@ -110,10 +110,6 @@
                                 {{ employee.designation?.name || '—' }}
                             </div>
                             <div>
-                                <span class="label">Band</span>
-                                {{ employee.band?.name || employee.band_name || '—' }}
-                            </div>
-                            <div>
                                 <span class="label">Department</span>
                                 <div v-if="employee.departments?.length" class="flex flex-col gap-1">
                                     <div v-for="d in employee.departments" :key="d.id">

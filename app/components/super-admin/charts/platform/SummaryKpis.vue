@@ -54,16 +54,16 @@ const cards = [
         subLabel: 'Employees managed across all orgs',
     },
     {
-        label: 'Active Subscriptions',
-        value: '128',
-        trend: 3,
-        subLabel: 'Orgs with active paid plans',
+        label: 'Active Employees',
+        value: '28,150',
+        trend: 4,
+        subLabel: 'Employees with active status',
     },
     {
-        label: 'Monthly Recurring Revenue',
-        value: '$13.2k',
-        trend: 11,
-        subLabel: 'MRR across all tenants',
+        label: 'Attendance Rate',
+        value: '94.2%',
+        trend: 2,
+        subLabel: 'Average attendance across orgs',
     },
 ];
 </script>

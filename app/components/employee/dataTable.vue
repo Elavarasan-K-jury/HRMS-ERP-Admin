@@ -88,10 +88,6 @@
                     <Icon name="lucide:building-2" class="w-4 h-4 text-white/40 shrink-0" />
                     <span class="truncate">{{ formatDepartment(emp) || '—' }}</span>
                 </p>
-                <p v-if="emp.band?.name || emp.band_name" class="text-xs text-white/60 flex items-center gap-2">
-                    <Icon name="ion:git-branch-outline" class="w-4 h-4 text-white/40 shrink-0" />
-                    <span class="truncate">{{ emp.band?.name || emp.band_name }}</span>
-                </p>
                 <p v-if="emp.email || emp.phone" class="text-xs text-white/60 flex items-center gap-2">
                     <Icon name="lucide:mail" class="w-4 h-4 text-white/40 shrink-0" />
                     <span class="truncate" :title="emp.email">{{ emp.email || '—' }}</span>
