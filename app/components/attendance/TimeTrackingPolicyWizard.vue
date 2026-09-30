@@ -174,6 +174,7 @@ const defaultConfig = () => ({
     onDuty: false,
 
     // Remote Work — WFH body (local, UI-only)
+    workFromHomeMaxDaysEnabled: false,
     workFromHomeMaxDays: '',
     workFromHomeFrequency: 'Week',
     workFromHomeProrateEnabled: false,

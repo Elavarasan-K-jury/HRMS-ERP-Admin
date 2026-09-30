@@ -22,15 +22,20 @@
                         class="border-t border-white/10 pt-2.5 flex flex-col gap-2.5" data-testid="ttp-wfh-body">
                         <!-- Max days -->
                         <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
-                            <span class="text-sm text-white/70">Employees can request for maximum of</span>
-                            <input type="number" min="1" v-model.number="config.workFromHomeMaxDays" :disabled="false" data-testid="ttp-wfh-max-days" placeholder="eg: 2" class="w-16 shrink-0 rounded-lg border border-white/15 bg-white/5 px-2.5 py-1 text-sm text-white placeholder:text-white/40 disabled:opacity-50 focus:outline-none focus:ring-1 focus:ring-emerald-400/50" />
+                            <label class="flex items-center gap-2 cursor-pointer group">
+                                <input type="checkbox" v-model="config.workFromHomeMaxDaysEnabled"
+                                    data-testid="ttp-wfh-max-days-check"
+                                    class="w-4 h-4 shrink-0 rounded border-white/20 bg-white/10 text-emerald-400 focus:ring-emerald-400/50" />
+                                <span class="text-sm text-white/80 group-hover:text-white transition-colors">Employees can request for maximum of</span>
+                            </label>
+                            <input type="number" min="1" v-model.number="config.workFromHomeMaxDays" :disabled="!config.workFromHomeMaxDaysEnabled" data-testid="ttp-wfh-max-days" placeholder="eg: 2" class="w-16 shrink-0 rounded-lg border border-white/15 bg-white/5 px-2.5 py-1 text-sm text-white placeholder:text-white/40 disabled:opacity-50 focus:outline-none focus:ring-1 focus:ring-emerald-400/50" />
                             <span class="text-sm text-white/70 whitespace-nowrap">day(s) of WFH in a</span>
-                            <FormSelect v-model="config.workFromHomeFrequency" :options="adjustmentFrequencies" data-testid="ttp-wfh-frequency" class="shrink-0" style="width: 125px" :full-width="false" width="125px" size="sm" rounded="lg" :searchable="false" :clearable="false" color="#fff" placeholder="Select" />
+                            <FormSelect v-model="config.workFromHomeFrequency" :options="adjustmentFrequencies" data-testid="ttp-wfh-frequency" class="shrink-0" style="width: 125px" :full-width="false" width="125px" size="sm" rounded="lg" :searchable="false" :clearable="false" :disabled="!config.workFromHomeMaxDaysEnabled" color="#fff" placeholder="Select" />
                         </div>
 
-                        <!-- Prorate (bordered row) -->
-                        <div class="rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 transition-opacity"
-                            :class="config.workFromHomeProrateEnabled ? '' : 'opacity-40'">
+                        <!-- Prorate (bordered row) — only when max-WFH-days is enabled; always active when visible -->
+                        <div v-if="config.workFromHomeMaxDaysEnabled"
+                            class="rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2 flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
                             <label class="flex items-center gap-2 cursor-pointer group">
                                 <input type="checkbox" v-model="config.workFromHomeProrateEnabled"
                                     data-testid="ttp-wfh-prorate" class="w-4 h-4 shrink-0 rounded border-white/20 bg-white/10 text-emerald-400 focus:ring-emerald-400/50" />
@@ -234,19 +239,18 @@
                     </div>
                 </div>
 
-                <!-- Additional Settings (depends on Work from home) -->
-                <div class="rounded-xl border border-white/10 bg-white/5 transition-opacity"
-                    :class="config.workFromHome ? '' : 'opacity-40 pointer-events-none'"
+                <!-- Additional Settings (only when Work from home is ON) -->
+                <div v-if="config.workFromHome" class="rounded-xl border border-white/10 bg-white/5"
                     data-testid="ttp-remote-additional-settings">
                     <button type="button" data-testid="ttp-remote-additional-toggle" :aria-expanded="config.remoteAdditionalSettingsExpanded"
                         class="w-full px-4 py-3 flex items-center justify-between gap-4 text-left"
-                        @click="config.workFromHome && (config.remoteAdditionalSettingsExpanded = !config.remoteAdditionalSettingsExpanded)">
+                        @click="config.remoteAdditionalSettingsExpanded = !config.remoteAdditionalSettingsExpanded">
                         <div class="min-w-0">
                             <div class="text-sm font-semibold text-white/90">Additional Settings</div>
                             <div class="text-xs text-white/55 mt-1">Attachment, restrictions and more</div>
                         </div>
-                        <Icon name="lucide:chevron-down" class="w-4 h-4 shrink-0 text-white/60 transition-transform"
-                            :class="config.remoteAdditionalSettingsExpanded ? 'rotate-180' : ''" />
+                        <Icon :name="config.remoteAdditionalSettingsExpanded ? 'lucide:chevron-up' : 'lucide:chevron-down'"
+                            class="w-4 h-4 shrink-0 text-white/60" />
                     </button>
 
                     <div v-if="config.remoteAdditionalSettingsExpanded && config.workFromHome"
