@@ -3,7 +3,7 @@
         <section class="card">
             <div class="hdr-row">
                 <h2 class="hdr"><Icon name="lucide:user-round" class="ic" /> Personal</h2>
-                <button class="edit-btn" title="Edit Personal" @click="openSection('personal')">
+                <button v-if="canEdit" class="edit-btn" title="Edit Personal" @click="openSection('personal')">
                     <Icon name="lucide:pencil" class="ic" />
                 </button>
             </div>
@@ -23,7 +23,7 @@
         <section class="card">
             <div class="hdr-row">
                 <h2 class="hdr"><Icon name="lucide:contact" class="ic" /> Contact</h2>
-                <button class="edit-btn" title="Edit Contact" @click="openSection('contact')">
+                <button v-if="canEdit" class="edit-btn" title="Edit Contact" @click="openSection('contact')">
                     <Icon name="lucide:pencil" class="ic" />
                 </button>
             </div>
@@ -38,7 +38,7 @@
         <section class="card">
             <div class="hdr-row">
                 <h2 class="hdr"><Icon name="lucide:map-pin" class="ic" /> Address Information</h2>
-                <button class="edit-btn" title="Edit Address" @click="openSection('address')">
+                <button v-if="canEdit" class="edit-btn" title="Edit Address" @click="openSection('address')">
                     <Icon name="lucide:pencil" class="ic" />
                 </button>
             </div>
@@ -59,7 +59,7 @@
         <section class="card">
             <div class="hdr-row">
                 <h2 class="hdr"><Icon name="lucide:align-left" class="ic" /> Professional Summary</h2>
-                <button class="edit-btn" title="Edit Summary" @click="openSection('summary')">
+                <button v-if="canEdit" class="edit-btn" title="Edit Summary" @click="openSection('summary')">
                     <Icon name="lucide:pencil" class="ic" />
                 </button>
             </div>
@@ -70,7 +70,7 @@
         <section class="card">
             <div class="hdr-row">
                 <h2 class="hdr"><Icon name="lucide:users" class="ic" /> Relationships</h2>
-                <button class="edit-btn" title="Manage Relationships" @click="openRelModal">
+                <button v-if="canEdit" class="edit-btn" title="Manage Relationships" @click="openRelModal">
                     <Icon name="lucide:plus" class="ic" />
                 </button>
             </div>
@@ -82,7 +82,7 @@
                 <div v-for="rel in relationships" :key="rel.id" class="rel-card">
                     <div class="rel-card-header">
                         <span class="rel-badge">{{ formatRelType(rel.relationship) }}</span>
-                        <div class="rel-actions">
+                        <div v-if="canEdit" class="rel-actions">
                             <button class="rel-action-btn" title="Edit" @click="openRelModal"><Icon name="lucide:pencil" class="ic" /></button>
                             <button class="rel-action-btn rel-action-delete" title="Delete" @click="deleteRelationship(rel)"><Icon name="lucide:trash-2" class="ic" /></button>
                         </div>
@@ -327,9 +327,12 @@ import ProfileIdentity from './ProfileIdentity.vue'
 
 const props = defineProps({
     employee: { type: Object, required: true },
+    employeeId: { type: String, default: null },
 })
 
 const emit = defineEmits(['updated'])
+
+const canEdit = computed(() => true)
 
 const employeesStore = useEmployeesStore()
 const docStore = useEmployeeDocumentStore()
@@ -571,8 +574,13 @@ async function loadRelationships() {
     relLoading.value = true
     try {
         const { $api } = useNuxtApp()
-        const { data } = await $api.get('/employee-profile/my/relationships')
-        relationships.value = data?.relationships || []
+        if (props.employeeId) {
+            const { data } = await $api.get(`/employees/${props.employeeId}/relationships`)
+            relationships.value = data?.relationships || []
+        } else {
+            const { data } = await $api.get('/employee-profile/my/relationships')
+            relationships.value = data?.relationships || []
+        }
     } catch (err) {
         console.error('[ProfileTab] Failed to load relationships:', err)
         relationships.value = []
@@ -627,16 +635,19 @@ async function saveAllRelationships() {
     relSaving.value = true
     try {
         const { $api } = useNuxtApp()
+        const base = props.employeeId
+            ? `/employees/${props.employeeId}/relationships`
+            : '/employee-profile/my/relationships'
         const currentIds = relForms.value.map(f => f._id).filter(Boolean)
         const toDelete = relOriginalIds.value.filter(id => !currentIds.includes(id))
         for (const id of toDelete) {
-            await $api.delete(`/employee-profile/my/relationships/${id}`)
+            await $api.delete(`${base}/${id}`)
         }
         for (const f of relForms.value) {
             if (f._id) {
-                await $api.put(`/employee-profile/my/relationships/${f._id}`, relPayload(f))
+                await $api.put(`${base}/${f._id}`, relPayload(f))
             } else {
-                await $api.post('/employee-profile/my/relationships', relPayload(f))
+                await $api.post(base, relPayload(f))
             }
         }
         useToast().success({ title: 'Saved', message: 'Relationships saved successfully.', timeout: 1500 })
@@ -655,7 +666,10 @@ async function deleteRelationship(rel) {
     if (!confirmed) return
     try {
         const { $api } = useNuxtApp()
-        await $api.delete(`/employee-profile/my/relationships/${rel.id}`)
+        const base = props.employeeId
+            ? `/employees/${props.employeeId}/relationships`
+            : '/employee-profile/my/relationships'
+        await $api.delete(`${base}/${rel.id}`)
         useToast().success({ title: 'Removed', message: 'Relationship removed.', timeout: 1500 })
         await loadRelationships()
     } catch (err) {
@@ -708,7 +722,12 @@ async function loadDocuments() {
     docLoading.value = true
     try {
         docStore.organizationId = props.employee.organization_id
-        const verifiedDocs = await docStore.fetchMyVerifiedDocuments({ limit: 50 })
+        let verifiedDocs
+        if (props.employeeId) {
+            verifiedDocs = await docStore.fetchVerifiedDocuments({ employee_id: props.employeeId, limit: 50 })
+        } else {
+            verifiedDocs = await docStore.fetchMyVerifiedDocuments({ limit: 50 })
+        }
 
         const groups = {}
         for (const doc of verifiedDocs) {
@@ -753,7 +772,13 @@ function downloadDoc(submission) {
 }
 
 function editDoc() {
-    navigateTo('/employee/profile?tab=documents')
+    if (props.employeeId) {
+        const route = useRoute()
+        const router = useRouter()
+        router.replace({ query: { ...route.query, tab: 'documents' } })
+    } else {
+        navigateTo('/employee/profile?tab=documents')
+    }
 }
 
 onMounted(() => {

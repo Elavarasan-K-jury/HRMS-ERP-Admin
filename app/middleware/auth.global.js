@@ -58,7 +58,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
         if (to.path === '/') {
             return navigateTo(authStore.defaultRoute, { replace: true })
         }
-        // Block employee from ALL /organization/* admin routes
+        // Employee Portal is restricted to /employee/* only.
+        // Organization Employee routing (/organization/:org/employee/:employee/*)
+        // is admin-facing and must not be reachable with employee scope.
         if (to.path.startsWith('/organization/')) {
             return navigateTo(authStore.defaultRoute, { replace: true })
         }
@@ -73,6 +75,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
         try {
             if (!authStore.isLoggedIn) {
                 if (portalScope) authStore.scope = portalScope
+                // getUserDetails early-returns without accessToken — seed it from cookie
+                if (!authStore.accessToken) authStore.accessToken = activeToken
                 await authStore.getUserDetails()
             }
             if (authStore.isLoggedIn) {

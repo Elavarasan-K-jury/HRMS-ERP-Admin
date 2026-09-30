@@ -99,10 +99,6 @@
                                 <div class="desc" v-if="h.description">{{ h.description }}</div>
                             </div>
 
-                            <div class="col-span-4 text-end region">
-                                {{ h.region || 'All Locations' }}
-                            </div>
-
                             <div class="col-span-1 flex items-center justify-center">
                                 <span class="badge" :class="badgeClass(h.type)">
                                     <span class="dot" :class="dotClass(h.type)"></span>

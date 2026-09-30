@@ -14,7 +14,7 @@
             </div>
         </div>
         <DataTable :items="employees" :loading="loading" :total="total" :page="page" :total-pages="totalPages"
-            :limit="limit" @limit-change="changeLimit" @refresh="fetchDepartments" @view="view" @edit="editEmployee"
+            :limit="limit" @limit-change="changeLimit" @refresh="fetchEmployees" @view="view" @edit="editEmployee"
             @delete="deleteEmployee" />
     </div>
     <UiSidebarModal width="980px" v-model="addUpdateModal" :title="formTitle">

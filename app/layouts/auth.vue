@@ -35,11 +35,12 @@
             <UiLoader />
         </div>
 
+        <IpRestrictedModal />
     </div>
 </template>
 
 <script setup>
-import { menu } from '../data/menu'
+import { menu, employee_menu } from '../data/menu'
 import { useThemeStore } from '../stores/shared/theme.store'
 import { useAuthStore } from '../stores/shared/auth.store'
 import { computed, onMounted } from 'vue'
@@ -69,7 +70,14 @@ const titleShort = computed(() => {
 })
 
 const activeMenu = computed(() => {
-    if (isEmployee.value) return authStore.menu
+    if (isEmployee.value) {
+        const orgId = authStore.organization
+        const empId = authStore.employee
+        if (orgId && empId) {
+            return employee_menu()
+        }
+        return []
+    }
     return menu
 })
 

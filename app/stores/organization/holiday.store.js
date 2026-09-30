@@ -12,13 +12,12 @@ export const useHolidayStore = defineStore('holiday', {
         policy_id: null,
         date: null,
         name: null,
-        region: null,
         type: 'PUBLIC',
+        leave_optional: false,
 
         // filters
         filter_year: null,
         filter_type: null,
-        filter_region: null,
         filter_policy: null,
 
         // calendar view
@@ -30,8 +29,8 @@ export const useHolidayStore = defineStore('holiday', {
 
     actions: {
         /* ---------------------------------------------------------
-         📌 LIST HOLIDAYS
-        --------------------------------------------------------- */
+         LIST HOLIDAYS
+        -------------------------------------------------------- */
         async fetchHolidays() {
             const toast = useToast()
             this.loading = true
@@ -44,18 +43,19 @@ export const useHolidayStore = defineStore('holiday', {
                     organization_id: this.organization_id,
                     year: this.filter_year || undefined,
                     type: this.filter_type?.value || undefined,
-                    region: this.filter_region?.value || undefined,
-                    policy_id: this.filter_policy?.value || undefined,
+                    policy_id: typeof this.filter_policy === 'object' ? this.filter_policy?.value : this.filter_policy || undefined,
                 }
 
                 const { data } = await $api.get('/holidays', { params })
 
-                this.holidays = data.holidays
-                this.total_count = data.total_count
+                this.holidays = data?.holidays || []
+                this.total_count = data?.total_count || 0
 
                 return data
             } catch (err) {
                 console.error('[holiday-store] fetchHolidays error:', err)
+                this.holidays = []
+                this.total_count = 0
                 toast.error({
                     title: 'Error!',
                     message: err.message,
@@ -67,8 +67,8 @@ export const useHolidayStore = defineStore('holiday', {
         },
 
         /* ---------------------------------------------------------
-         📌 GET HOLIDAY BY ID
-        --------------------------------------------------------- */
+         GET HOLIDAY BY ID
+        -------------------------------------------------------- */
         async fetchHolidayById(id) {
             const toast = useToast()
             try {
@@ -87,8 +87,8 @@ export const useHolidayStore = defineStore('holiday', {
         },
 
         /* ---------------------------------------------------------
-         📌 CREATE HOLIDAY
-        --------------------------------------------------------- */
+         CREATE HOLIDAY
+        -------------------------------------------------------- */
         async createHoliday() {
             const toast = useToast()
             try {
@@ -99,8 +99,8 @@ export const useHolidayStore = defineStore('holiday', {
                     policy_id: this.policy_id || undefined,
                     date: this.date,
                     name: this.name,
-                    region: this.region || undefined,
                     type: this.type,
+                    leave_optional: this.leave_optional,
                 }
 
                 const { data } = await $api.post('/holidays', payload)
@@ -122,8 +122,8 @@ export const useHolidayStore = defineStore('holiday', {
         },
 
         /* ---------------------------------------------------------
-         📌 UPDATE HOLIDAY
-        --------------------------------------------------------- */
+         UPDATE HOLIDAY
+        -------------------------------------------------------- */
         async updateHoliday() {
             const toast = useToast()
             try {
@@ -133,8 +133,8 @@ export const useHolidayStore = defineStore('holiday', {
                     policy_id: this.policy_id || undefined,
                     date: this.date,
                     name: this.name,
-                    region: this.region || undefined,
                     type: this.type,
+                    leave_optional: this.leave_optional,
                 }
 
                 const { data } = await $api.put(`/holidays/${this.holiday_id}`, payload)
@@ -156,8 +156,8 @@ export const useHolidayStore = defineStore('holiday', {
         },
 
         /* ---------------------------------------------------------
-         📌 DELETE HOLIDAY
-        --------------------------------------------------------- */
+         DELETE HOLIDAY
+        -------------------------------------------------------- */
         async deleteHoliday(id) {
             const toast = useToast()
             try {
@@ -180,8 +180,8 @@ export const useHolidayStore = defineStore('holiday', {
         },
 
         /* ---------------------------------------------------------
-         📌 HOLIDAY CALENDAR VIEW (YYYY-MM)
-        --------------------------------------------------------- */
+         HOLIDAY CALENDAR VIEW (YYYY-MM)
+        -------------------------------------------------------- */
         async fetchHolidayCalendar(month) {
             const toast = useToast()
             this.loading = true
@@ -193,7 +193,6 @@ export const useHolidayStore = defineStore('holiday', {
                     organization_id: this.organization_id,
                     month,
                     policy_id: this.filter_policy || undefined,
-                    region: this.filter_region || undefined,
                 }
 
                 const { data } = await $api.get('/holidays/calendar/view', { params })
@@ -213,15 +212,30 @@ export const useHolidayStore = defineStore('holiday', {
         },
 
         /* ---------------------------------------------------------
-         📌 Reset form values
-        --------------------------------------------------------- */
+         Reset form values
+        -------------------------------------------------------- */
         resetForm() {
             this.policy_id = null
             this.date = null
             this.name = null
-            this.region = null
             this.type = 'PUBLIC'
+            this.leave_optional = false
             this.holiday_id = null
+        },
+
+        /* ---------------------------------------------------------
+         Aliases for backward compatibility (employee/holidays.vue)
+        -------------------------------------------------------- */
+        async fetchAllHolidays() {
+            return this.fetchHolidays()
+        },
+
+        getHolidaysByYear() {
+            if (!this.filter_year) return this.holidays
+            return this.holidays.filter(h => {
+                const d = new Date(h.date)
+                return d.getFullYear() === this.filter_year
+            })
         }
     }
 })

@@ -7,5 +7,6 @@
         <main class="flex-1">
             <slot />
         </main>
+        <IpRestrictedModal />
     </div>
 </template>

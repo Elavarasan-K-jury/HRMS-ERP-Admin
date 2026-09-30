@@ -259,6 +259,8 @@ const props = defineProps({
     },
 })
 
+defineEmits(['toggleSidebar'])
+
 const openMenu = ref(null)
 const showLogoutConfirm = ref(false)
 

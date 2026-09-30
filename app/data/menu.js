@@ -1,9 +1,9 @@
-export const employee_menu = (org_id, employee_id) => {
+export const employee_menu = () => {
     return [
         {
             group: 'Home',
             items: [
-                { label: 'Dashboard', path: `/organization/${org_id}/employee/${employee_id}/home`, icon: 'ion:pie-chart' },
+                { label: 'Dashboard', path: '/employee', icon: 'ion:pie-chart' },
             ]
         },
 
@@ -12,145 +12,15 @@ export const employee_menu = (org_id, employee_id) => {
             items: [
                 {
                     label: 'Me',
-                    path: `/organization/${org_id}/employee/${employee_id}/me`,
+                    path: '/employee/profile',
                     icon: 'ion:person-outline',
                     children: [
-                        { label: 'Attendance', path: `/organization/${org_id}/employee/${employee_id}/attendance`, icon: 'ion:clock' },
-                        { label: 'Leave', path: `/organization/${org_id}/employee/${employee_id}/leaves`, icon: 'ion:calendar-outline' },
-                        { label: 'Performance', path: `/organization/${org_id}/employee/${employee_id}/performance`, icon: 'ion:bar-chart-outline' },
-                        { label: 'Holidays', path: `/organization/${org_id}/employee/${employee_id}/holidays`, icon: 'ion:calendar-outline' },
-                        { label: 'Expenses & Travels', path: `/organization/${org_id}/employee/${employee_id}/expenses`, icon: 'ion:cash' },
-                        { label: 'Apps', path: `/organization/${org_id}/employee/${employee_id}/apps`, icon: 'ion:apps-outline' },
+                        { label: 'Attendance', path: '/employee/attendance', icon: 'ion:clock' },
+                        { label: 'Holidays', path: '/employee/holidays', icon: 'ion:calendar-outline' },
+                        { label: 'Expenses & Travels', path: '/employee/expense', icon: 'ion:cash' },
                     ]
                 }
             ]
-        },
-
-        {
-            group: 'Employees',
-            items: [
-                {
-                    label: 'Employees',
-                    path: `/organization/${org_id}/employee/${employee_id}/employees`,
-                    icon: 'ion:people',
-                    children: [
-                        { label: 'Employees List', path: `/organization/${org_id}/employee/${employee_id}/employees/list`, icon: 'ion:person-outline' },
-                    ],
-                },
-            ],
-        },
-
-                {
-            group: 'Time Attend',
-            items: [
-                {
-                    label: 'Time Attend',
-                    path: `/organization/${org_id}/employee/${employee_id}/attendance`,
-                    icon: 'ion:clock',
-                    children: [
-                        { label: 'Attendance Tracking', path: `/organization/${org_id}/employee/${employee_id}/attendance`, icon: 'ion:clock' },
-                        { label: 'Leaves', path: `/organization/${org_id}/employee/${employee_id}/leaves`, icon: 'ion:calendar' },
-                    ],
-                },
-            ],
-        },
-
-        {
-            group: 'Org Structure',
-            items: [
-                {
-                    label: 'Org Structure',
-                    path: `/organization/${org_id}/employee/${employee_id}/org-structure`,
-                    icon: 'ion:business',
-                    children: [
-                        { label: 'Departments', path: `/organization/${org_id}/employee/${employee_id}/org-structure/departments`, icon: 'lucide:git-fork' },
-                        { label: 'Branches', path: `/organization/${org_id}/employee/${employee_id}/org-structure/branches`, icon: 'lucide:building-2' },
-                        { label: 'Holidays', path: `/organization/${org_id}/employee/${employee_id}/org-structure/holidays`, icon: 'ion:calendar-number-outline' },
-                        { label: 'Designations', path: `/organization/${org_id}/employee/${employee_id}/org-structure/designations`, icon: 'ion:briefcase-outline' },
-                        { label: 'Hierarchy', path: `/organization/${org_id}/employee/${employee_id}/org-structure/hierarchy`, icon: 'ion:people-outline' },
-                    ],
-                },
-            ],
-        },
-
-        {
-            group: 'Exits',
-            items: [
-                {
-                    label: 'Exits',
-                    path: `/organization/${org_id}/employee/${employee_id}/exits`,
-                    icon: 'ion:exit-outline',
-                    children: [
-                        { label: 'Summary', path: `/organization/${org_id}/employee/${employee_id}/exits/summary`, icon: 'ion:stats-chart-outline' },
-                        { label: 'Exit Process', path: `/organization/${org_id}/employee/${employee_id}/exits/process`, icon: 'ion:document-text-outline' },
-                        { label: 'Reverted Exits', path: `/organization/${org_id}/employee/${employee_id}/exits/reverted`, icon: 'ion:refresh-outline' },
-                        { label: 'Task Tracking', path: `/organization/${org_id}/employee/${employee_id}/exits/task-tracking`, icon: 'ion:checklist-outline' },
-                    ],
-                },
-            ],
-        },
-
-        {
-            group: 'Expenses',
-            items: [
-                {
-                    label: 'Expense and Travels',
-                    path: `/organization/${org_id}/employee/${employee_id}/expense-travels`,
-                    icon: 'ion:cash',
-                    children: [
-                        { label: 'Summary', path: `/organization/${org_id}/employee/${employee_id}/expense-travels/summary`, icon: 'ion:stats-chart-outline' },
-                        { label: 'Expenses', path: `/organization/${org_id}/employee/${employee_id}/expense-travels/expenses`, icon: 'ion:card-outline' },
-                        { label: 'Advances', path: `/organization/${org_id}/employee/${employee_id}/expense-travels/advances`, icon: 'ion:cash-outline' },
-                    ],
-                },
-            ],
-        },
-
-        {
-            group: 'Documents',
-            items: [
-                {
-                    label: 'Documents',
-                    path: `/organization/${org_id}/employee/${employee_id}/documents`,
-                    icon: 'ion:folder-outline',
-                    children: [
-                        { label: 'Employee Documents', path: `/organization/${org_id}/employee/${employee_id}/documents/employee`, icon: 'ion:person-outline' },
-                        { label: 'Organization Documents', path: `/organization/${org_id}/employee/${employee_id}/documents/organization`, icon: 'ion:business-outline' },
-                    ],
-                },
-            ],
-        },
-
-        {
-            group: 'My Finance',
-            items: [
-                {
-                    label: 'My Finance',
-                    path: `/organization/${org_id}/employee/${employee_id}/my-finance`,
-                    icon: 'ion:wallet',
-                    children: [
-                        { label: 'Summary', path: `/organization/${org_id}/employee/${employee_id}/my-finance/summary`, icon: 'ion:stats-chart-outline' },
-                        { label: 'My Pay', path: `/organization/${org_id}/employee/${employee_id}/my-finance/my-pay`, icon: 'ion:cash-outline' },
-                        { label: 'Manage Tax', path: `/organization/${org_id}/employee/${employee_id}/my-finance/manage-tax`, icon: 'heroicons:percent-badge' },
-                    ]
-                }
-            ]
-        },
-
-        {
-            group: 'Reports & Analytics',
-            items: [
-                {
-                    label: 'Analytics & Reports',
-                    path: `/organization/${org_id}/employee/${employee_id}/reports`,
-                    icon: 'ion:bar-chart',
-                    children: [
-                        { label: 'HR Reports', path: `/organization/${org_id}/employee/${employee_id}/reports/hr`, icon: 'ion:people-circle-outline' },
-                        { label: 'Payroll Reports', path: `/organization/${org_id}/employee/${employee_id}/reports/payroll`, icon: 'ion:cash-outline' },
-                        { label: 'Attendance Reports', path: `/organization/${org_id}/employee/${employee_id}/reports/attendance`, icon: 'ion:time-outline' },
-                    ],
-                },
-            ],
         },
     ]
 }
@@ -191,12 +61,12 @@ export const organization_menu = (org_id) => {
                     children: [
                         { label: 'Departments', path: `/organization/${org_id}/departments`, icon: 'lucide:git-fork', permission: 'orgnaization.departments.view' },
                         { label: 'Branches', path: `/organization/${org_id}/branches`, icon: 'lucide:building-2', permission: 'orgnaization.branches.view' },
-                        { label: 'Holidays', path: `/organization/${org_id}/holiday`, icon: 'ion:calendar-number-outline' },
                         { label: 'Designations', path: `/organization/${org_id}/designations`, icon: 'ion:briefcase-outline', permission: 'orgnaization.designations.view' },
                         { label: 'Hierarchy', path: `/organization/${org_id}/hierarchy`, icon: 'ion:people-outline', permission: 'orgnaization.hierarchy.view' },
                         { label: 'Pay Grades', path: `/organization/${org_id}/org-structure/pay-grades`, icon: 'heroicons:currency-dollar' },
                         { label: 'Legal Entities', path: `/organization/${org_id}/org-structure/legal-entities`, icon: 'heroicons:building-office' },
                         { label: 'Location', path: `/organization/${org_id}/org-structure/locations`, icon: 'heroicons:map-pin' },
+                        { label: 'IP Configurations', path: `/organization/${org_id}/settings/ip-configurations`, icon: 'ion:globe-outline' },
                     ],
                 },
             ],
@@ -212,14 +82,16 @@ export const organization_menu = (org_id) => {
                     icon: 'ion:clock',
                     children: [
                         { label: 'Attendance Tracking', path: `/organization/${org_id}/attendance`, icon: 'ion:clock', permission: 'attendance.view' },
-                        { label: 'Attendance Policy', path: `/organization/${org_id}/attendance/policy`, icon: 'ion:document-text-outline', permission: 'attendance.view' },
                         { label: 'Attendance Report', path: `/organization/${org_id}/attendance/report`, icon: 'ion:document-text-outline', permission: 'attendance.view' },
-                        { label: 'Approvals', path: `/organization/${org_id}/attendance/approvals`, icon: 'heroicons:check-circle' },
-                        { label: 'Shifts/Weekly Offs', path: `/organization/${org_id}/attendance/shifts`, icon: 'ion:calendar-outline' },
+                        { label: 'Approvals', path: `/organization/${org_id}/approvals/inbox`, icon: 'heroicons:check-circle' },
+                        { label: 'Regularise & Cancel Penalties', path: `/organization/${org_id}/attendance/regularise`, icon: 'ion:create-outline', permission: 'attendance_regularisation.manage' },
+                        { label: 'Shifts/WeeklyOffs & Holidays', path: `/organization/${org_id}/attendance/shifts`, icon: 'ion:calendar-outline' },
                         { label: 'Overtime', path: `/organization/${org_id}/attendance/overtime`, icon: 'ion:time-outline' },
                         { label: 'Leaves', path: `/organization/${org_id}/leave`, icon: 'ion:calendar', permission: 'leave.view' },
+                        { label: 'Leave Types', path: `/organization/${org_id}/attendance/leave-types`, icon: 'ion:list-outline', permission: 'leave.manage' },
                         { label: 'Reports', path: `/organization/${org_id}/attendance/reports`, icon: 'ion:stats-chart-outline' },
                         { label: 'Settings', path: `/organization/${org_id}/attendance/settings`, icon: 'ion:cog-outline' },
+                        { label: 'Approval Flows', path: `/organization/${org_id}/settings/approval-flows`, icon: 'heroicons:cog-6-tooth' },
                     ],
                 },
             ],
@@ -414,6 +286,8 @@ export const menu = [
     },
 ]
 
+
+//Old Org menu
 export const getMenu = (admin = false, org_id, moduleKeys = [], permissionKeys = []) => {
     if (admin) {
         return [
@@ -429,7 +303,6 @@ export const getMenu = (admin = false, org_id, moduleKeys = [], permissionKeys =
                             { label: 'Departments', path: `/organization/${org_id}/departments`, icon: 'lucide:git-fork' },
                             { label: 'Designations', path: `/organization/${org_id}/designations`, icon: 'ion:briefcase-outline' },
                             { label: 'Hierarchy', path: `/organization/${org_id}/hierarchy`, icon: 'ion:people-outline' },
-                            { label: 'Holidays', path: `/organization/${org_id}/holiday`, icon: 'ion:calendar-number-outline' },
                         ],
                     },
                     {
@@ -439,7 +312,6 @@ export const getMenu = (admin = false, org_id, moduleKeys = [], permissionKeys =
                         children: [
                             { label: 'Employees', path: `/organization/${org_id}/employee/list`, icon: 'ion:person-outline' },
                             { label: 'Employee Categories', path: `/organization/${org_id}/employee/categories`, icon: 'ion:albums-outline' },
-                            { label: 'Permissions', path: `/organization/${org_id}/employee/permissions`, icon: 'heroicons:lock-closed' },
                         ],
                     },
                     {
@@ -556,150 +428,9 @@ export const getMenu = (admin = false, org_id, moduleKeys = [], permissionKeys =
             },
         ]
     } else {
-        return [
-            {
-                group: 'Home',
-                items: [
-                    { label: 'Dashboard', path: '/employee', icon: 'ion:pie-chart' },
-                ]
-            },
-            {
-                group: 'Self',
-                items: [
-                    {
-                        label: 'Me',
-                        path: '/employee',
-                        icon: 'ion:person-outline',
-                        children: [
-                            { label: 'Attendance', path: '/employee/attendance', icon: 'ion:clock' },
-                            { label: 'Leave', path: '/employee/leaves', icon: 'ion:calendar-outline' },
-                            { label: 'Performance', path: '/employee/performance', icon: 'ion:bar-chart-outline' },
-                            { label: 'Holidays', path: '/employee/holidays', icon: 'ion:calendar-outline' },
-                            { label: 'Expenses & Travels', path: '/employee/expense', icon: 'ion:cash' },
-                            { label: 'Apps', path: '/employee/apps', icon: 'ion:apps-outline' },
-                        ]
-                    }
-                ]
-            },
-            {
-                group: 'Employees',
-                items: [
-                    {
-                        label: 'Employees',
-                        path: '/employee/employees',
-                        icon: 'ion:people',
-                        children: [
-                            { label: 'Employees List', path: `/organization/${org_id}/employee/list`, icon: 'ion:person-outline' },
-                        ],
-                    },
-                ],
-            },
-            {
-                group: 'Org Structure',
-                items: [
-                    {
-                        label: 'Org Structure',
-                        path: '/employee/org-structure',
-                        icon: 'ion:business',
-                        children: [
-                            { label: 'Departments', path: `/organization/${org_id}/departments`, icon: 'lucide:git-fork' },
-                            { label: 'Branches', path: `/organization/${org_id}/branches`, icon: 'lucide:building-2' },
-                            { label: 'Holidays', path: `/organization/${org_id}/holiday`, icon: 'ion:calendar-number-outline' },
-                            { label: 'Designations', path: `/organization/${org_id}/designations`, icon: 'ion:briefcase-outline' },
-                            { label: 'Hierarchy', path: `/organization/${org_id}/hierarchy`, icon: 'ion:people-outline' },
-                        ],
-                    },
-                ],
-            },
-            {
-                group: 'Exits',
-                items: [
-                    {
-                        label: 'Exits',
-                        path: '/employee/exits',
-                        icon: 'ion:exit-outline',
-                        children: [
-                            { label: 'Summary', path: `/organization/${org_id}/exits/summary`, icon: 'ion:stats-chart-outline' },
-                            { label: 'Exit Process', path: `/organization/${org_id}/exits/process`, icon: 'ion:document-text-outline' },
-                            { label: 'Reverted Exits', path: `/organization/${org_id}/exits/reverted`, icon: 'ion:refresh-outline' },
-                            { label: 'Task Tracking', path: `/organization/${org_id}/exits/task-tracking`, icon: 'ion:checklist-outline' },
-                        ],
-                    },
-                ],
-            },
-            {
-                group: 'Expenses',
-                items: [
-                    {
-                        label: 'Expense and Travels',
-                        path: '/employee/expense-travels',
-                        icon: 'ion:cash',
-                        children: [
-                            { label: 'Summary', path: `/organization/${org_id}/expense-travels/summary`, icon: 'ion:stats-chart-outline' },
-                            { label: 'Expenses', path: `/organization/${org_id}/expense-travels/expenses`, icon: 'ion:card-outline' },
-                            { label: 'Advances', path: `/organization/${org_id}/expense-travels/advances`, icon: 'ion:cash-outline' },
-                        ],
-                    },
-                ],
-            },
-            {
-                group: 'Documents',
-                items: [
-                    {
-                        label: 'Documents',
-                        path: '/employee/documents',
-                        icon: 'ion:folder-outline',
-                        children: [
-                            { label: 'Employee Documents', path: `/organization/${org_id}/documents/employee`, icon: 'ion:person-outline' },
-                            { label: 'Organization Documents', path: `/organization/${org_id}/documents/organization`, icon: 'ion:business-outline' },
-                        ],
-                    },
-                ],
-            },
-            {
-                group: 'My Finance',
-                items: [
-                    {
-                        label: 'My Finance',
-                        path: '/employee/my-finance',
-                        icon: 'ion:wallet',
-                        children: [
-                            { label: 'Summary', path: '/employee/my-finance/summary', icon: 'ion:stats-chart-outline' },
-                            { label: 'My Pay', path: '/employee/my-finance/my-pay', icon: 'ion:cash-outline' },
-                            { label: 'Manage Tax', path: '/employee/my-finance/manage-tax', icon: 'heroicons:percent-badge' },
-                        ]
-                    }
-                ]
-            },
-            {
-                group: 'Time Attend',
-                items: [
-                    {
-                        label: 'Time Attend',
-                        path: '/employee/time-attend',
-                        icon: 'ion:clock',
-                        children: [
-                            { label: 'Attendance Tracking', path: '/employee/attendance', icon: 'ion:clock' },
-                            { label: 'Leaves', path: `/organization/${org_id}/leave`, icon: 'ion:calendar' },
-                        ],
-                    },
-                ],
-            },
-            {
-                group: 'Reports & Analytics',
-                items: [
-                    {
-                        label: 'Analytics & Reports',
-                        path: '/employee/reports',
-                        icon: 'ion:bar-chart',
-                        children: [
-                            { label: 'HR Reports', path: '/employee/reports/hr', icon: 'ion:people-circle-outline' },
-                            { label: 'Payroll Reports', path: '/employee/reports/payroll', icon: 'ion:cash-outline' },
-                            { label: 'Attendance Reports', path: '/employee/reports/attendance', icon: 'ion:time-outline' },
-                        ],
-                    },
-                ],
-            },
-        ]
+        // Employee sidebar is now sourced exclusively from employee_menu()
+        // in auth.vue and employee.vue layouts. This branch is retained
+        // only for backward compatibility with authStore.toggleView().
+        return []
     }
 }

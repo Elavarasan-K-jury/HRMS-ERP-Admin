@@ -3,6 +3,7 @@
         <!-- Tab Navigation -->
         <div class="flex items-center gap-1 border-b border-white/15">
             <button v-for="(tab, index) in tabs" :key="index" :disabled="tab.disabled" :style="getTabStyle(index)"
+                :data-testid="tab.testid"
                 class="tabs-btn relative inline-flex items-center justify-center gap-2 px-3.5 py-2.5 text-sm font-semibold capitalize select-none whitespace-nowrap transition-all duration-300
                        disabled:opacity-50 disabled:cursor-not-allowed" :class="getTabClasses(index)"
                 @click="selectTab(index)">

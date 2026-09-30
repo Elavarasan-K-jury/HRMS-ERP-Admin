@@ -30,22 +30,18 @@
         </div>
 
         <!-- FILTERS -->
-        <!-- <div class="flex flex-wrap gap-3">
-
+        <div class="flex flex-wrap gap-3">
             <FormSelect v-model="holidayStore.filter_type" :options="typeOptions" placeholder="Type"
                 prepend-icon="lucide:filter" />
-
             <FormSelect v-model="holidayStore.filter_region" :options="regionOptions" placeholder="Region"
                 prepend-icon="lucide:map-pin" />
-
             <FormSelect v-model="holidayStore.filter_policy" :options="policyOptions" placeholder="Policy"
                 prepend-icon="lucide:shield" />
-        </div> -->
+        </div>
 
         <!-- TABLE -->
         <HolidayTable v-if="isListView" :items="holidays" :loading="loading" :total="total" :page="page"
-            :total-pages="totalPages" @view="viewHoliday" @edit="editHoliday" @delete="deleteHoliday" @prev="prevPage"
-            @next="nextPage" />
+            :total-pages="totalPages" @view="viewHoliday" @edit="editHoliday" @delete="deleteHoliday" />
 
         <HolidayCalendarView v-else :calendar="calendar" :month="selectedMonth" @month-change="changeMonth" />
     </div>
@@ -82,6 +78,7 @@ import { storeToRefs } from 'pinia'
 
 import { useAuthStore } from '../../../stores/shared/auth.store'
 import { useHolidayStore } from '../../../stores/organization/holiday.store'
+import { useLocationStore } from '../../../stores/organization/location.store'
 
 import HolidayTable from '../../../components/holiday/dataTable.vue'
 import HolidayDetailedView from '../../../components/holiday/DetailedView.vue'
@@ -93,7 +90,6 @@ import HolidayCalendarView from '../../../components/holiday/HolidayCalendarView
 ----------------------------------------- */
 definePageMeta({
     layout: 'organization',
-    key: route => route.fullPath,
 })
 
 /* -----------------------------------------
@@ -101,6 +97,7 @@ definePageMeta({
 ----------------------------------------- */
 const authStore = useAuthStore()
 const holidayStore = useHolidayStore()
+const locationStore = useLocationStore()
 
 const {
     holidays,
@@ -112,7 +109,6 @@ const {
     policy_id,
     date,
     name,
-    region,
     type,
     filter_year
 } = storeToRefs(holidayStore)
@@ -120,7 +116,6 @@ const {
 /* -----------------------------------------
    UI STATE
 ----------------------------------------- */
-const search = ref('')
 const page = ref(1)
 const totalPages = ref(1)
 
@@ -164,17 +159,17 @@ const typeOptions = [
     { label: 'COMPANY EVENT', value: 'COMPANY_EVENT' },
 ]
 
-const regionOptions = [
-    { label: 'All Regions', value: '' },
-    { label: 'KA - Karnataka', value: 'KA' },
-    { label: 'TN - Tamil Nadu', value: 'TN' },
-    { label: 'MH - Maharashtra', value: 'MH' },
-    { label: 'DL - Delhi', value: 'DL' },
-]
-
 const policyOptions = [
     { label: 'Default Policy', value: null }
 ]
+
+const regionOptions = computed(() => {
+    const states = (locationStore.locations || [])
+        .map(l => l.state)
+        .filter(s => s && String(s).trim())
+    const unique = [...new Set(states)].sort()
+    return [{ label: 'All Regions', value: null }, ...unique.map(s => ({ label: s, value: s }))]
+})
 
 /* -----------------------------------------
    COMPUTEDS
@@ -188,26 +183,10 @@ watch(
     () => [
         holidayStore.filter_year,
         holidayStore.filter_type,
-        holidayStore.filter_region,
         holidayStore.filter_policy,
     ],
     () => fetchHolidays()
 )
-
-/* -----------------------------------------
-   SEARCH
------------------------------------------ */
-const timer = ref(null)
-
-watch(search, () => {
-    clearTimeout(timer.value)
-    timer.value = setTimeout(() => fetchResults(search.value), 300)
-})
-
-const goTo = (item) => {
-    const match = holidays.value.find(h => h.id === item.value)
-    if (match) viewHoliday(match)
-}
 
 /* -----------------------------------------
    CRUD Actions
@@ -242,7 +221,6 @@ const editHoliday = (holiday) => {
     policy_id.value = holiday.policy_id || null
     date.value = holiday.date
     name.value = holiday.name
-    region.value = holiday.region
     type.value = holiday.type
 
     formTitle.value = 'Update Holiday'
@@ -301,6 +279,12 @@ onMounted(async () => {
 
     // Set default year = current year
     filter_year.value = new Date().getFullYear()
+
+    // Fetch locations for region filter
+    if (authStore.organization) {
+        locationStore.organization_id = authStore.organization
+        await locationStore.fetchLocations()
+    }
 
     await fetchHolidays()
 });

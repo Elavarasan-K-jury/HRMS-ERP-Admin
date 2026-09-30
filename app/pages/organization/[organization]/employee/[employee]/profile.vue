@@ -22,10 +22,10 @@
             <ProfileTabs :active="activeTab" @change="setTab" />
 
             <div class="tab-content">
-                <AboutTab v-if="activeTab === 'about'" :employee="employee" />
-                <ProfileTab v-else-if="activeTab === 'profile'" :employee="employee" @updated="loadEmployee" />
-                <JobTab v-else-if="activeTab === 'job'" :employee="employee" />
-                <DocumentsTab v-else-if="activeTab === 'documents'" :employee="employee" />
+                <AboutTab v-if="activeTab === 'about'" :employee="employee" :employee-id="route.params.employee" />
+                <ProfileTab v-else-if="activeTab === 'profile'" :employee="employee" :employee-id="route.params.employee" @updated="loadEmployee" />
+                <JobTab v-else-if="activeTab === 'job'" :employee="employee" :employee-id="route.params.employee" :organization-id="route.params.organization" :can-edit="true" />
+                <DocumentsTab v-else-if="activeTab === 'documents'" :employee="employee" :employee-id="route.params.employee" :organization-id="route.params.organization" />
             </div>
         </div>
     </div>
@@ -64,7 +64,7 @@ import DocumentsTab from '../../../../../components/employee/profile/DocumentsTa
 import EmployeeForm from '../../../../../components/employee/form.vue'
 import { apiAddressToStore } from '../../../../../utils/employeeProfile'
 
-definePageMeta({ layout: 'auth' })
+definePageMeta({ layout: 'organization' })
 
 const route = useRoute()
 const router = useRouter()

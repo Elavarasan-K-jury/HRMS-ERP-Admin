@@ -36,21 +36,30 @@
         <div v-if="preloader" class="w-full h-screen backdrop-blur-xl bg-white/10 flex items-center justify-center">
             <UiLoader />
         </div>
+
+        <IpRestrictedModal />
     </div>
 </template>
 
 <script setup>
-import { employee_menu } from '../data/menu'
+import { organization_menu } from '../data/menu'
 import { useThemeStore } from '../stores/shared/theme.store'
 import { useAuthStore } from '../stores/shared/auth.store'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const authStore = useAuthStore()
 const themeStore = useThemeStore()
 
-const menu = ref([])
+// Organization Admin → Employee context: full Organization Admin menu.
+// NOT employee_menu() — Employee Portal lives only under /employee/* via auth.vue.
+const menu = computed(() => {
+    if (route.params.organization) {
+        return organization_menu(route.params.organization)
+    }
+    return []
+})
 const title = 'JURY-HRMS'
 
 const sidebar = computed(() => themeStore.sidebar)
@@ -95,7 +104,6 @@ onMounted(async () => {
         if (route.params.organization && route.params.employee) {
             authStore.organization = route.params.organization
             authStore.employee = route.params.employee
-            menu.value = employee_menu(route.params.organization, route.params.employee)
             const { $setOrganizationId, $setEmpId } = useNuxtApp()
             $setOrganizationId(route.params.organization)
             $setEmpId(route.params.employee)

@@ -13,7 +13,7 @@
             </div>
         </div>
 
-        <!-- Type / Region -->
+        <!-- Type -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
                 <label class="label">Type</label>
@@ -27,8 +27,11 @@
             </div>
 
             <div>
-                <label class="label">Region (optional)</label>
-                <input v-model="region" type="text" placeholder="e.g. Karnataka, PAN India" class="input" />
+                <label class="label">Leave Optional</label>
+                <select v-model="leave_optional" class="input bg-transparent">
+                    <option :value="false">No</option>
+                    <option :value="true">Yes</option>
+                </select>
             </div>
         </div>
 
@@ -48,7 +51,7 @@ import { storeToRefs } from 'pinia'
 import { useHolidayStore } from '@/stores/organization/holiday.store'
 
 const holidayStore = useHolidayStore()
-const { name, date, type, region, policy_id } = storeToRefs(holidayStore);
+const { name, date, type, leave_optional, policy_id } = storeToRefs(holidayStore);
 </script>
 
 <style scoped>

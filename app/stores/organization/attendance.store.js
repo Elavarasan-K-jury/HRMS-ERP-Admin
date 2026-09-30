@@ -107,8 +107,6 @@ export const useEmployeeAttendanceStore = defineStore('employeeAttendance', {
 
                 // Update local reactive state
                 this.evaluateClockState(cleaned)
-
-                console.log('todayAttendance:', cleaned)
             } catch (error) {
                 console.error("Error fetching today's attendance:", error)
             } finally {

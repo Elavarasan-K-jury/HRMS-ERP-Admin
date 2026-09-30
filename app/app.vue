@@ -1,6 +1,6 @@
 <template>
   <NuxtLayout>
-    <NuxtPage :key="route.path" />
+    <NuxtPage :key="route.meta.keepAliveKey || route.path" />
   </NuxtLayout>
 </template>
 

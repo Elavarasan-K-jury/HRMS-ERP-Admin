@@ -94,10 +94,6 @@
                                 <div class="desc" v-if="h.description">{{ h.description }}</div>
                             </div>
 
-                            <div class="col-span-4 text-end region">
-                                {{ h.region || 'All Locations' }}
-                            </div>
-
                             <div class="col-span-1 flex items-center justify-center">
                                 <span class="badge" :class="badgeClass(h.type)">
                                     <span class="dot" :class="dotClass(h.type)"></span>
@@ -121,11 +117,11 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useHolidayOrgStore } from '../../stores/organization/holidayOrg.store'
+import { useHolidayStore } from '../../stores/employee/holiday.store'
 
 definePageMeta({ layout: 'auth' })
 
-const store = useHolidayOrgStore()
+const store = useHolidayStore()
 const { holidays, loading, filter_year } = storeToRefs(store)
 
 const year = computed({
@@ -134,6 +130,17 @@ const year = computed({
 })
 
 const activeFilter = ref('all')
+
+const filters = [
+    { value: 'all', label: 'All' },
+    { value: 'PUBLIC', label: 'Public' },
+    { value: 'RESTRICTED', label: 'Restricted' },
+    { value: 'OPTIONAL', label: 'Optional' },
+]
+
+const buttonFilterClass = (active) => active
+    ? 'px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider bg-white/15 border border-white/25 text-white'
+    : 'px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider bg-white/5 border border-white/10 text-white/60 hover:bg-white/10 hover:text-white transition-all'
 
 /* ---- Fetch on Mount ---- */
 onMounted(() => {

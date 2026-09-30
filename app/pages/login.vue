@@ -127,7 +127,13 @@ const currentPromo = ref(0)
 onMounted(() => {
     themeStore.preloader = false
     const auth = useAuthStore()
-    if (!auth.accessToken) {
+    // Only clear when there is truly no session cookie.
+    // Never wipe a valid EMPLOYEE_/ADMIN_ cookie just because the store
+    // accessToken has not been hydrated yet (that destroyed logins).
+    const hasSessionCookie =
+        useCookie('ADMIN_ACCESS_KEY').value ||
+        useCookie('EMPLOYEE_ACCESS_KEY').value
+    if (!hasSessionCookie) {
         auth.clearToken()
     } else {
         auth.loadLocalData()

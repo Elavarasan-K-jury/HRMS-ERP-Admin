@@ -28,7 +28,7 @@ export const useEmployeeAttendanceStore = defineStore('employee-attendance', {
                         month: `${this.year.value}-${this.month.value < 10 ? `0${this.month.value}` : this.month.value}`,
                     },
                 })
-                this.attendanceList = data.attendance
+                this.attendanceList = data?.attendance ?? []
             } catch (error) {
                 console.error("Error fetching today's attendance:", error)
             } finally {

@@ -14,9 +14,7 @@
                 </div>
                 <div><span class="label">Probation</span>{{ probationInfo }}</div>
                 <div><span class="label">Designation</span>{{ employee.designation?.name || '—' }}</div>
-                <div><span class="label">Band</span>{{ employee.band?.name || employee.band_name || '—' }}</div>
                 <div><span class="label">Department</span>{{ departmentName || '—' }}</div>
-                <div><span class="label">Cost Center</span>{{ employee.cost_center_name || '—' }}</div>
                 <div><span class="label">Pay Grade</span>{{ employee.pay_grade_name || '—' }}</div>
                 <div><span class="label">Business Unit</span>{{ employee.organization?.name || '—' }}</div>
                 <div><span class="label">Location</span>{{ employee.location_name || '—' }}</div>
@@ -36,15 +34,51 @@
         <section class="card md:col-span-2">
             <h2 class="hdr"><Icon name="lucide:clock" class="ic" /> Employee Time</h2>
             <div class="grid2">
-                <div><span class="label">Shift</span>{{ currentShift?.name || '—' }}</div>
+                <div class="shift-field">
+                    <span class="label">Shift</span>
+                    <div class="flex items-center gap-2">
+                        <span>{{ shiftDisplayName }}</span>
+                        <button v-if="canEdit && currentAssignment" class="edit-link" @click="openShiftDrawer" title="Update Shift">
+                            <Icon name="lucide:pencil" class="h-3 w-3" />
+                        </button>
+                        <button v-else-if="canEdit" class="add-link" @click="openShiftDrawer">
+                            <Icon name="lucide:plus" class="h-3 w-3" /> Add Shift
+                        </button>
+                    </div>
+                </div>
                 <div><span class="label">Shift Timings</span>{{ shiftTimings || '—' }}</div>
                 <div><span class="label">Break</span>{{ breakLabel || '—' }}</div>
-                <div><span class="label">Weekly Off</span>{{ weeklyOffLabel || '—' }}</div>
+                <div class="weekly-off-field">
+                    <span class="label">Weekly Off</span>
+                    <div class="flex items-center gap-2">
+                        <span>{{ weeklyOffPolicyName || 'Not assigned' }}</span>
+                        <button v-if="canEdit && weeklyOffAssignment" class="edit-link" @click="openWeeklyOffDrawer" title="Update Weekly Off">
+                            <Icon name="lucide:pencil" class="h-3 w-3" />
+                        </button>
+                        <button v-else-if="canEdit" class="add-link" @click="openWeeklyOffDrawer">
+                            <Icon name="lucide:plus" class="h-3 w-3" /> Add Weekly Off
+                        </button>
+                    </div>
+                </div>
                 <div><span class="label">Probation Policy</span>{{ probation?.policy_name || '—' }}</div>
                 <div><span class="label">Probation Duration</span>{{ probationDuration || '—' }}</div>
+                <div class="holiday-policy-field">
+                    <span class="label">Holiday Policy</span>
+                    <div class="flex items-center gap-2">
+                        <span>{{ holidayPolicyName || 'Not assigned' }}</span>
+                        <button v-if="canEdit && holidayPolicyName" class="edit-link" @click="openHolidayDrawer">
+                            <Icon name="lucide:pencil" class="h-3 w-3" />
+                        </button>
+                        <button v-else-if="canEdit" class="add-link" @click="openHolidayDrawer">
+                            <Icon name="lucide:plus" class="h-3 w-3" /> Add Holiday Policy
+                        </button>
+                    </div>
+                </div>
             </div>
             <p v-if="loadingShift" class="empty">Loading shift details…</p>
-            <p v-else-if="!currentShift" class="empty">No shift assigned yet.</p>
+            <p v-else-if="shiftLoadError" class="empty">Failed to load shift details.</p>
+            <p v-else-if="!currentAssignment" class="empty">{{ emptyShiftHint }}</p>
+            <p v-if="weeklyOffLoadError" class="empty">Failed to load weekly off details.</p>
         </section>
 
         <section class="card md:col-span-2">
@@ -61,14 +95,62 @@
             <p v-else class="empty">No employment timeline available.</p>
         </section>
     </div>
+
+    <!-- Write drawers: Org Admin only — never mounted on Employee Portal Job tab -->
+    <EmployeeHolidayPolicyDrawer
+        v-if="canEdit"
+        v-model="holidayDrawerOpen"
+        :employee-id="props.employeeId"
+        :organization-id="props.organizationId"
+        :current-policy-id="holidayPolicyId"
+        :current-policy-name="holidayPolicyName"
+        @saved="onHolidayPolicySaved"
+    />
+
+    <EmployeeShiftDrawer
+        v-if="canEdit"
+        v-model="shiftDrawerOpen"
+        :employee-id="empId"
+        :organization-id="orgId"
+        :current-shift-id="currentShift?.id || currentAssignment?.shift_id || ''"
+        :current-shift-name="shiftDisplayName"
+        :current-assignment="currentAssignment"
+        @saved="onShiftSaved"
+    />
+
+    <EmployeeWeeklyOffDrawer
+        v-if="canEdit"
+        v-model="weeklyOffDrawerOpen"
+        :employee-id="empId"
+        :organization-id="orgId"
+        :current-policy-id="weeklyOffAssignment?.weekly_off_policy_id || ''"
+        :current-policy-name="weeklyOffAssignment?.policy_name || ''"
+        :current-assignment="weeklyOffAssignment"
+        @saved="onWeeklyOffSaved"
+    />
 </template>
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import EmployeeHolidayPolicyDrawer from './EmployeeHolidayPolicyDrawer.vue'
+import EmployeeShiftDrawer from './EmployeeShiftDrawer.vue'
+import EmployeeWeeklyOffDrawer from './EmployeeWeeklyOffDrawer.vue'
+import { todayStr } from '~/data/shiftRotation'
 
 const props = defineProps({
     employee: { type: Object, required: true },
+    employeeId: { type: String, default: '' },
+    organizationId: { type: String, default: '' },
+    // Explicit context: Org Admin Job tab is read+write; Employee Portal Job tab is read-only.
+    // Pattern matches PayGradeTable canEdit prop.
+    canEdit: { type: Boolean, default: true },
 })
+
+const emptyShiftHint = computed(() =>
+    props.canEdit
+        ? 'No shift assigned yet — use Add Shift to assign one.'
+        : 'No shift assigned yet.'
+)
 
 const departmentName = computed(() => {
     const e = props.employee
@@ -161,20 +243,32 @@ const timeline = computed(() => {
  * ---------------------------------------------------------- */
 const assignments = ref([])
 const loadingShift = ref(false)
+const shiftLoadError = ref(false)
+const shiftDrawerOpen = ref(false)
+
+const empId = computed(() => props.employeeId || props.employee?.id || '')
+const orgId = computed(() => props.organizationId || props.employee?.organization_id || props.employee?.organization?.id || '')
+
+const dayOnly = (iso) => (iso ? String(iso).slice(0, 10) : '')
 
 const loadShiftData = async () => {
-    if (!props.employee?.id) return
+    if (!empId.value) return
     loadingShift.value = true
+    shiftLoadError.value = false
     try {
         const { $api } = useNuxtApp()
+        // canEdit=false (Employee Portal): legacy active_only behavior, unchanged.
+        // canEdit=true (Org Admin): load ALL assignments so future/upcoming rows are visible.
         const { data } = await $api.get('/shift-assignments', {
-            params: { employee_id: props.employee.id, active_only: true },
+            params: props.canEdit
+                ? { employee_id: empId.value }
+                : { employee_id: empId.value, active_only: true },
         })
         const assigns = data?.assignments || []
         const withShift = await Promise.all(assigns.map(async (a) => {
             try {
                 const { data: s } = await $api.get(`/shifts/${a.shift_id}`)
-                return { ...a, shift: s }
+                return { ...a, shift: { ...a.shift, ...s, name: s?.name || a.shift?.name || '' } }
             } catch {
                 return a
             }
@@ -182,7 +276,12 @@ const loadShiftData = async () => {
         assignments.value = withShift
     } catch (err) {
         console.error('[JobTab] Shift load failed:', err)
-        assignments.value = []
+        if (props.canEdit) {
+            // Org Admin: never mask a failed load as "no assignment"
+            shiftLoadError.value = true
+        } else {
+            assignments.value = [] // legacy Employee Portal behavior, unchanged
+        }
     } finally {
         loadingShift.value = false
     }
@@ -190,7 +289,51 @@ const loadShiftData = async () => {
 
 onMounted(loadShiftData)
 
-const currentShift = computed(() => assignments.value[0]?.shift || null)
+// canEdit=false (Employee Portal): first active row — exactly the previous behavior.
+// canEdit=true (Org Admin): resolve with date-only inclusive bounds:
+//   covering today -> today's assignment; else earliest future row (upcoming);
+//   past-only / none -> null (Add Shift).
+const resolvedAssignment = computed(() => {
+    const rows = assignments.value
+    if (!props.canEdit) return rows[0] || null
+    const today = todayStr()
+    const covering = rows.find((r) => {
+        const from = dayOnly(r.valid_from)
+        const to = dayOnly(r.valid_to)
+        return from <= today && (!to || to >= today)
+    })
+    if (covering) return covering
+    let earliest = null
+    for (const r of rows) {
+        const from = dayOnly(r.valid_from)
+        if (from > today && (!earliest || from < dayOnly(earliest.valid_from))) earliest = r
+    }
+    return earliest
+})
+
+const currentAssignment = computed(() => resolvedAssignment.value)
+const currentShift = computed(() => {
+    const a = currentAssignment.value
+    if (!a) return null
+    return a.shift || { id: a.shift_id, name: '' }
+})
+
+const isUpcoming = computed(() => {
+    if (!props.canEdit) return false
+    const a = currentAssignment.value
+    return !!a && dayOnly(a.valid_from) > todayStr()
+})
+
+const shiftDisplayName = computed(() => {
+    if (!currentAssignment.value) return 'Not assigned'
+    const base = currentShift.value?.name || 'Assigned shift'
+    if (isUpcoming.value) {
+        const d = new Date(`${dayOnly(currentAssignment.value.valid_from)}T00:00:00`)
+        const label = d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })
+        return `${base} (from ${label})`
+    }
+    return base
+})
 
 const shiftTimings = computed(() => {
     const s = currentShift.value
@@ -200,16 +343,99 @@ const shiftTimings = computed(() => {
     return st && et ? `${st} → ${et}` : (st || et)
 })
 
+function openShiftDrawer() {
+    if (!props.canEdit) return
+    shiftDrawerOpen.value = true
+}
+
+async function onShiftSaved() {
+    await loadShiftData()
+}
+
 const breakLabel = computed(() => {
     const mins = currentShift.value?.break_minutes
     return mins ? `${mins} min` : ''
 })
 
-const weeklyOffLabel = computed(() => {
-    const wo = currentShift.value?.weekly_off
-    if (!Array.isArray(wo) || !wo.length) return ''
-    return wo.map(d => d.charAt(0).toUpperCase() + d.slice(1)).join(', ')
+/* ------------------------------------------------------------
+ * Employee Weekly Off (policy assignment — not shift.weekly_off days)
+ * ---------------------------------------------------------- */
+const weeklyOffAssignments = ref([])
+const weeklyOffLoading = ref(false)
+const weeklyOffLoadError = ref(false)
+const weeklyOffDrawerOpen = ref(false)
+
+const loadWeeklyOffData = async () => {
+    if (!empId.value) return
+    weeklyOffLoading.value = true
+    weeklyOffLoadError.value = false
+    try {
+        const { $api } = useNuxtApp()
+        // organization_id: the endpoint requires org context; the Employee Portal
+        // never sends an x-org-id header, so pass it explicitly when known.
+        // Fetch ALL assignments (both scopes) so future/upcoming rows are visible;
+        // resolution below picks covering-today vs earliest future.
+        const { data } = await $api.get('/weekly-off/assignments', {
+            params: { employee_id: empId.value, organization_id: orgId.value || undefined },
+        })
+        weeklyOffAssignments.value = data?.assignments || []
+    } catch (err) {
+        console.error('[JobTab] Weekly Off load failed:', err)
+        // Never mask a failed load as "no assignment"
+        weeklyOffLoadError.value = true
+        weeklyOffAssignments.value = []
+    } finally {
+        weeklyOffLoading.value = false
+    }
+}
+
+// Resolve with date-only inclusive bounds (both scopes):
+//   covering today -> today's assignment; else earliest future row (upcoming);
+//   past-only / none -> null (Not assigned / Add Weekly Off for admins).
+const resolvedWeeklyOffAssignment = computed(() => {
+    const rows = weeklyOffAssignments.value
+    const today = todayStr()
+    const covering = rows.find((r) => {
+        const from = dayOnly(r.effective_from)
+        const to = dayOnly(r.effective_to)
+        return from <= today && (!to || to >= today)
+    })
+    if (covering) return covering
+    let earliest = null
+    for (const r of rows) {
+        const from = dayOnly(r.effective_from)
+        if (from > today && (!earliest || from < dayOnly(earliest.effective_from))) earliest = r
+    }
+    return earliest
 })
+
+const weeklyOffAssignment = computed(() => resolvedWeeklyOffAssignment.value)
+
+const weeklyOffIsUpcoming = computed(() => {
+    const a = weeklyOffAssignment.value
+    return !!a && dayOnly(a.effective_from) > todayStr()
+})
+
+const weeklyOffPolicyName = computed(() => {
+    const a = weeklyOffAssignment.value
+    if (!a) return ''
+    const base = a.policy_name || ''
+    if (weeklyOffIsUpcoming.value) {
+        const d = new Date(`${dayOnly(a.effective_from)}T00:00:00`)
+        const label = d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })
+        return `${base} (from ${label})`
+    }
+    return base
+})
+
+function openWeeklyOffDrawer() {
+    if (!props.canEdit) return
+    weeklyOffDrawerOpen.value = true
+}
+
+async function onWeeklyOffSaved() {
+    await loadWeeklyOffData()
+}
 
 function formatDate(iso) {
     if (!iso) return ''
@@ -218,12 +444,70 @@ function formatDate(iso) {
     return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
-function formatTime(iso) {
-    if (!iso) return ''
-    const d = new Date(iso)
-    if (isNaN(d)) return ''
+function formatTime(hm) {
+    if (!hm) return ''
+    // Canonical Shift wire format is HH:mm — pure time-of-day, never new Date("04:00")
+    const m = String(hm).match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/)
+    if (m) {
+        const h = Number(m[1])
+        if (h > 23) return ''
+        const period = h >= 12 ? 'PM' : 'AM'
+        const h12 = h % 12 === 0 ? 12 : h % 12
+        return `${String(h12).padStart(2, '0')}:${m[2]} ${period}`
+    }
+    // Legacy epoch time-of-day (1970-01-01T04:00:00.000Z) — read UTC HH:mm only, no local TZ shift
+    const epoch = String(hm).match(/^1970-\d{2}-\d{2}T(\d{2}):(\d{2})/)
+    if (epoch) {
+        const h = Number(epoch[1])
+        if (h > 23) return ''
+        const period = h >= 12 ? 'PM' : 'AM'
+        const h12 = h % 12 === 0 ? 12 : h % 12
+        return `${String(h12).padStart(2, '0')}:${epoch[2]} ${period}`
+    }
+    // Other ISO datetimes (real events): local display fields only
+    const d = new Date(hm)
+    if (isNaN(d.getTime())) return ''
     return d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })
 }
+
+/* ------------------------------------------------------------
+ * Employee Holiday Policy
+ * ---------------------------------------------------------- */
+const holidayPolicyId = ref('')
+const holidayPolicyName = ref('')
+const holidayDrawerOpen = ref(false)
+
+const loadHolidayPolicy = async () => {
+    const empId = props.employeeId || props.employee?.id
+    const orgId = props.organizationId || props.employee?.organization_id
+    if (!empId || !orgId) return
+    try {
+        const { $api } = useNuxtApp()
+        const { data } = await $api.get(`/employees/${empId}/holiday-policy`, {
+            params: { organization_id: orgId },
+        })
+        const a = data?.assignment
+        holidayPolicyId.value = a?.policy_id || ''
+        holidayPolicyName.value = a?.policy_name || ''
+    } catch (err) {
+        console.error('[JobTab] Holiday policy load failed:', err)
+        holidayPolicyId.value = ''
+        holidayPolicyName.value = ''
+    }
+}
+
+function openHolidayDrawer() {
+    if (!props.canEdit) return
+    holidayDrawerOpen.value = true
+}
+
+async function onHolidayPolicySaved() {
+    await loadHolidayPolicy()
+}
+
+onMounted(loadHolidayPolicy)
+
+onMounted(loadWeeklyOffData)
 </script>
 
 <style scoped>
@@ -337,6 +621,55 @@ function formatTime(iso) {
     font-size: 13px;
     color: rgba(255, 255, 255, 0.4);
     font-style: italic;
+}
+
+.shift-field {
+    grid-column: 1 / -1;
+}
+
+.holiday-policy-field {
+    grid-column: 1 / -1;
+}
+
+.weekly-off-field {
+    grid-column: 1 / -1;
+}
+
+.edit-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    color: rgba(52, 211, 153, 0.8);
+    background: rgba(52, 211, 153, 0.1);
+    border: 1px solid rgba(52, 211, 153, 0.2);
+    border-radius: 6px;
+    padding: 2px 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.edit-link:hover {
+    background: rgba(52, 211, 153, 0.2);
+    color: #6ee7b7;
+}
+
+.add-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    color: rgba(52, 211, 153, 0.9);
+    background: rgba(52, 211, 153, 0.08);
+    border: 1px solid rgba(52, 211, 153, 0.15);
+    border-radius: 6px;
+    padding: 2px 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.add-link:hover {
+    background: rgba(52, 211, 153, 0.18);
+    border-color: rgba(52, 211, 153, 0.3);
+    color: #6ee7b7;
 }
 
 @media (max-width: 640px) {

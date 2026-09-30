@@ -62,7 +62,8 @@
             <div v-else-if="filteredDocTypes.length === 0" class="empty-state">
                 <Icon name="lucide:file-question" class="h-10 w-10 text-white/25 mb-3" />
                 <p class="text-sm text-white/50">No documents assigned</p>
-                <p class="text-xs text-white/35 mt-1">Your assigned employee documents will appear here.</p>
+                <p v-if="isAdmin" class="text-xs text-white/35 mt-1">No pending documents for this employee.</p>
+                <p v-else class="text-xs text-white/35 mt-1">Your assigned employee documents will appear here.</p>
             </div>
 
             <div v-else class="doc-list">
@@ -94,15 +95,41 @@
                                 </div>
                             </div>
                         </div>
-                        <button v-if="dt.state === 'VERIFIED'" class="edit-btn" @click="openSubmitDrawer(dt)">
-                            <Icon name="lucide:pencil" class="h-4 w-4" /> Edit
-                        </button>
-                        <button v-else-if="dt.state === 'PENDING_VERIFICATION'" class="pending-btn" disabled>
-                            <Icon name="lucide:clock" class="h-4 w-4" /> Pending
-                        </button>
-                        <button v-else class="add-details-btn" @click="openSubmitDrawer(dt)">
-                            <Icon name="lucide:plus-circle" class="h-4 w-4" /> Add details
-                        </button>
+                        <div class="flex items-center gap-2">
+                            <template v-if="isAdmin && dt.state === 'PENDING_VERIFICATION'">
+                                <button class="add-details-btn" @click="verifyDocument(dt)">
+                                    <Icon name="lucide:check-circle" class="h-4 w-4" /> Verify
+                                </button>
+                                <button class="reject-btn" @click="openRejectModal(dt)">
+                                    <Icon name="lucide:x-circle" class="h-4 w-4" /> Reject
+                                </button>
+                            </template>
+                            <template v-else-if="isAdmin && dt.state === 'VERIFIED'">
+                                <button class="edit-btn" @click="openSubmitDrawer(dt)">
+                                    <Icon name="lucide:pencil" class="h-4 w-4" /> Edit
+                                </button>
+                            </template>
+                            <template v-else-if="isAdmin && (dt.state === 'UNSUBMITTED' || dt.state === 'REJECTED')">
+                                <button class="add-details-btn" @click="openSubmitDrawer(dt)">
+                                    <Icon name="lucide:plus-circle" class="h-4 w-4" /> Submit
+                                </button>
+                            </template>
+                            <template v-else-if="!isAdmin && dt.state === 'VERIFIED'">
+                                <button class="edit-btn" @click="openSubmitDrawer(dt)">
+                                    <Icon name="lucide:pencil" class="h-4 w-4" /> Edit
+                                </button>
+                            </template>
+                            <template v-else-if="!isAdmin && dt.state === 'PENDING_VERIFICATION'">
+                                <button class="pending-btn" disabled>
+                                    <Icon name="lucide:clock" class="h-4 w-4" /> Pending
+                                </button>
+                            </template>
+                            <template v-else-if="!isAdmin">
+                                <button class="add-details-btn" @click="openSubmitDrawer(dt)">
+                                    <Icon name="lucide:plus-circle" class="h-4 w-4" /> Add details
+                                </button>
+                            </template>
+                        </div>
                     </div>
 
                     <div v-if="dt.state === 'VERIFIED' && dt.verifiedDocument" class="doc-card-details">
@@ -125,23 +152,53 @@
                     </div>
 
                     <div v-if="dt.state === 'PENDING_VERIFICATION'" class="doc-card-details">
-                        <p class="text-xs text-amber-400/70 italic">Your submission is awaiting admin verification.</p>
+                        <p v-if="isAdmin" class="text-xs text-amber-400/70 italic">This submission is awaiting your verification.</p>
+                        <p v-else class="text-xs text-amber-400/70 italic">Your submission is awaiting admin verification.</p>
                     </div>
 
                     <div v-if="dt.state === 'REJECTED'" class="doc-card-details">
-                        <p class="text-xs text-red-400/70 italic">Your submission was rejected. Please review and resubmit.</p>
+                        <p v-if="isAdmin" class="text-xs text-red-400/70 italic">This submission was rejected. Employee can resubmit.</p>
+                        <p v-else class="text-xs text-red-400/70 italic">Your submission was rejected. Please review and resubmit.</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <EmployeeSubmitDocumentDrawer
+            v-if="!isAdmin"
             v-model="submitDrawerOpen"
             :document-type-id="submitDrawerDocTypeId"
             :assignment-id="submitDrawerAssignmentId"
             :existing-submission="submitDrawerExisting"
             @submitted="onSubmitted"
         />
+
+        <SubmitDocumentDrawer
+            v-if="isAdmin"
+            v-model="adminDrawerOpen"
+            :pending="adminDrawerPending"
+            :organization-id="organizationId"
+            @submitted="onSubmitted"
+        />
+
+        <UiSidebarModal v-model="rejectModalOpen" title="Reject Document" width="480px">
+            <template #default>
+                <div class="flex flex-col gap-4">
+                    <p class="text-sm text-white/70">
+                        Rejecting submission for <strong class="text-white/90">{{ rejectTarget?.document_type_name }}</strong>.
+                    </p>
+                    <div class="flex flex-col gap-1.5">
+                        <p class="text-sm text-white/80">Rejection Reason <span class="text-rose-400">*</span></p>
+                        <textarea v-model="rejectReason" rows="3" placeholder="Provide a reason for rejection..."
+                            class="w-full bg-white/[0.06] border border-white/15 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:border-rose-400/50 resize-none"></textarea>
+                    </div>
+                </div>
+            </template>
+            <template #footer>
+                <UiButton @click="closeRejectModal" color="#fff" text="Cancel" :disabled="rejecting" />
+                <UiButton @click="confirmReject" color="#ff4a4a" :text="rejecting ? 'Rejecting...' : 'Reject'" prepend-icon="lucide:x-circle" :disabled="rejecting" :loading="rejecting" />
+            </template>
+        </UiSidebarModal>
     </section>
 </template>
 
@@ -151,13 +208,19 @@ import { useRoute } from 'vue-router'
 import { useEmployeeDocumentStore } from '~/stores/organization/employeeDocument.store'
 import { resolveMediaUrl } from '~/utils/media'
 import EmployeeSubmitDocumentDrawer from '~/components/employee-documents/EmployeeSubmitDocumentDrawer.vue'
+import SubmitDocumentDrawer from '~/components/employee-documents/SubmitDocumentDrawer.vue'
 
 const props = defineProps({
     employee: { type: Object, required: true },
+    employeeId: { type: String, default: null },
+    organizationId: { type: String, default: null },
 })
 
 const docStore = useEmployeeDocumentStore()
 const route = useRoute()
+
+const isAdmin = computed(() => !!props.employeeId)
+const canEdit = computed(() => true)
 
 const assignments = ref([])
 const verifiedDocs = ref([])
@@ -171,6 +234,14 @@ const submitDrawerOpen = ref(false)
 const submitDrawerDocTypeId = ref('')
 const submitDrawerAssignmentId = ref('')
 const submitDrawerExisting = ref(null)
+
+const adminDrawerOpen = ref(false)
+const adminDrawerPending = ref(null)
+
+const rejectModalOpen = ref(false)
+const rejectTarget = ref(null)
+const rejectReason = ref('')
+const rejecting = ref(false)
 
 const verifiedByType = computed(() => {
     const map = new Map()
@@ -258,15 +329,83 @@ function selectFolder(folderId) {
 }
 
 function openSubmitDrawer(dt) {
-    submitDrawerDocTypeId.value = dt.document_type_id
-    submitDrawerAssignmentId.value = dt.id
-    submitDrawerExisting.value = dt.state === 'VERIFIED' ? dt.verifiedDocument : null
-    submitDrawerOpen.value = true
+    if (isAdmin.value) {
+        const existingSubmission = dt.state === 'VERIFIED' && dt.verifiedDocument
+            ? dt.verifiedDocument
+            : dt.latestSubmission && (dt.state === 'PENDING_VERIFICATION' || dt.state === 'REJECTED')
+                ? dt.latestSubmission
+                : null
+        adminDrawerPending.value = {
+            folder_id: dt.folder_id,
+            document_type_id: dt.document_type_id,
+            document_type_name: dt.document_type_name,
+            assignment_id: dt.id,
+            employee_id: props.employeeId,
+            employee_name: props.employee.display_name || props.employee.full_name || '',
+            employee_code: props.employee.employee_code || '',
+            folder_name: dt.folder_name || '',
+            existing_submission: existingSubmission,
+        }
+        adminDrawerOpen.value = true
+    } else {
+        submitDrawerDocTypeId.value = dt.document_type_id
+        submitDrawerAssignmentId.value = dt.id
+        submitDrawerExisting.value = dt.state === 'VERIFIED' ? dt.verifiedDocument : null
+        submitDrawerOpen.value = true
+    }
 }
 
 async function onSubmitted() {
     submitDrawerOpen.value = false
+    adminDrawerOpen.value = false
+    adminDrawerPending.value = null
     await loadData()
+}
+
+function openRejectModal(dt) {
+    rejectTarget.value = dt
+    rejectReason.value = ''
+    rejectModalOpen.value = true
+}
+
+function closeRejectModal() {
+    rejectModalOpen.value = false
+    rejectTarget.value = null
+    rejectReason.value = ''
+    rejecting.value = false
+}
+
+async function confirmReject() {
+    if (rejecting.value || !rejectTarget.value?.latestSubmission?.id) return
+    if (!rejectReason.value.trim()) {
+        useToast().error({ title: 'Required', message: 'Please provide a rejection reason.', timeout: 2500 })
+        return
+    }
+    rejecting.value = true
+    try {
+        const submissionId = rejectTarget.value.latestSubmission.id
+        await docStore.rejectSubmission(submissionId, rejectReason.value.trim(), null, props.organizationId)
+        useToast().success({ title: 'Rejected', message: 'Document submission rejected.', timeout: 1500 })
+        closeRejectModal()
+        await loadData()
+    } catch (err) {
+        const msg = err?.response?.data?.error || err.message || 'Failed to reject'
+        useToast().error({ title: 'Error', message: String(msg).replace(/^\d+ [A-Z_]+:\s*/, ''), timeout: 3000 })
+    } finally {
+        rejecting.value = false
+    }
+}
+
+async function verifyDocument(dt) {
+    if (!dt.latestSubmission?.id) return
+    try {
+        await docStore.verifySubmission(dt.latestSubmission.id, null, props.organizationId)
+        useToast().success({ title: 'Verified', message: 'Document verified successfully.', timeout: 1500 })
+        await loadData()
+    } catch (err) {
+        const msg = err?.response?.data?.error || err.message || 'Failed to verify'
+        useToast().error({ title: 'Error', message: String(msg).replace(/^\d+ [A-Z_]+:\s*/, ''), timeout: 3000 })
+    }
 }
 
 const SENSITIVE_KEYS = ['aadhaar_number', 'aadhaar', 'aadhar', 'pan_number', 'pan', 'passport_number', 'passport', 'driving_licence', 'voter_id', 'ssn', 'social_security']
@@ -326,11 +465,20 @@ async function loadData() {
     loading.value = true
     error.value = null
     try {
-        const [assignResult, verifiedResult, submissionsResult] = await Promise.all([
-            docStore.fetchMyAssignments(),
-            docStore.fetchMyVerifiedDocuments(),
-            docStore.fetchMySubmissions(),
-        ])
+        let assignResult, verifiedResult, submissionsResult
+        if (props.employeeId) {
+            ;[assignResult, verifiedResult, submissionsResult] = await Promise.all([
+                docStore.fetchEmployeeAssignments(props.employeeId, { organization_id: props.organizationId }),
+                docStore.fetchVerifiedDocuments({ employee_id: props.employeeId, organization_id: props.organizationId, limit: 50 }),
+                docStore.fetchEmployeeSubmissions(props.employeeId, { organization_id: props.organizationId }),
+            ])
+        } else {
+            ;[assignResult, verifiedResult, submissionsResult] = await Promise.all([
+                docStore.fetchMyAssignments(),
+                docStore.fetchMyVerifiedDocuments(),
+                docStore.fetchMySubmissions(),
+            ])
+        }
         assignments.value = assignResult
         verifiedDocs.value = verifiedResult
         submissions.value = submissionsResult
@@ -743,6 +891,27 @@ onMounted(loadData)
     flex-shrink: 0;
 }
 
+.reject-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: rgba(244, 63, 94, 0.8);
+    background: rgba(244, 63, 94, 0.1);
+    border: 1px solid rgba(244, 63, 94, 0.2);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+}
+.reject-btn:hover {
+    background: rgba(244, 63, 94, 0.2);
+    border-color: rgba(244, 63, 94, 0.35);
+    color: #fda4af;
+}
+
 .doc-card--verified {
     border-color: rgba(52, 211, 153, 0.15);
 }
@@ -866,7 +1035,7 @@ onMounted(loadData)
     .main-header { flex-direction: column; }
     .search-box { min-width: 100%; }
     .doc-card-header { flex-direction: column; align-items: flex-start; gap: 10px; }
-    .add-details-btn, .edit-btn, .pending-btn { align-self: flex-end; }
+    .add-details-btn, .edit-btn, .pending-btn, .reject-btn { align-self: flex-end; }
     .file-row { flex-direction: column; align-items: flex-start; gap: 8px; }
 }
 </style>

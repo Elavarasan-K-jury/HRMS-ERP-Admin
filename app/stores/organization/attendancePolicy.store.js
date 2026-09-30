@@ -26,6 +26,11 @@ export const useAttendancePolicyStore = defineStore('attendancePolicy', {
         },
         overtime_allowed: true,
         min_overtime_minutes: 0,
+        allow_regularisation: true,
+        regularisation_mode: 'BOTH',
+        max_regularisation_requests: null,
+        regularisation_period: 'MONTHLY',
+        regularisation_window_days: 30,
     }),
 
     actions: {
@@ -80,6 +85,21 @@ export const useAttendancePolicyStore = defineStore('attendancePolicy', {
                     rounding_strategy: this.rounding_strategy,
                     overtime_allowed: this.overtime_allowed,
                     min_overtime_minutes: Number(this.min_overtime_minutes),
+                    allow_regularisation: this.allow_regularisation,
+                    regularisation_mode: this.regularisation_mode,
+                    max_regularisation_requests:
+                        this.max_regularisation_requests === '' ||
+                        this.max_regularisation_requests === null ||
+                        this.max_regularisation_requests === undefined
+                            ? null
+                            : Number(this.max_regularisation_requests),
+                    regularisation_period: this.regularisation_period,
+                    regularisation_window_days:
+                        this.regularisation_window_days === '' ||
+                        this.regularisation_window_days === null ||
+                        this.regularisation_window_days === undefined
+                            ? null
+                            : Number(this.regularisation_window_days),
                 }
 
                 const { data } = await $api.post('/attendance-policies', payload)
@@ -114,6 +134,21 @@ export const useAttendancePolicyStore = defineStore('attendancePolicy', {
                     rounding_strategy: this.rounding_strategy,
                     overtime_allowed: this.overtime_allowed,
                     min_overtime_minutes: Number(this.min_overtime_minutes),
+                    allow_regularisation: this.allow_regularisation,
+                    regularisation_mode: this.regularisation_mode,
+                    max_regularisation_requests:
+                        this.max_regularisation_requests === '' ||
+                        this.max_regularisation_requests === null ||
+                        this.max_regularisation_requests === undefined
+                            ? null
+                            : Number(this.max_regularisation_requests),
+                    regularisation_period: this.regularisation_period,
+                    regularisation_window_days:
+                        this.regularisation_window_days === '' ||
+                        this.regularisation_window_days === null ||
+                        this.regularisation_window_days === undefined
+                            ? null
+                            : Number(this.regularisation_window_days),
                 }
 
                 const { data } = await $api.put(`/attendance-policies/${this.policy_id}`, payload)
@@ -145,6 +180,11 @@ export const useAttendancePolicyStore = defineStore('attendancePolicy', {
             this.rounding_strategy = 'basic'
             this.overtime_allowed = true
             this.min_overtime_minutes = 0
+            this.allow_regularisation = true
+            this.regularisation_mode = 'BOTH'
+            this.max_regularisation_requests = null
+            this.regularisation_period = 'MONTHLY'
+            this.regularisation_window_days = 30
         },
 
         /* ----------------------------------------------
@@ -164,6 +204,14 @@ export const useAttendancePolicyStore = defineStore('attendancePolicy', {
             this.rounding_strategy = policy.rounding_strategy
             this.overtime_allowed = policy.overtime_allowed
             this.min_overtime_minutes = policy.min_overtime_minutes
+            this.allow_regularisation = policy.allow_regularisation ?? true
+            this.regularisation_mode = policy.regularisation_mode ?? 'BOTH'
+            this.max_regularisation_requests =
+                policy.max_regularisation_requests ?? null
+            this.regularisation_period =
+                policy.regularisation_period ?? 'MONTHLY'
+            this.regularisation_window_days =
+                policy.regularisation_window_days ?? 30
         }
     }
 })

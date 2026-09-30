@@ -17,7 +17,6 @@
                         <th class="th">Holiday</th>
                         <th class="th">Date</th>
                         <th class="th">Type</th>
-                        <th class="th">Region</th>
                         <th class="th">Policy</th>
                         <th class="th">Created</th>
                         <th class="th">Updated</th>
@@ -37,9 +36,6 @@
                             </td>
                             <td class="td">
                                 <div class="skeleton w-24" />
-                            </td>
-                            <td class="td">
-                                <div class="skeleton w-20" />
                             </td>
                             <td class="td">
                                 <div class="skeleton w-40" />
@@ -76,19 +72,11 @@
                             </span>
                         </td>
 
-                        <!-- Region -->
-                        <td class="td align-top">
-                            <span>{{ h.region || '—' }}</span>
-                        </td>
-
                         <!-- Policy -->
                         <td class="td align-top">
                             <span class="font-medium">
                                 {{ h.policy?.name || h.policy_name || '—' }}
                             </span>
-                            <div class="text-xs text-white/60">
-                                {{ h.policy?.region || h.policy_region || '' }}
-                            </div>
                         </td>
 
                         <!-- Created -->

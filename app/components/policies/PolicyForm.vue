@@ -66,6 +66,42 @@
             </div>
         </div>
 
+        <div class="flex flex-col gap-2 col-span-2 mt-3 border-t border-white/10 pt-3">
+            <label class="text-md text-white/80">Regularisation</label>
+            <div class="grid grid-cols-2 gap-3">
+                <div class="flex justify-between items-center">
+                    <label>Allow Regularisation</label>
+                    <UiSwitch v-model="allow_regularisation" />
+                </div>
+                <div class="flex flex-col gap-2">
+                    <label class="text-md text-white/80">Mode:</label>
+                    <FormSelect color="#fff" v-model="regularisation_mode" :options="[
+                        { label: 'Both', value: 'BOTH' },
+                        { label: 'Adjust logs', value: 'ADJUST_LOGS' },
+                        { label: 'Exempt penalty', value: 'EXEMPT_PENALTY' }
+                    ]" placeholder="Regularisation mode" />
+                </div>
+                <div class="flex flex-col gap-2">
+                    <label class="text-md text-white/80">Max Requests (per period, blank = unlimited):</label>
+                    <FormInput color="#fff" v-model="max_regularisation_requests"
+                        placeholder="e.g. 2" />
+                </div>
+                <div class="flex flex-col gap-2">
+                    <label class="text-md text-white/80">Period:</label>
+                    <FormSelect color="#fff" v-model="regularisation_period" :options="[
+                        { label: 'Monthly', value: 'MONTHLY' },
+                        { label: 'Weekly', value: 'WEEKLY' },
+                        { label: 'Yearly', value: 'YEARLY' }
+                    ]" placeholder="Period" />
+                </div>
+                <div class="flex flex-col gap-2">
+                    <label class="text-md text-white/80">Window (days back):</label>
+                    <FormInput color="#fff" v-model="regularisation_window_days"
+                        placeholder="e.g. 30" />
+                </div>
+            </div>
+        </div>
+
     </div>
 </template>
 
@@ -87,6 +123,11 @@ const {
     checkout_buffer_min,
     rounding_strategy,
     overtime_allowed,
-    min_overtime_minutes
+    min_overtime_minutes,
+    allow_regularisation,
+    regularisation_mode,
+    max_regularisation_requests,
+    regularisation_period,
+    regularisation_window_days
 } = storeToRefs(store);
 </script>

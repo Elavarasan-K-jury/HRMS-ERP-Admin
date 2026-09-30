@@ -16,7 +16,7 @@
                 <div class="about-field-card">
                     <div class="about-field-header">
                         <span class="about-field-label">About</span>
-                        <button class="about-field-action" @click="openAboutModal">
+                        <button v-if="canEdit" class="about-field-action" @click="openAboutModal">
                             <Icon name="lucide:pencil" class="about-field-action-icon" />
                             {{ aboutData.about ? 'Edit' : 'Add your response' }}
                         </button>
@@ -26,7 +26,7 @@
                 <div class="about-field-card">
                     <div class="about-field-header">
                         <span class="about-field-label">What I love about my job?</span>
-                        <button class="about-field-action" @click="openAboutModal">
+                        <button v-if="canEdit" class="about-field-action" @click="openAboutModal">
                             <Icon name="lucide:pencil" class="about-field-action-icon" />
                             {{ aboutData.what_i_love_about_job ? 'Edit' : 'Add your response' }}
                         </button>
@@ -36,7 +36,7 @@
                 <div class="about-field-card">
                     <div class="about-field-header">
                         <span class="about-field-label">My interests and hobbies</span>
-                        <button class="about-field-action" @click="openAboutModal">
+                        <button v-if="canEdit" class="about-field-action" @click="openAboutModal">
                             <Icon name="lucide:pencil" class="about-field-action-icon" />
                             {{ aboutData.interests_and_hobbies ? 'Edit' : 'Add your response' }}
                         </button>
@@ -81,11 +81,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 
 const props = defineProps({
     employee: { type: Object, required: true },
+    employeeId: { type: String, default: null },
 })
+
+const canEdit = computed(() => true)
 
 const subTabs = [
     { label: 'Summary', value: 'summary' },
@@ -103,13 +106,21 @@ const aboutForm = ref({ about: '', what_i_love_about_job: '', interests_and_hobb
 async function loadAbout() {
     aboutLoading.value = true
     try {
-        const { $api } = useNuxtApp()
-        const { data } = await $api.get('/employee-profile/my/about')
-        if (data?.about) {
+        if (props.employeeId) {
             aboutData.value = {
-                about: data.about.about || '',
-                what_i_love_about_job: data.about.what_i_love_about_job || '',
-                interests_and_hobbies: data.about.interests_and_hobbies || '',
+                about: props.employee.about || '',
+                what_i_love_about_job: props.employee.what_i_love_about_job || '',
+                interests_and_hobbies: props.employee.interests_and_hobbies || '',
+            }
+        } else {
+            const { $api } = useNuxtApp()
+            const { data } = await $api.get('/employee-profile/my/about')
+            if (data?.about) {
+                aboutData.value = {
+                    about: data.about.about || '',
+                    what_i_love_about_job: data.about.what_i_love_about_job || '',
+                    interests_and_hobbies: data.about.interests_and_hobbies || '',
+                }
             }
         }
     } catch (err) {
@@ -129,13 +140,22 @@ async function saveAbout() {
     aboutSaving.value = true
     try {
         const { $api } = useNuxtApp()
-        const { data } = await $api.put('/employee-profile/my/about', {
-            about: aboutForm.value.about?.trim() || null,
-            what_i_love_about_job: aboutForm.value.what_i_love_about_job?.trim() || null,
-            interests_and_hobbies: aboutForm.value.interests_and_hobbies?.trim() || null,
-        })
-        if (data?.about) {
-            aboutData.value = { ...data.about }
+        if (props.employeeId) {
+            await $api.put(`/employees/${props.employeeId}`, {
+                about: aboutForm.value.about?.trim() || null,
+                whatILoveAboutJob: aboutForm.value.what_i_love_about_job?.trim() || null,
+                interestsAndHobbies: aboutForm.value.interests_and_hobbies?.trim() || null,
+            })
+            aboutData.value = { ...aboutForm.value }
+        } else {
+            const { data } = await $api.put('/employee-profile/my/about', {
+                about: aboutForm.value.about?.trim() || null,
+                what_i_love_about_job: aboutForm.value.what_i_love_about_job?.trim() || null,
+                interests_and_hobbies: aboutForm.value.interests_and_hobbies?.trim() || null,
+            })
+            if (data?.about) {
+                aboutData.value = { ...data.about }
+            }
         }
         aboutModalOpen.value = false
         useToast().success({ title: 'Saved', message: 'About information updated.', timeout: 1500 })

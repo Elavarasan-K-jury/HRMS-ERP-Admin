@@ -24,7 +24,7 @@
             <div class="tab-content">
                 <AboutTab v-if="activeTab === 'about'" :employee="employee" />
                 <ProfileTab v-else-if="activeTab === 'profile'" :employee="employee" @updated="loadEmployee" />
-                <JobTab v-else-if="activeTab === 'job'" :employee="employee" />
+                <JobTab v-else-if="activeTab === 'job'" :employee="employee" :can-edit="false" />
                 <DocumentsTab v-else-if="activeTab === 'documents'" :employee="employee" />
             </div>
         </div>

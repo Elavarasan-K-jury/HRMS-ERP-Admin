@@ -36,6 +36,8 @@
         <div v-if="preloader" class="w-full h-screen backdrop-blur-xl bg-white/10 flex items-center justify-center">
             <UiLoader />
         </div>
+
+        <IpRestrictedModal />
     </div>
 </template>
 

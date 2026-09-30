@@ -64,6 +64,28 @@
                         {{ policy?.min_overtime_minutes ?? 0 }} min
                     </PolicyItem>
 
+                    <PolicyItem label="Allow Regularisation" icon="lucide:calendar-check">
+                        <span :class="policy?.allow_regularisation ? 'text-green-400' : 'text-red-400'">
+                            {{ (policy?.allow_regularisation ?? true) ? 'Yes' : 'No' }}
+                        </span>
+                    </PolicyItem>
+
+                    <PolicyItem label="Reg. Mode" icon="lucide:sliders-horizontal">
+                        {{ policy?.regularisation_mode || 'BOTH' }}
+                    </PolicyItem>
+
+                    <PolicyItem label="Max Reg. Requests" icon="lucide:hash">
+                        {{ policy?.max_regularisation_requests ?? 'Unlimited' }}
+                    </PolicyItem>
+
+                    <PolicyItem label="Reg. Period" icon="lucide:calendar-range">
+                        {{ policy?.regularisation_period || 'MONTHLY' }}
+                    </PolicyItem>
+
+                    <PolicyItem label="Reg. Window" icon="lucide:clock">
+                        {{ policy?.regularisation_window_days ?? '—' }} days
+                    </PolicyItem>
+
                 </div>
             </div>
         </template>

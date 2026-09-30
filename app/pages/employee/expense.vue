@@ -1,4 +1,5 @@
 <template>
+    <div>
     <div class="h-[calc(100vh-4rem)] overflow-y-auto text-white p-4 glass-scroll">
         <div class="max-w-full mx-auto space-y-4 pb-10">
 
@@ -252,6 +253,7 @@
             </div>
         </div>
     </UiModal>
+    </div>
 </template>
 
 <script setup>

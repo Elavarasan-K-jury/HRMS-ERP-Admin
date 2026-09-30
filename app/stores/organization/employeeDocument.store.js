@@ -661,11 +661,11 @@ export const useEmployeeDocumentStore = defineStore('employeeDocument', {
             }
         },
 
-        async fetchEmployeeAssignments(employeeId) {
+        async fetchEmployeeAssignments(employeeId, opts = {}) {
             this.assignmentsLoading = true
             try {
                 const { $api } = useNuxtApp()
-                const { data } = await $api.get(`/employee-documents/employees/${employeeId}/assignments`, { params: { organization_id: this.organizationId } })
+                const { data } = await $api.get(`/employee-documents/employees/${employeeId}/assignments`, { params: { organization_id: opts.organization_id || this.organizationId } })
                 this.assignments = (data?.assignments || []).map(mapAssignment)
                 this.assignmentTotal = data?.total || this.assignments.length
                 return this.assignments
@@ -830,7 +830,7 @@ export const useEmployeeDocumentStore = defineStore('employeeDocument', {
             try {
                 const { $api } = useNuxtApp()
                 const params = {
-                    organization_id: this.organizationId,
+                    organization_id: opts.organization_id || this.organizationId,
                     page: opts.page ?? this.submissionPage,
                     limit: opts.limit ?? this.submissionLimit,
                 }

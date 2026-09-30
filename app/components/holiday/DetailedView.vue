@@ -22,17 +22,14 @@
 
                 <div class="border-t border-white/10 pt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div class="space-y-1">
-                        <div class="label">Region</div>
-                        <div>{{ holiday.region || '—' }}</div>
+                        <div class="label">Leave Optional</div>
+                        <div>{{ holiday.leave_optional ? 'Yes' : 'No' }}</div>
                     </div>
 
                     <div class="space-y-1">
                         <div class="label">Policy</div>
                         <div class="font-medium">
                             {{ holiday.policy?.name || holiday.policy_name || '—' }}
-                        </div>
-                        <div class="text-xs text-white/60">
-                            {{ holiday.policy?.region || holiday.policy_region || '' }}
                         </div>
                     </div>
 

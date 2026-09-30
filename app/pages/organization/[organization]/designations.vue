@@ -23,8 +23,8 @@
         </template>
 
         <template #footer>
-            <UiButton @click="closeDepartmentModal" color="#fff" text="Cancel" prepend-icon="ion:close-circle" />
-            <UiButton @click="saveDesignation" color="#4aff7a" text="Save Organization"
+            <UiButton @click="closeDesignationModal" color="#fff" text="Cancel" prepend-icon="ion:close-circle" />
+            <UiButton @click="saveDesignation" color="#4aff7a" text="Save Designation"
                 prepend-icon="ion:save-outline" />
         </template>
     </UiSidebarModal>
@@ -34,7 +34,7 @@
         </template>
         <template #footer>
             <UiButton @click="cancelDelete" color="#fff" text="Cancel" prepend-icon="ion:close-circle" />
-            <UiButton @click="confirmDelete" color="#750d0d" text="Delete Department" prepend-icon="ion:trash" />
+            <UiButton @click="confirmDelete" color="#750d0d" text="Delete Designation" prepend-icon="ion:trash" />
         </template>
     </UiModal>
 </template>
@@ -49,9 +49,9 @@ import DesignationForm from '../../../components/designation/form.vue';
 import designationsList from '../../../constants/designations';
 import { useDepartmentStore } from '../../../stores/organization/department.store'
 import { storeToRefs } from 'pinia';
+const route = useRoute();
 definePageMeta({
     layout: 'organization',
-    key: route => route.fullPath,
 });
 const departmentStore = useDepartmentStore();
 const addUpdateModal = ref(false)
@@ -89,7 +89,7 @@ watch(search, () => {
 
 const saveDesignation = async () => {
     await designationStore.saveDesignation()
-    closeDepartmentModal()
+    closeDesignationModal()
 }
 
 const createNewDesignation = () => {
@@ -97,7 +97,7 @@ const createNewDesignation = () => {
     addUpdateModal.value = true
 }
 
-const closeDepartmentModal = () => {
+const closeDesignationModal = () => {
     formTitle.value = null
     name.value = null
     description.value = null

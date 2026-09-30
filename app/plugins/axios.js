@@ -54,7 +54,13 @@ export default defineNuxtPlugin(() => {
 
     api.interceptors.response.use(
         (res) => res,
-        (err) => Promise.reject(err)
+        (err) => {
+            if (process.client && isIpRestrictedError(err)) {
+                const { showIpRestricted } = useIpRestriction()
+                showIpRestricted()
+            }
+            return Promise.reject(err)
+        }
     )
 
     return {

@@ -1,7 +1,7 @@
 <template>
     <transition name="fade-scale">
         <div v-if="modelValue" class="fixed inset-0 z-[120] flex items-center justify-center backdrop-blur-md"
-            @click.self="close">
+            :style="{ zIndex: zIndex }" @click.self="close">
             <div class="relative w-full rounded-2xl border border-white/15
                bg-white/10 backdrop-blur-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.6)]
           transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]" :class="panelClass" :style="panelStyle">
@@ -19,7 +19,7 @@
                 </header>
 
                 <!-- Content -->
-                <section class="flex-1 overflow-y-auto px-6 py-5 glass-scroll">
+                <section class="flex-1 overflow-y-auto min-h-0 px-6 py-5 glass-scroll">
                     <slot>
                         <p class="text-white/70 text-sm">Place your content here.</p>
                     </slot>
@@ -55,9 +55,15 @@ const props = defineProps({
     /** explicit width; accepts number (px) or any CSS length (e.g., '720px', '60rem', '70vw') */
     width: { type: [Number, String], default: '' },
 
+    /** optional max height (e.g., '92vh'); when set, the panel becomes a flex
+     *  column and the content section scrolls internally so tall content never
+     *  pushes the panel outside the viewport */
+    maxHeight: { type: String, default: '' },
+
     showHeader: { type: Boolean, default: true },
     showFooter: { type: Boolean, default: true },
     showClose: { type: Boolean, default: true },
+    zIndex: { type: Number, default: 120 },
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -71,21 +77,25 @@ const resolvedWidth = computed(() => {
 
 /** class only applies when width is not provided */
 const panelClass = computed(() => {
-    if (resolvedWidth.value) return 'max-w-[95vw]'
-    return {
+    const constrained = props.maxHeight ? 'flex flex-col' : ''
+    if (resolvedWidth.value) return `max-w-[95vw] ${constrained}`.trim()
+    const preset = {
         sm: 'max-w-[420px]',
         md: 'max-w-[600px]',
         lg: 'max-w-[820px]',
     }[props.size] || 'max-w-[600px]'
+    return `${preset} ${constrained}`.trim()
 })
 
 /** inline style takes priority if width is provided */
 const panelStyle = computed(() => {
-    if (!resolvedWidth.value) return {}
-    return {
-        width: resolvedWidth.value,
-        maxWidth: '95vw',
+    const style = {}
+    if (resolvedWidth.value) {
+        style.width = resolvedWidth.value
+        style.maxWidth = '95vw'
     }
+    if (props.maxHeight) style.maxHeight = props.maxHeight
+    return style
 });
 </script>
 
